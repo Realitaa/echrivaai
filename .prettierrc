@@ -4,14 +4,11 @@
     "singleAttributePerLine": false,
     "htmlWhitespaceSensitivity": "css",
     "printWidth": 80,
-    "plugins": [
-        "prettier-plugin-tailwindcss"
-    ],
-    "tailwindFunctions": [
-        "clsx",
-        "cn",
-        "cva"
-    ],
+    "plugins": ["prettier-plugin-tailwindcss", "@prettier/plugin-php"],
+    "phpVersion": "8.3",
+    "trailingCommaPHP": true,
+    "braceStyle": "psr-2",
+    "tailwindFunctions": ["clsx", "cn", "cva"],
     "tailwindStylesheet": "resources/css/app.css",
     "tabWidth": 4,
     "overrides": [

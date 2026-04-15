@@ -19,10 +19,13 @@ class SecurityController extends Controller implements HasMiddleware
      */
     public static function middleware(): array
     {
-        return Features::canManageTwoFactorAuthentication()
-            && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
-                ? [new Middleware('password.confirm', only: ['edit'])]
-                : [];
+        return Features::canManageTwoFactorAuthentication() &&
+            Features::optionEnabled(
+                Features::twoFactorAuthentication(),
+                'confirmPassword',
+            )
+            ? [new Middleware('password.confirm', only: ['edit'])]
+            : [];
     }
 
     /**
@@ -37,8 +40,13 @@ class SecurityController extends Controller implements HasMiddleware
         if (Features::canManageTwoFactorAuthentication()) {
             $request->ensureStateIsValid();
 
-            $props['twoFactorEnabled'] = $request->user()->hasEnabledTwoFactorAuthentication();
-            $props['requiresConfirmation'] = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm');
+            $props['twoFactorEnabled'] = $request
+                ->user()
+                ->hasEnabledTwoFactorAuthentication();
+            $props['requiresConfirmation'] = Features::optionEnabled(
+                Features::twoFactorAuthentication(),
+                'confirm',
+            );
         }
 
         return Inertia::render('settings/Security', $props);
@@ -53,7 +61,10 @@ class SecurityController extends Controller implements HasMiddleware
             'password' => $request->password,
         ]);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Password updated.')]);
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Password updated.'),
+        ]);
 
         return back();
     }

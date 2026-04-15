@@ -1,2 +1,13 @@
+/vendor
+/node_modules
+/storage
+/public
+/bootstrap/cache
+/dist
+.env
+*.lock
+pnpm-workspace.yaml
+
+# Existing ignores
 resources/js/components/ui/*
 resources/views/mail/*

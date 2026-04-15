@@ -18,10 +18,11 @@ test('security page is displayed', function () {
     $this->actingAs($user)
         ->withSession(['auth.password_confirmed_at' => time()])
         ->get(route('security.edit'))
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('settings/Security')
-            ->where('canManageTwoFactor', true)
-            ->where('twoFactorEnabled', false),
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('settings/Security')
+                ->where('canManageTwoFactor', true)
+                ->where('twoFactorEnabled', false),
         );
 });
 
@@ -35,53 +36,58 @@ test('security page requires password confirmation when enabled', function () {
         'confirmPassword' => true,
     ]);
 
-    $response = $this->actingAs($user)
-        ->get(route('security.edit'));
+    $response = $this->actingAs($user)->get(route('security.edit'));
 
     $response->assertRedirect(route('password.confirm'));
 });
 
-test('security page does not require password confirmation when disabled', function () {
-    $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
+test(
+    'security page does not require password confirmation when disabled',
+    function () {
+        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
-    $user = User::factory()->create();
+        $user = User::factory()->create();
 
-    Features::twoFactorAuthentication([
-        'confirm' => true,
-        'confirmPassword' => false,
-    ]);
+        Features::twoFactorAuthentication([
+            'confirm' => true,
+            'confirmPassword' => false,
+        ]);
 
-    $this->actingAs($user)
-        ->get(route('security.edit'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('settings/Security'),
-        );
-});
+        $this->actingAs($user)
+            ->get(route('security.edit'))
+            ->assertOk()
+            ->assertInertia(
+                fn(Assert $page) => $page->component('settings/Security'),
+            );
+    },
+);
 
-test('security page renders without two factor when feature is disabled', function () {
-    $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
+test(
+    'security page renders without two factor when feature is disabled',
+    function () {
+        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
-    config(['fortify.features' => []]);
+        config(['fortify.features' => []]);
 
-    $user = User::factory()->create();
+        $user = User::factory()->create();
 
-    $this->actingAs($user)
-        ->get(route('security.edit'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('settings/Security')
-            ->where('canManageTwoFactor', false)
-            ->missing('twoFactorEnabled')
-            ->missing('requiresConfirmation'),
-        );
-});
+        $this->actingAs($user)
+            ->get(route('security.edit'))
+            ->assertOk()
+            ->assertInertia(
+                fn(Assert $page) => $page
+                    ->component('settings/Security')
+                    ->where('canManageTwoFactor', false)
+                    ->missing('twoFactorEnabled')
+                    ->missing('requiresConfirmation'),
+            );
+    },
+);
 
 test('password can be updated', function () {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->from(route('security.edit'))
         ->put(route('user-password.update'), [
             'current_password' => 'password',
@@ -99,8 +105,7 @@ test('password can be updated', function () {
 test('correct password must be provided to update password', function () {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
+    $response = $this->actingAs($user)
         ->from(route('security.edit'))
         ->put(route('user-password.update'), [
             'current_password' => 'wrong-password',
