@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\SubmissionController;
 
-Route::group(["prefix"=> "submission", 'middleware' => 'role:admin'], function () {
-    Route::get("/", [SubmissionController::class, 'index'])->name("admin.submission.index");
-    Route::get("/{submission}", [SubmissionController::class, 'show'])->name("admin.submission.show");
+Route::group(["prefix"=> "admin/submissions", 'middleware' => 'role:admin', 'as' => 'admin.submission.'], function () {
+    Route::get("/", [SubmissionController::class, 'index'])->name("index");
+    Route::get("/{submission}", [SubmissionController::class, 'show'])->name("show");
 });

@@ -71,7 +71,7 @@ class UserController extends Controller
             'message' => 'User created successfully.',
         ]);
 
-        return to_route("admin.users.index");
+        return to_route("admin.user.index");
     }
 
     /**
@@ -109,7 +109,7 @@ class UserController extends Controller
             'message' => 'User updated successfully.',
         ]);
 
-        return to_route("admin.users.index");
+        return to_route("admin.user.index");
     }
 
     /**
@@ -122,7 +122,7 @@ class UserController extends Controller
                 'type'=> 'error',
                 'message' => 'You cannot delete yourself.',
             ]);
-            return to_route("admin.users.index");
+            return to_route("admin.user.index");
         }
 
         $user->delete();
@@ -132,7 +132,7 @@ class UserController extends Controller
             'message' => 'User deleted successfully.',
         ]);
 
-        return to_route("admin.users.index");
+        return to_route("admin.user.index");
     }
 
     /**
@@ -151,6 +151,6 @@ class UserController extends Controller
             'message' => 'Teacher registration approved successfully.',
         ]);
 
-        return to_route("admin.users.index");
+        return to_route("admin.user.index");
     }
 }

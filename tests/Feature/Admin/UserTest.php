@@ -8,7 +8,7 @@ test('admin can view user list', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $this->actingAs($admin)
-        ->get(route('admin.users.index'))
+        ->get(route('admin.user.index'))
         ->assertSuccessful();
 });
 
@@ -16,7 +16,7 @@ test('non-admin cannot access user management', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $this->actingAs($user)
-        ->get(route('admin.users.index'))
+        ->get(route('admin.user.index'))
         ->assertForbidden();
 });
 
@@ -34,7 +34,7 @@ test('admin can filter users by role', function () {
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.users.index', ['role' => 'teacher']))
+        ->get(route('admin.user.index', ['role' => 'teacher']))
         ->assertInertia(fn (Assert $page) =>
             $page->where('users.data', function ($users) {
                 $names = collect($users)->pluck('name');
@@ -62,7 +62,7 @@ test('admin can filter users by role and approval', function () {
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.users.index', [
+        ->get(route('admin.user.index', [
             'role' => 'teacher',
             'is_approved' => 0,
         ]))
@@ -88,7 +88,7 @@ test('admin can search users by email', function () {
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.users.index', ['search' => 'findme']))
+        ->get(route('admin.user.index', ['search' => 'findme']))
         ->assertInertia(fn (Assert $page) =>
             $page->where('users.data', function ($users) {
                 $emails = collect($users)->pluck('email');
@@ -104,7 +104,7 @@ test('empty search return all users', function () {
     User::factory()->count(15)->create();
 
     $this->actingAs($admin)
-        ->get(route('admin.users.index', ['search' => '']))
+        ->get(route('admin.user.index', ['search' => '']))
         ->assertInertia(fn (Assert $page) =>
             $page->has('users.data', 10)
         );
@@ -115,7 +115,7 @@ test('pagination works correctly', function () {
     User::factory()->count(15)->create();
 
     $this->actingAs($admin)
-        ->get(route('admin.users.index'))
+        ->get(route('admin.user.index'))
         ->assertInertia(fn (Assert $page) =>
             $page->has('users.data', 10)
         );
@@ -126,14 +126,14 @@ test('admin can create user', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->actingAs($admin)
-        ->post(route('admin.users.store'), [
+        ->post(route('admin.user.store'), [
             'name' => 'New User',
             'email' => 'exampleemail@example.com',
             'password' => 'password',
             'role' => 'student',
         ]);
 
-    $response->assertRedirect(route('admin.users.index'));
+    $response->assertRedirect(route('admin.user.index'));
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
@@ -152,7 +152,7 @@ test('email must be unique when creating', function () {
     User::factory()->create(['email' => 'test@mail.com']);
 
     $this->actingAs($admin)
-        ->post(route('admin.users.store'), [
+        ->post(route('admin.user.store'), [
             'name' => 'Test',
             'email' => 'test@mail.com',
             'password' => 'password',
@@ -165,14 +165,14 @@ test('auto approve teacher created by admin', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->actingAs($admin)
-        ->post(route('admin.users.store'), [
+        ->post(route('admin.user.store'), [
             'name' => 'New Teacher',
             'email' => 'exampleemail@example.com',
             'password' => 'password',
             'role' => 'teacher',
         ]);
 
-    $response->assertRedirect(route('admin.users.index'));
+    $response->assertRedirect(route('admin.user.index'));
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
@@ -190,7 +190,7 @@ test('non-admin cannot create user', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $this->actingAs($user)
-        ->post(route('admin.users.store'), [])
+        ->post(route('admin.user.store'), [])
         ->assertForbidden();
 });
 
@@ -200,7 +200,7 @@ test('admin can update user', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $response = $this->actingAs($admin)
-        ->put(route('admin.users.update', $user), [
+        ->put(route('admin.user.update', $user), [
             'name' => 'Updated Name',
             'email' => 'exampleemail2@example.com',
             'password' => 'newpassword',
@@ -208,7 +208,7 @@ test('admin can update user', function () {
             'is_approved' => false,
         ]);
 
-    $response->assertRedirect(route('admin.users.index'));
+    $response->assertRedirect(route('admin.user.index'));
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
@@ -230,7 +230,7 @@ test('email must be unique when updating', function () {
     $user2 = User::factory()->create(['email' => 'b@test.com']);
 
     $this->actingAs($admin)
-        ->put(route('admin.users.update', $user2), [
+        ->put(route('admin.user.update', $user2), [
             'email' => 'a@test.com',
         ])
         ->assertSessionHasErrors('email');
@@ -243,11 +243,11 @@ test('update without password does not change password', function () {
     ]);
 
     $response = $this->actingAs($admin)
-        ->put(route('admin.users.update', $user), [
+        ->put(route('admin.user.update', $user), [
             'name' => 'Updated Name',
         ]);
 
-    $response->assertRedirect(route('admin.users.index'));
+    $response->assertRedirect(route('admin.user.index'));
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
@@ -262,7 +262,7 @@ test('non-admin cannot update user', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $this->actingAs($user)
-        ->put(route('admin.users.update', $user), [])
+        ->put(route('admin.user.update', $user), [])
         ->assertForbidden();
 });
 
@@ -272,14 +272,14 @@ test('admin can delete user', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $response = $this->actingAs($admin)
-        ->delete(route('admin.users.destroy', $user));
+        ->delete(route('admin.user.destroy', $user));
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'User deleted successfully.',
     ]);
 
-    $response->assertRedirect(route('admin.users.index'));
+    $response->assertRedirect(route('admin.user.index'));
     $this->assertDatabaseMissing('users', ['id' => $user->id]);
 });
 
@@ -287,9 +287,9 @@ test("admin can't self delete", function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->actingAs($admin)
-        ->delete(route('admin.users.destroy', $admin));
+        ->delete(route('admin.user.destroy', $admin));
 
-    $response->assertRedirect(route('admin.users.index'));
+    $response->assertRedirect(route('admin.user.index'));
 
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
@@ -303,7 +303,7 @@ test('non-admin cannot delete user', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $this->actingAs($user)
-        ->delete(route('admin.users.destroy', $user))
+        ->delete(route('admin.user.destroy', $user))
         ->assertForbidden();
 });
 
@@ -313,9 +313,9 @@ test('admin can toggle user approval', function () {
     $user = User::factory()->create(['role' => 'teacher', 'is_approved' => false]);
 
     $response = $this->actingAs($admin)
-        ->patch(route('admin.users.approve', $user));
+        ->patch(route('admin.user.approve', $user));
 
-    $response->assertRedirect(route('admin.users.index'));
+    $response->assertRedirect(route('admin.user.index'));
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
@@ -333,10 +333,10 @@ test('toggle approval twice returns to original state', function () {
     $user = User::factory()->create(['is_approved' => false]);
 
     $this->actingAs($admin)
-        ->patch(route('admin.users.approve', $user));
+        ->patch(route('admin.user.approve', $user));
 
     $this->actingAs($admin)
-        ->patch(route('admin.users.approve', $user));
+        ->patch(route('admin.user.approve', $user));
 
     expect($user->fresh()->is_approved)->toBeFalse();
 });
@@ -345,6 +345,6 @@ test('non-admin cannot toggle user approval', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $this->actingAs($user)
-        ->patch(route('admin.users.approve', $user))
+        ->patch(route('admin.user.approve', $user))
         ->assertForbidden();
 });
