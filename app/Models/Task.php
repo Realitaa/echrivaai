@@ -44,4 +44,9 @@ class Task extends Model
     {
         return $this->morphMany(File::class, 'fileable');
     }
+
+    public function hasSubmission(): bool
+    {
+        return $this->submissions()->count() > 0;
+    }
 }
