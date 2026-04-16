@@ -15,7 +15,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'class_id',
+        'classroom_id',
         'title',
         'description',
         'deadline',
@@ -25,9 +25,9 @@ class Task extends Model
         'is_published',
     ];
 
-    public function class(): BelongsTo
+    public function classroom(): BelongsTo
     {
-        return $this->belongsTo(Classes::class);
+        return $this->belongsTo(Classroom::class);
     }
 
     public function creator(): BelongsTo

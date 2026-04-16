@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Enrollment;
 use App\Models\User;
-use App\Models\Classes;
+use App\Models\Classroom;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,7 +23,7 @@ class EnrollmentFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'class_id' => Classes::factory(),
+            'classroom_id' => Classroom::factory(),
             'role' => fake()->randomElement(['student', 'teacher']),
             'joined_at' => now(),
         ];

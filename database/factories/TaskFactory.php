@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Task;
-use App\Models\Classes;
+use App\Models\Classroom;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +22,7 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            'class_id' => Classes::factory(),
+            'classroom_id' => Classroom::factory(),
             'title' => fake()->sentence(),
             'description' => fake()->paragraph(),
             'deadline' => fake()->dateTimeBetween('+1 days', '+1 month'),

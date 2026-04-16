@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Classes extends Model
+class Classroom extends Model
 {
-    /** @use HasFactory<ClassesFactory> */
+    /** @use HasFactory<\Database\Factories\ClassroomFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -33,5 +33,10 @@ class Classes extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    public function hasActiveTasks(): bool
+    {
+        return $this->tasks()->where('is_published', true)->exists();
     }
 }
