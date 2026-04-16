@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\Classroom;
 use App\Models\Task;
+use App\Models\Enrollment;
 use Inertia\Testing\AssertableInertia as Assert;
 
 // === Admin/ClassroomController.index ===
@@ -188,4 +189,56 @@ test('non-admin cannot delete classroom', function () {
     $this->actingAs($user)
         ->delete(route('admin.classroom.destroy', $classroom))
         ->assertForbidden();
+});
+
+// === Admin/ClassroomController.enrollments ===
+
+test('admin can view enrollments of a classroom', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $classroom = Classroom::factory()->create();
+
+    $users = User::factory()->count(3)->create();
+
+    foreach ($users as $user) {
+        Enrollment::factory()->create([
+            'classroom_id' => $classroom->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    $response = $this->actingAs($admin)
+        ->get(route('admin.classroom.enrollments', $classroom));
+
+    $response->assertSuccessful()
+        ->assertJsonCount(3, 'data');
+});
+
+test('non-admin cannot view enrollments', function () {
+    $user = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('admin.classroom.enrollments', $classroom))
+        ->assertForbidden();
+});
+
+test('enrollments include user data', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $classroom = Classroom::factory()->create();
+
+    $user = User::factory()->create([
+        'name' => 'TEST_USER'
+    ]);
+
+    Enrollment::factory()->create([
+        'classroom_id' => $classroom->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->actingAs($admin)
+        ->get(route('admin.classroom.enrollments', $classroom));
+
+    $response->assertJsonFragment([
+        'name' => 'TEST_USER'
+    ]);
 });

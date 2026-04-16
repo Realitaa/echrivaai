@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classroom;
+use App\Models\Enrollment;
 use Inertia\Inertia;
 
 class ClassroomController extends Controller
@@ -48,5 +49,16 @@ class ClassroomController extends Controller
         ]);
 
         return to_route('admin.classroom.index');
+    }
+
+    public function enrollments(Classroom $classroom)
+    {
+        $enrollments = $classroom->enrollments()
+        ->with('user:id,name,email')
+        ->get();
+
+        return response()->json([
+            'data' => $enrollments
+        ]);
     }
 }
