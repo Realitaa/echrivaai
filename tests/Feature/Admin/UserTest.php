@@ -99,6 +99,17 @@ test('admin can search users by email', function () {
         );
 });
 
+test('empty search return all users', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    User::factory()->count(15)->create();
+
+    $this->actingAs($admin)
+        ->get(route('admin.users.index', ['search' => '']))
+        ->assertInertia(fn (Assert $page) =>
+            $page->has('users.data', 10)
+        );
+});
+
 test('pagination works correctly', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     User::factory()->count(15)->create();
@@ -123,6 +134,12 @@ test('admin can create user', function () {
         ]);
 
     $response->assertRedirect(route('admin.users.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'User created successfully.',
+    ]);
+
     $this->assertDatabaseHas('users', [
         'email' => 'exampleemail@example.com',
         'role' => 'student',
@@ -156,6 +173,12 @@ test('auto approve teacher created by admin', function () {
         ]);
 
     $response->assertRedirect(route('admin.users.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'User created successfully.',
+    ]);
+
     $this->assertDatabaseHas('users', [
         'email' => 'exampleemail@example.com',
         'role' => 'teacher',
@@ -186,6 +209,12 @@ test('admin can update user', function () {
         ]);
 
     $response->assertRedirect(route('admin.users.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'User updated successfully.',
+    ]);
+
     $this->assertDatabaseHas('users', [
         'id' => $user->id,
         'name' => 'Updated Name',
@@ -213,10 +242,17 @@ test('update without password does not change password', function () {
         'password' => bcrypt('oldpassword')
     ]);
 
-    $this->actingAs($admin)
+    $response = $this->actingAs($admin)
         ->put(route('admin.users.update', $user), [
             'name' => 'Updated Name',
         ]);
+
+    $response->assertRedirect(route('admin.users.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'User updated successfully.',
+    ]);
 
     expect($user->fresh()->password)
         ->toBe($user->password);
@@ -238,6 +274,11 @@ test('admin can delete user', function () {
     $response = $this->actingAs($admin)
         ->delete(route('admin.users.destroy', $user));
 
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'User deleted successfully.',
+    ]);
+
     $response->assertRedirect(route('admin.users.index'));
     $this->assertDatabaseMissing('users', ['id' => $user->id]);
 });
@@ -245,9 +286,15 @@ test('admin can delete user', function () {
 test("admin can't self delete", function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
-    $this->actingAs($admin)
-        ->delete(route('admin.users.destroy', $admin))
-        ->assertRedirect(route('admin.users.index'));
+    $response = $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $admin));
+
+    $response->assertRedirect(route('admin.users.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'error',
+        'message' => 'You cannot delete yourself.',
+    ]);
 
     $this->assertDatabaseHas('users', ['id' => $admin->id]);
 });
@@ -269,6 +316,12 @@ test('admin can toggle user approval', function () {
         ->patch(route('admin.users.approve', $user));
 
     $response->assertRedirect(route('admin.users.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'Teacher registration approved successfully.',
+    ]);
+
     $this->assertDatabaseHas('users', [
         'id' => $user->id,
         'is_approved' => true,

@@ -20,7 +20,7 @@ test('admin can view classroom list table', function () {
         );
 });
 
-test('non-admin cannot access Classroom list table', function () {
+test('non-admin cannot access classroom list table', function () {
     $user = User::factory()->create(['role' => 'teacher']);
 
     $this->actingAs($user)
@@ -28,7 +28,7 @@ test('non-admin cannot access Classroom list table', function () {
         ->assertForbidden();
 });
 
-test('admin can filter Classroom by teacher_id', function () {
+test('admin can filter classroom by teacher_id', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $teacher1 = User::factory()->create(['role' => 'teacher']);
@@ -58,7 +58,7 @@ test('admin can filter Classroom by teacher_id', function () {
         );
 });
 
-test('admin can search Classroom by name', function () {
+test('admin can search classroom by name', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     Classroom::factory()->create(['name' => 'Laravel Mastery']);
@@ -76,7 +76,7 @@ test('admin can search Classroom by name', function () {
         );
 });
 
-test('admin can search Classroom by code', function () {
+test('admin can search classroom by code', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     Classroom::factory()->create([
@@ -113,7 +113,7 @@ test('filter with invalid teacher_id returns empty result', function () {
         );
 });
 
-test('empty search returns all Classroom', function () {
+test('empty search returns all classroom', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     Classroom::factory()->count(3)->create();

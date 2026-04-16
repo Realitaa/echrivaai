@@ -106,7 +106,7 @@ class UserController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'User updated.',
+            'message' => 'User updated successfully.',
         ]);
 
         return to_route("admin.users.index");
@@ -129,7 +129,7 @@ class UserController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'User deleted.',
+            'message' => 'User deleted successfully.',
         ]);
 
         return to_route("admin.users.index");
@@ -144,6 +144,11 @@ class UserController extends Controller
     {
         $user->update([
             'is_approved' => !$user->is_approved
+        ]);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Teacher registration approved successfully.',
         ]);
 
         return to_route("admin.users.index");
