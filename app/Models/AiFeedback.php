@@ -12,6 +12,8 @@ class AiFeedback extends Model
     /** @use HasFactory<AiFeedbackFactory> */
     use HasFactory;
 
+    protected $table = 'ai_feedbacks';
+
     protected $fillable = [
         'submission_id',
         'model_name',

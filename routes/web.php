@@ -15,3 +15,4 @@ require __DIR__ . '/settings.php';
 require __DIR__ . '/users.php';
 require __DIR__ . '/classroom.php';
 require __DIR__ . '/tasks.php';
+require __DIR__ . '/submission.php';
