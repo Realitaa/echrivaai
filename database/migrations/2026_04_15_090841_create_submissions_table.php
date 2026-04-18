@@ -22,13 +22,6 @@ return new class extends Migration
 
             $table->longText('content');
 
-            $table->integer('score_ai')->nullable();
-            $table->integer('score_teacher')->nullable();
-            $table->integer('final_score')->nullable();
-
-            $table->text('feedback_ai')->nullable();
-            $table->text('feedback_teacher')->nullable();
-
             $table->string('status')->default('submitted');
 
             $table->timestamp('submitted_at')->useCurrent();

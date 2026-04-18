@@ -26,8 +26,6 @@ class TaskFactory extends Factory
             'title' => fake()->sentence(),
             'description' => fake()->paragraph(),
             'deadline' => fake()->dateTimeBetween('+1 days', '+1 month'),
-            'max_score' => 100,
-            'type' => fake()->randomElement(['essay', 'quiz']),
             'created_by' => User::factory(),
             'is_published' => true,
         ];

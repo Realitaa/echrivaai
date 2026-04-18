@@ -19,8 +19,6 @@ class Task extends Model
         'title',
         'description',
         'deadline',
-        'max_score',
-        'type',
         'created_by',
         'is_published',
     ];
@@ -43,6 +41,11 @@ class Task extends Model
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function rubrics(): HasMany
+    {
+        return $this->hasMany(TaskRubric::class);
     }
 
     public function hasSubmission(): bool

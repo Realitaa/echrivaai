@@ -21,11 +21,6 @@ class Submission extends Model
         'version',
         'is_latest',
         'content',
-        'score_ai',
-        'score_teacher',
-        'final_score',
-        'feedback_ai',
-        'feedback_teacher',
         'status',
         'submitted_at',
     ];
@@ -48,6 +43,11 @@ class Submission extends Model
     public function aiFeedbacks(): HasMany
     {
         return $this->hasMany(AiFeedback::class);
+    }
+
+    public function rubricScores(): HasMany
+    {
+        return $this->hasMany(SubmissionRubricScore::class);
     }
 
     public function files(): MorphMany

@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('task_rubrics', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('classroom_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('task_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
             $table->string('title');
             $table->text('description')->nullable();
-            $table->timestamp('deadline')->nullable();
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
-            $table->boolean('is_published')->default(false);
-            
+            $table->integer('max_score');
+            $table->integer('order')->default(0);
+
             $table->timestamps();
         });
     }
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('task_rubrics');
     }
 };
