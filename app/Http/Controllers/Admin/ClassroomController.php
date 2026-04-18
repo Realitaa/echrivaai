@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classroom;
-use App\Models\Enrollment;
 use Inertia\Inertia;
 
 class ClassroomController extends Controller

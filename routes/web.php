@@ -9,10 +9,10 @@ Route::inertia('/', 'Welcome', [
 
 Route::middleware(['auth'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
-});
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/users.php';
-require __DIR__ . '/classroom.php';
-require __DIR__ . '/tasks.php';
-require __DIR__ . '/submission.php';
+    require __DIR__ . '/settings.php';
+    require __DIR__ . '/users.php';
+    require __DIR__ . '/classroom.php';
+    require __DIR__ . '/tasks.php';
+    require __DIR__ . '/submission.php';
+});
