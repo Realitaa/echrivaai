@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\Classroom;
 use App\Models\Task;
+use App\Models\Enrollment;
 use Inertia\Testing\AssertableInertia as Assert;
 
 // === INDEX ===
@@ -189,6 +190,29 @@ test('teacher can view classroom details', function () {
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) =>
             $page->where('classroom.id', $classroom->id)
+        );
+});
+
+test('teacher can view enrolled students', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create([
+        'teacher_id' => $teacher->id,
+    ]);
+
+    $student = User::factory()->create(['role' => 'student']);
+    Enrollment::factory()->create([
+        'classroom_id' => $classroom->id,
+        'user_id' => $student->id,
+    ]);
+
+    $this->actingAs($teacher)
+        ->get(route('teacher.classroom.show', $classroom))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) =>
+            $page->has('classroom.students', 1, fn (Assert $page) =>
+                $page->where('id', $student->id)
+                    ->etc()
+            )
         );
 });
 

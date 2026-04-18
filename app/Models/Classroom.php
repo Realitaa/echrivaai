@@ -35,6 +35,11 @@ class Classroom extends Model
         return $this->hasMany(Enrollment::class);
     }
 
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'enrollments', 'classroom_id', 'user_id');
+    }
+
     public function hasActiveTasks(): bool
     {
         return $this->tasks()->where('is_published', true)->exists();

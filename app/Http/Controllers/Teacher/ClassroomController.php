@@ -50,6 +50,7 @@ class ClassroomController extends Controller
     public function show(Classroom $classroom)
     {
         $classroom->loadCount(['tasks', 'enrollments']);
+        $classroom->load(['students']);
 
         return Inertia::render('teacher/classroom/Show', [
             'classroom' => $classroom,
