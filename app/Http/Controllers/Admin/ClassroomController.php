@@ -4,25 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classroom;
+use App\Services\Admin\ClassroomService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ClassroomController extends Controller
 {
-    public function index()
+    public function __construct(protected ClassroomService $classroomService)
     {
-        $classroom = Classroom::with('teacher')
-            ->when(request('teacher_id'), function ($query) {
-                $query->where('teacher_id', request('teacher_id'));
-            })
-            ->when(request('search'), function ($query) {
-                $search = request('search');
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%");
-                });
-            })
-            ->latest()
-            ->paginate(10);
+    }
+
+    public function index(Request $request)
+    {
+        $classroom = $this->classroomService->getPaginatedClassrooms($request);
 
         return Inertia::render('admin/Classroom', [
             'classroom' => $classroom,
@@ -31,7 +25,7 @@ class ClassroomController extends Controller
 
     public function destroy(Classroom $classroom)
     {
-        if ($classroom->hasActiveTasks()) {
+        if (!$this->classroomService->deleteClassroom($classroom)) {
             Inertia::flash('toast', [
                 'type' => 'error',
                 'message' => 'Classroom cannot be deleted because it has active tasks.',
@@ -39,8 +33,6 @@ class ClassroomController extends Controller
 
             return to_route('admin.classroom.index');
         }
-
-        $classroom->delete();
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -52,9 +44,7 @@ class ClassroomController extends Controller
 
     public function enrollments(Classroom $classroom)
     {
-        $enrollments = $classroom->enrollments()
-        ->with('user:id,name,email')
-        ->get();
+        $enrollments = $this->classroomService->getEnrollments($classroom);
 
         return response()->json([
             'data' => $enrollments

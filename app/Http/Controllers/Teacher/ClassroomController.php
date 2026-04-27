@@ -3,40 +3,31 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Teacher\StoreClassroomRequest;
+use App\Http\Requests\Teacher\UpdateClassroomRequest;
 use App\Models\Classroom;
-use Illuminate\Support\Str;
+use App\Services\Teacher\ClassroomService;
 use Inertia\Inertia;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
 
 class ClassroomController extends Controller
 {
+    public function __construct(protected ClassroomService $classroomService)
+    {
+    }
+
     public function index()
     {
-        $classrooms = Classroom::where('teacher_id', auth()->id())
-            ->withCount('tasks')
-            ->withCount('enrollments')
-            ->latest()
-            ->paginate(10);
+        $classrooms = $this->classroomService->getPaginatedClassrooms();
 
         return Inertia::render('teacher/classroom/Index', [
             'classrooms' => $classrooms,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreClassroomRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-        ]);
-
-        Classroom::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'teacher_id' => auth()->id(),
-            'code' => Str::random(8),
-        ]);
+        $this->classroomService->createClassroom($request->validated());
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -49,8 +40,7 @@ class ClassroomController extends Controller
     #[Authorize('view', 'classroom')]
     public function show(Classroom $classroom)
     {
-        $classroom->loadCount(['tasks', 'enrollments']);
-        $classroom->load(['students']);
+        $classroom = $this->classroomService->loadClassroomDetails($classroom);
 
         return Inertia::render('teacher/classroom/Show', [
             'classroom' => $classroom,
@@ -58,17 +48,9 @@ class ClassroomController extends Controller
     }
 
     #[Authorize('update', 'classroom')]
-    public function update(Request $request, Classroom $classroom)
+    public function update(UpdateClassroomRequest $request, Classroom $classroom)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-        ]);
-
-        $classroom->update([
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
+        $this->classroomService->updateClassroom($classroom, $request->validated());
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -81,15 +63,13 @@ class ClassroomController extends Controller
     #[Authorize('delete', 'classroom')]
     public function destroy(Classroom $classroom)
     {
-        if ($classroom->hasActiveTasks()) {
+        if (!$this->classroomService->deleteClassroom($classroom)) {
             return redirect()->route('teacher.classroom.index')
                 ->with('toast', [
                     'type' => 'error',
                     'message' => 'Classroom cannot be deleted because it has active tasks.',
                 ]);
         }
-
-        $classroom->delete();
 
         Inertia::flash('toast', [
             'type' => 'success',

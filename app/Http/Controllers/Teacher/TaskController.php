@@ -3,13 +3,19 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Teacher\StoreTaskRequest;
+use App\Http\Requests\Teacher\UpdateTaskRequest;
 use App\Models\Classroom;
 use App\Models\Task;
-use Illuminate\Http\Request;
+use App\Services\Teacher\TaskService;
 use Inertia\Inertia;
 
 class TaskController extends Controller
 {
+    public function __construct(protected TaskService $taskService)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -17,7 +23,7 @@ class TaskController extends Controller
     {
         $this->authorizeClassroomAccess($classroom);
 
-        $tasks = $classroom->tasks()->latest()->paginate(10);
+        $tasks = $this->taskService->getPaginatedTasks($classroom);
 
         return Inertia::render('teacher/task/Index', [
             'tasks' => $tasks,
@@ -27,24 +33,11 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Classroom $classroom)
+    public function store(StoreTaskRequest $request, Classroom $classroom)
     {
         $this->authorizeClassroomAccess($classroom);
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'deadline' => ['required', 'date', 'after_or_equal:today'],
-            'is_published' => ['nullable', 'boolean'],
-        ]);
-
-        $classroom->tasks()->create([
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'deadline' => $validated['deadline'],
-            'is_published' => $validated['is_published'] ?? false,
-            'created_by' => auth()->id(),
-        ]);
+        $this->taskService->createTask($classroom, $request->validated());
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -69,18 +62,11 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Classroom $classroom, Task $task)
+    public function update(UpdateTaskRequest $request, Classroom $classroom, Task $task)
     {
         $this->authorizeTaskAccess($classroom, $task);
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'deadline' => ['required', 'date', 'after_or_equal:today'],
-            'is_published' => ['nullable', 'boolean'],
-        ]);
-
-        $task->update($validated);
+        $this->taskService->updateTask($task, $request->validated());
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -97,7 +83,7 @@ class TaskController extends Controller
     {
         $this->authorizeTaskAccess($classroom, $task);
 
-        if ($task->hasSubmission()) {
+        if (!$this->taskService->deleteTask($task)) {
             Inertia::flash('toast', [
                 'type' => 'error',
                 'message' => 'Task cannot be deleted because it has submissions!',
@@ -105,8 +91,6 @@ class TaskController extends Controller
 
             return to_route('teacher.classroom.show', $classroom);
         }
-
-        $task->delete();
 
         Inertia::flash('toast', [
             'type' => 'success',
