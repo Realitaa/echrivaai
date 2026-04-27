@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\Classroom;
 use App\Models\Task;
+use App\Models\TaskRubric;
 use App\Models\Submission;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -52,6 +53,32 @@ test('teacher can create task with complete attributes', function () {
             'description' => 'This is a complete description',
             'deadline' => $deadline,
             'is_published' => true,
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+                [
+                    'title' => 'Vocabulary',
+                    'description' => 'Vocabulary is good',
+                    'max_score' => 25,
+                    'order' => 2,
+                ],
+                [
+                    'title' => 'Organization',
+                    'description' => 'Organization is good',
+                    'max_score' => 25,
+                    'order' => 3,
+                ],
+                [
+                    'title' => 'Conventions',
+                    'description' => 'Conventions is good',
+                    'max_score' => 25,
+                    'order' => 4,
+                ],
+            ],
         ]);
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
@@ -66,30 +93,192 @@ test('teacher can create task with complete attributes', function () {
         'created_by' => $teacher->id,
         'is_published' => true,
     ]);
+
+    $task = Task::where('title', 'Complete Task')->first();
+    
+    $this->assertDatabaseCount('task_rubrics', 4); 
+    $this->assertDatabaseHas('task_rubrics', [
+        'task_id' => $task->id,
+        'title' => 'Grammar',
+        'max_score' => 25,
+        'order' => 1,
+    ]);
 });
 
-test('teacher can create task with only title and deadline (draft)', function () {
+test('teacher cannot create task with negative or zero rubric max_score', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $deadline = Carbon::now()->addDays(3)->toDateTimeString();
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'max_score' => 0, 
+                    'order' => 1,
+                ],
+            ],
+        ]);
+
+    $response->assertSessionHasErrors('rubrics.0.max_score');
+});
+
+test('teacher cannot create task with missing rubric title', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
     $response = $this->actingAs($teacher)
         ->post(route('teacher.classroom.task.store', $classroom), [
-            'title' => 'Minimal Task',
-            'deadline' => $deadline,
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => '', // Kosong
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+            ],
         ]);
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
-    $response->assertInertiaFlash('toast', [
-        'type' => 'success',
-        'message' => 'Task created successfully!',
-    ]);
+    $response->assertSessionHasErrors('rubrics.0.title');
+});
 
-    $this->assertDatabaseHas('tasks', [
-        'title' => 'Minimal Task',
-        'is_published' => false, // Default dari migration
-    ]);
+test('teacher cannot create task with missing rubric description', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => '', // Kosong
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+            ],
+        ]);
+
+    $response->assertSessionHasErrors('rubrics.0.description');
+});
+
+test('teacher cannot create task with missing rubric order', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    // 'order' => 1, // Missing order
+                ],
+            ],
+        ]);
+
+    $response->assertSessionHasErrors('rubrics.0.order');
+});
+
+test('teacher cannot create task with non-integer rubric order', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    'order' => 'satu', // Non-integer
+                ],
+            ],
+        ]);
+
+    $response->assertSessionHasErrors('rubrics.0.order');
+});
+
+test('teacher cannot create task with duplicate rubric title', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+                [
+                    'title' => 'Grammar', // Duplicate title
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    'order' => 2,
+                ],
+            ],
+        ]);
+
+    $response->assertSessionHasErrors('rubrics.1.title');
+});
+
+test('teacher cannot create task with duplicate rubric order', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+                [
+                    'title' => 'Vocabulary',
+                    'description' => 'Vocabulary is good',
+                    'max_score' => 25,
+                    'order' => 1, // Duplicate order
+                ],
+            ],
+        ]);
+
+    $response->assertSessionHasErrors('rubrics.1.order');
+});
+
+
+
+test('teacher cannot create task without rubric', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $deadline = Carbon::now()->addDays(7)->toDateTimeString();
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Complete Task',
+            'description' => 'This is a complete description',
+            'deadline' => $deadline,
+            'is_published' => true,
+        ]);
+
+    $response->assertSessionHasErrors('rubrics');
 });
 
 test('teacher cannot create task without title', function () {
@@ -165,10 +354,11 @@ test('teacher cannot create task in other teacher classroom', function () {
 
 // === UPDATE ===
 
-test('teacher can update task attributes', function () {
+test('teacher can update task attributes while still a draft', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
+    TaskRubric::factory()->create(['task_id' => $task->id]);
 
     $newDeadline = Carbon::now()->addDays(10)->toDateTimeString();
 
@@ -178,6 +368,32 @@ test('teacher can update task attributes', function () {
             'description' => 'Updated description',
             'deadline' => $newDeadline,
             'is_published' => true,
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+                [
+                    'title' => 'Vocabulary',
+                    'description' => 'Vocabulary is good',
+                    'max_score' => 25,
+                    'order' => 2,
+                ],
+                [
+                    'title' => 'Organization',
+                    'description' => 'Organization is good',
+                    'max_score' => 25,
+                    'order' => 3,
+                ],
+                [
+                    'title' => 'Conventions',
+                    'description' => 'Conventions is good',
+                    'max_score' => 25,
+                    'order' => 4,
+                ],
+            ],
         ]);
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
@@ -191,6 +407,97 @@ test('teacher can update task attributes', function () {
         'title' => 'Updated Task Title',
         'deadline' => $newDeadline,
         'is_published' => true,
+    ]);
+
+    $this->assertDatabaseCount('task_rubrics', 4);
+    $this->assertDatabaseHas('task_rubrics', [
+        'task_id' => $task->id,
+        'title' => 'Grammar',
+        'max_score' => 25,
+        'order' => 1,
+    ]);
+});
+
+test('teacher can remove a rubric during task update', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
+    
+    // Asumsi task ini awalnya punya 2 rubrik
+    TaskRubric::factory()->create(['task_id' => $task->id, 'title' => 'Grammar', 'order' => 1]);
+    TaskRubric::factory()->create(['task_id' => $task->id, 'title' => 'Vocabulary', 'order' => 2]);
+
+    $this->assertDatabaseCount('task_rubrics', 2);
+
+    // Saat update, teacher HANYA mengirimkan 1 rubrik (Vocabulary dihapus)
+    $response = $this->actingAs($teacher)
+        ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
+            'title' => 'Updated Task',
+            'deadline' => Carbon::now()->addDays(10)->toDateTimeString(),
+            'is_published' => false,
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar description',
+                    'max_score' => 25,
+                    'order' => 1,
+                ]
+            ],
+        ]);
+
+    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+
+    // Pastikan di database rubriknya tinggal 1 (proses sinkronisasi berhasil membuang Vocabulary)
+    $this->assertDatabaseCount('task_rubrics', 1);
+    $this->assertDatabaseMissing('task_rubrics', [
+        'title' => 'Vocabulary',
+    ]);
+});
+
+test('teacher cannot update publised task', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => true]);
+    TaskRubric::factory()->create(['task_id' => $task->id, 'max_score' => 25]);
+    
+    $response = $this->actingAs($teacher)
+        ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
+            'title' => 'Updated Task Title',
+            'description' => 'Updated description',
+            'deadline' => Carbon::now()->addDays(10)->toDateTimeString(),
+            'is_published' => true,
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good', 
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+                [
+                    'title' => 'Vocabulary',
+                    'description' => 'Vocabulary is good',
+                    'max_score' => 25,
+                    'order' => 2,
+                ],
+                [
+                    'title' => 'Organization',
+                    'description' => 'Organization is good',
+                    'max_score' => 25,
+                    'order' => 3,
+                ],
+                [
+                    'title' => 'Conventions',
+                    'description' => 'Conventions is good',
+                    'max_score' => 25,
+                    'order' => 4,
+                ],
+            ],
+        ]);
+
+    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertInertiaFlash('toast', [
+        'type' => 'error',
+        'message' => 'You cannot update a published task!',
     ]);
 });
 
@@ -304,13 +611,12 @@ test('teacher cannot view task details from other classroom teacher', function (
         ->assertForbidden();
 });
 
-
 // === DESTROY ===
 
-test('teacher can delete task', function () {
+test('teacher can delete unpublished task', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
 
     $response = $this->actingAs($teacher)
         ->delete(route('teacher.classroom.task.destroy', [$classroom, $task]));
@@ -322,6 +628,23 @@ test('teacher can delete task', function () {
     ]);
 
     $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+});
+
+test('teacher cannot delete published task', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => true]);
+
+    $response = $this->actingAs($teacher)
+        ->delete(route('teacher.classroom.task.destroy', [$classroom, $task]));
+
+    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertInertiaFlash('toast', [
+        'type' => 'error',
+        'message' => 'You cannot delete a published task!',
+    ]);
+
+    $this->assertDatabaseHas('tasks', ['id' => $task->id]);
 });
 
 test('teacher cannot delete other teacher task', function () {
@@ -338,7 +661,7 @@ test('teacher cannot delete other teacher task', function () {
 test('teacher cannot delete task that already has submissions', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
     
     // Asumsi ada submission
     Submission::factory()->create(['task_id' => $task->id]);

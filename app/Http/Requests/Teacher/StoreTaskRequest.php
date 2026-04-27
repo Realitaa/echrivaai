@@ -8,7 +8,8 @@ class StoreTaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $classroom = $this->route('classroom');
+        return $classroom && $classroom->teacher_id === auth()->id();
     }
 
     public function rules(): array
@@ -18,6 +19,11 @@ class StoreTaskRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'deadline' => ['required', 'date', 'after_or_equal:today'],
             'is_published' => ['nullable', 'boolean'],
+            'rubrics' => ['required', 'array', 'min:1'],
+            'rubrics.*.title' => ['required', 'string', 'max:255', 'distinct'],
+            'rubrics.*.description' => ['required', 'string'],
+            'rubrics.*.max_score' => ['required', 'integer', 'min:1'],
+            'rubrics.*.order' => ['required', 'integer', 'distinct'],
         ];
     }
 }

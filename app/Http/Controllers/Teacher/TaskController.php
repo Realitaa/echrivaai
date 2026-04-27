@@ -66,6 +66,15 @@ class TaskController extends Controller
     {
         $this->authorizeTaskAccess($classroom, $task);
 
+        if ($task->is_published) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'You cannot update a published task!',
+            ]);
+
+            return to_route('teacher.classroom.show', $classroom);
+        }
+
         $this->taskService->updateTask($task, $request->validated());
 
         Inertia::flash('toast', [
@@ -82,6 +91,15 @@ class TaskController extends Controller
     public function destroy(Classroom $classroom, Task $task)
     {
         $this->authorizeTaskAccess($classroom, $task);
+
+        if ($task->is_published) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'You cannot delete a published task!',
+            ]);
+
+            return to_route('teacher.classroom.show', $classroom);
+        }
 
         if (!$this->taskService->deleteTask($task)) {
             Inertia::flash('toast', [
