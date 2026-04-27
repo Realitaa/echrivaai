@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestamp('deadline')->nullable();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->boolean('is_published')->default(false);
+            $table->integer('minimal_score')->default(85);
             
             $table->timestamps();
         });

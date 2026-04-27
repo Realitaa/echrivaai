@@ -21,6 +21,7 @@ class Task extends Model
         'deadline',
         'created_by',
         'is_published',
+        'minimal_score',
     ];
 
     public function classroom(): BelongsTo

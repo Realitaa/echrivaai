@@ -28,6 +28,7 @@ class TaskFactory extends Factory
             'deadline' => fake()->dateTimeBetween('+1 days', '+1 month'),
             'created_by' => User::factory(),
             'is_published' => true,
+            'minimal_score' => 85,
         ];
     }
 

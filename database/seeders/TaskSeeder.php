@@ -23,8 +23,7 @@ class TaskSeeder extends Seeder
             'title' => 'Write About Yourself',
             'description' => 'Write a short essay in French about yourself.',
             'deadline' => now()->addDays(7),
-            'max_score' => 100,
-            'type' => 'essay',
+            'minimal_score' => 85,
             'created_by' => $teacher->id,
             'is_published' => true,
         ]);
