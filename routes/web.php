@@ -15,4 +15,5 @@ Route::middleware(['auth'])->group(function () {
     require __DIR__ . '/classroom.php';
     require __DIR__ . '/tasks.php';
     require __DIR__ . '/submission.php';
+    require __DIR__ . '/files.php';
 });
