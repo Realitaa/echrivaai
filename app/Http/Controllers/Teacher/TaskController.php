@@ -115,7 +115,7 @@ class TaskController extends Controller
             'message' => 'Task deleted successfully!',
         ]);
 
-        return to_route('teacher.classroom.index');
+        return to_route('teacher.classroom.show', $classroom);
     }
 
     /**

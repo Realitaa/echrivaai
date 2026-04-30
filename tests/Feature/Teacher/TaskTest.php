@@ -621,7 +621,7 @@ test('teacher can delete unpublished task', function () {
     $response = $this->actingAs($teacher)
         ->delete(route('teacher.classroom.task.destroy', [$classroom, $task]));
 
-    $response->assertRedirect(route('teacher.classroom.index'));
+    $response->assertRedirect(route('teacher.classroom.show', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task deleted successfully!',
@@ -692,6 +692,10 @@ test('non-teacher cannot access teacher task routes', function () {
         
     $this->actingAs($student)
         ->put(route('teacher.classroom.task.update', [$classroom, $task]), [])
+        ->assertForbidden();
+
+    $this->actingAs($student)
+        ->delete(route('teacher.classroom.task.destroy', [$classroom, $task]))
         ->assertForbidden();
 });
 
