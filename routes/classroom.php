@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ClassroomController as AdminClassroomController;
 use App\Http\Controllers\Teacher\ClassroomController as TeacherClassroomController;
 use App\Http\Controllers\Teacher\TaskController;
 use App\Http\Controllers\Teacher\SubmissionController;
+use App\Http\Controllers\Student\ClassroomController as StudentClassroomController;
 
 Route::group(["prefix"=> "admin/classrooms", 'middleware' => ['auth', 'role:admin'], 'as' => 'admin.classroom.'], function () {
     Route::get("/", [AdminClassroomController::class, 'index'])->name("index");
@@ -32,4 +33,10 @@ Route::group(["prefix"=> "teacher/classrooms", 'middleware' => ['auth', 'role:te
             Route::put("/{submission}/feedback", [SubmissionController::class, "feedback"])->name("feedback");
         });
     });
+});
+
+Route::group(["prefix"=> "student/classrooms", 'middleware' => ['auth', 'role:student'], 'as' => 'student.classroom.'], function() {
+    Route::get("/", [StudentClassroomController::class, "index"])->name("index");
+    Route::post("/enroll", [StudentClassroomController::class, "enroll"])->name("enroll");
+    Route::get("/{classroom}", [StudentClassroomController::class, "show"])->name("show");
 });

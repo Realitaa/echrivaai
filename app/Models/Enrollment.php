@@ -30,4 +30,11 @@ class Enrollment extends Model
     {
         return $this->belongsTo(Classroom::class);
     }
+
+    public function isEnrolled($userId, $classroomId): bool
+    {
+        return Enrollment::where('user_id', $userId)
+            ->where('classroom_id', $classroomId)
+            ->exists();
+    }
 }
