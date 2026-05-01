@@ -44,4 +44,9 @@ class Classroom extends Model
     {
         return $this->tasks()->where('is_published', true)->exists();
     }
+
+    public function publishedTasks()
+    {
+        return $this->hasMany(Task::class)->where('is_published', true);
+    }
 }
