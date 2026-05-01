@@ -5,10 +5,12 @@ use App\Models\Classroom;
 use App\Models\Task;
 use App\Models\TaskRubric;
 use App\Models\Submission;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
 
-// === INDEX ===
+// === Teacher/TaskController.index ===
 
 test('teacher can view task list card inside a classroom', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
@@ -39,9 +41,100 @@ test('teacher cannot view task list from other classroom teacher', function () {
         ->assertForbidden();
 });
 
-// === STORE ===
+// === Teacher/TaskController.store ===
 
 test('teacher can create task with complete attributes', function () {
+    Storage::fake('public');
+    $file1 = UploadedFile::fake()->create('materi-tambahan.pdf', 1000);
+    $file2 = UploadedFile::fake()->create('materi-pendukung.pdf', 2000);
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $deadline = Carbon::now()->addDays(7)->toDateTimeString();
+
+    $uploadedFile1 = $this->actingAs($teacher)
+        ->postJson(route('file.upload'), [
+            'file' => $file1,
+        ])->assertSuccessful();
+
+    $uploadedFile2 = $this->actingAs($teacher)
+        ->postJson(route('file.upload'), [
+            'file' => $file2,
+        ])->assertSuccessful();
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Complete Task',
+            'description' => 'This is a complete description',
+            'deadline' => $deadline,
+            'is_published' => true,
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar is good',
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+                [
+                    'title' => 'Vocabulary',
+                    'description' => 'Vocabulary is good',
+                    'max_score' => 25,
+                    'order' => 2,
+                ],
+                [
+                    'title' => 'Organization',
+                    'description' => 'Organization is good',
+                    'max_score' => 25,
+                    'order' => 3,
+                ],
+                [
+                    'title' => 'Conventions',
+                    'description' => 'Conventions is good',
+                    'max_score' => 25,
+                    'order' => 4,
+                ],
+            ],
+            'attachments' => [
+                $uploadedFile1->json('file')['id'],
+                $uploadedFile2->json('file')['id'],
+            ],
+        ]);
+
+    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'Task created successfully!',
+    ]);
+
+    $this->assertDatabaseHas('tasks', [
+        'classroom_id' => $classroom->id,
+        'title' => 'Complete Task',
+        'created_by' => $teacher->id,
+        'is_published' => true,
+    ]);
+
+    $task = Task::where('title', 'Complete Task')->first();
+    
+    $this->assertDatabaseCount('task_rubrics', 4); 
+    $this->assertDatabaseHas('task_rubrics', [
+        'task_id' => $task->id,
+        'title' => 'Grammar',
+        'max_score' => 25,
+        'order' => 1,
+    ]);
+
+    $this->assertDatabaseCount('files', 2);
+    $this->assertDatabaseHas('files', [
+        'original_name' => 'materi-tambahan.pdf',
+        'fileable_type' => Task::class,
+    ]);
+    $this->assertDatabaseHas('files', [
+        'original_name' => 'materi-pendukung.pdf',
+        'fileable_type' => Task::class,
+    ]);
+});
+
+test('teacher can create task without a file attachment', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
@@ -352,7 +445,7 @@ test('teacher cannot create task in other teacher classroom', function () {
         ->assertForbidden();
 });
 
-// === UPDATE ===
+// === Teacher/TaskController.update ===
 
 test('teacher can update task attributes while still a draft', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
@@ -584,7 +677,7 @@ test('teacher cannot update other teacher tasks', function () {
         ->assertForbidden();
 });
 
-// === SHOW ===
+// === Teacher/TaskController.show ===
 
 test('teacher can view task details', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);

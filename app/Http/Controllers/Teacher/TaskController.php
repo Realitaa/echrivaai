@@ -37,7 +37,11 @@ class TaskController extends Controller
     {
         $this->authorizeClassroomAccess($classroom);
 
-        $this->taskService->createTask($classroom, $request->validated());
+        $task = $this->taskService->createTask($classroom, $request->validated());
+
+        if ($request->has('attachments')) {
+            $this->taskService->attachFiles($task, $request->input('attachments'));
+        }
 
         Inertia::flash('toast', [
             'type' => 'success',
