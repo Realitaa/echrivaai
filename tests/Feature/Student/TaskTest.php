@@ -62,6 +62,38 @@ test('student cannot view other student task list card', function () {
         ->assertForbidden();
 });
 
+test('student cannot view unpublished task', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $classroom = Classroom::factory()->create();
+    
+    Enrollment::factory()->create([
+        'user_id' => $student->id,
+        'classroom_id' => $classroom->id,
+    ]);
+
+    // published task
+    Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'is_published' => true,
+    ]);
+
+    // unpublished task
+    Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'is_published' => false,
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.classroom.task.index', $classroom))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) =>
+            $page->component('student/task/Index')
+                 ->where('tasks.data', function ($tasks) {
+                    return $tasks->where('is_published', true)->count() === 1;
+                 })
+        );
+});
+
 // ROUTE ACCESS
 
 test('non-student cannot access student task route', function () {
