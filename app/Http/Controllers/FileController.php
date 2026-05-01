@@ -22,6 +22,7 @@ class FileController extends Controller
         $temporaryFile = TemporaryFile::create([
             'filename' => $filename,
             'original_name' => $file->getClientOriginalName(),
+            'uploaded_by' => auth()->id(),
         ]);
 
         return response()->json([
@@ -32,6 +33,13 @@ class FileController extends Controller
 
     public function remove(TemporaryFile $file)
     {
+        if ($file->uploaded_by != auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
         Storage::disk('public')->delete('tmp/'.$file->filename);
         $file->delete();
 

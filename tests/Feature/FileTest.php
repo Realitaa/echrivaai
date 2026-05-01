@@ -10,7 +10,8 @@ beforeEach(function () {
 
 test('user can upload file to temporary folder', function () {
     $user = User::factory()->create();
-    $file = UploadedFile::fake()->create('materi-tambahan.pdf', 1000);
+    $fileOriginalName = "materi-tambahan.pdf";
+    $file = UploadedFile::fake()->create($fileOriginalName, 1000);
 
     $response = $this->actingAs($user)
         ->postJson(route('file.upload'), [
@@ -28,6 +29,10 @@ test('user can upload file to temporary folder', function () {
         ],
     ]);
 
+    $this->assertDatabaseHas('temporary_files', [
+        'uploaded_by' => $user->id,
+        'original_name' => $fileOriginalName,
+    ]);
 });
 
 test('user can remove file from temporary folder', function () {
@@ -59,6 +64,26 @@ test('user trying to upload file exceeding upload size limit should failed', fun
         ]);
 
     $response->assertJsonValidationErrors(['file']);
+});
+
+test('user cannot remove another user file from temporary folder', function () {
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
+    $file = UploadedFile::fake()->create('materi-tambahan.pdf', 1000);
+
+    $response = $this->actingAs($user1)
+        ->postJson(route('file.upload'), [
+            'file' => $file,
+        ])->assertSuccessful();
+
+    $file = $response->json('file')['id'];
+
+    $this->actingAs($user2)
+        ->deleteJson(route('file.remove', $file))->assertForbidden();
+
+    $this->assertDatabaseHas('temporary_files', [
+        'id' => $file,
+    ]);
 });
 
 test('guest trying to upload file should failed', function () {

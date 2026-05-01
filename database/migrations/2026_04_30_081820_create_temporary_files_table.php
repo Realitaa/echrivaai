@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('filename');
             $table->string('original_name');
+            $table->foreignId('uploaded_by')->constrained('users');
             $table->timestamps();
         });
     }
