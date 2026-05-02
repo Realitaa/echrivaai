@@ -4,26 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TemporaryFile;
+use App\Services\FileService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
+    public function __construct(protected FileService $fileService) 
+    {
+    }
+
     public function upload(Request $request)
     {
         $request->validate([
             'file' => 'required|file|max:20480|mimes:pdf,doc,docx,ppt,pptx,jpg,jpeg,png,gif',
         ]);
 
-        $file = $request->file('file');
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $file->storeAs('tmp/', $filename, 'public');
-
-        $temporaryFile = TemporaryFile::create([
-            'filename' => $filename,
-            'original_name' => $file->getClientOriginalName(),
-            'uploaded_by' => auth()->id(),
-        ]);
+        $temporaryFile = $this->fileService->putTempFile($request->file('file'));
 
         return response()->json([
             'success' => true,
@@ -40,8 +37,7 @@ class FileController extends Controller
             ], 403);
         }
 
-        Storage::disk('public')->delete('tmp/'.$file->filename);
-        $file->delete();
+        $this->fileService->deleteTempFileByName($file->filename);
 
         return response()->json([
             'success' => true,

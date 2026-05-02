@@ -8,12 +8,13 @@ use App\Models\Classroom;
 use App\Models\Submission;
 use App\Models\Task;
 use App\Services\Student\SubmissionService;
+use App\Services\FileService;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
 class SubmissionController extends Controller
 {
-    public function __construct(protected SubmissionService $submissionService)
+    public function __construct(protected SubmissionService $submissionService, protected FileService $fileService)
     {
     }
 
@@ -43,6 +44,11 @@ class SubmissionController extends Controller
 
         // Check deadline (now <= deadline, inclusive)
         if ($task->deadline && Carbon::now()->gt($task->deadline)) {
+            $files = $request->validated('temporary_file_ids') ?? [];
+            foreach ($files as $fileId) {
+                $this->fileService->deleteTempFileById($fileId);
+            }
+
             Inertia::flash('toast', [
                 'type'    => 'error',
                 'message' => 'The deadline for this task has passed.',
@@ -53,6 +59,11 @@ class SubmissionController extends Controller
 
         // Check no processing submission exists (concurrency lock)
         if ($this->submissionService->hasProcessingSubmission(auth()->id(), $task->id)) {
+            $files = $request->validated('temporary_file_ids') ?? [];
+            foreach ($files as $fileId) {
+                $this->fileService->deleteTempFileById($fileId);
+            }
+
             Inertia::flash('toast', [
                 'type'    => 'error',
                 'message' => 'Your previous submission is still being processed. Please wait.',
