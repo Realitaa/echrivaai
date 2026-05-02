@@ -29,6 +29,9 @@ test('user can upload file to temporary folder', function () {
         ],
     ]);
 
+    $uploadedFilename = $response->json('file.filename');
+    Storage::disk('public')->assertExists("tmp/$uploadedFilename");
+
     $this->assertDatabaseHas('temporary_files', [
         'uploaded_by' => $user->id,
         'original_name' => $fileOriginalName,
@@ -44,6 +47,9 @@ test('user can remove file from temporary folder', function () {
             'file' => $file,
         ])->assertSuccessful();
 
+    $uploadedFilename = $response->json('file.filename');
+    Storage::disk('public')->assertExists("tmp/$uploadedFilename");
+
     $file = $response->json('file')['id'];
 
     $this->actingAs($user)
@@ -52,6 +58,8 @@ test('user can remove file from temporary folder', function () {
     $this->assertDatabaseMissing('temporary_files', [
         'id' => $file,
     ]);
+
+    Storage::disk('public')->assertMissing("tmp/$uploadedFilename");
 });
 
 test('user trying to upload file exceeding upload size limit should failed', function () {
@@ -64,6 +72,9 @@ test('user trying to upload file exceeding upload size limit should failed', fun
         ]);
 
     $response->assertJsonValidationErrors(['file']);
+
+    $uploadedFilename = $response->json('file.filename');
+    Storage::disk('public')->assertMissing("tmp/$uploadedFilename");
 });
 
 test('user cannot remove another user file from temporary folder', function () {
@@ -76,6 +87,9 @@ test('user cannot remove another user file from temporary folder', function () {
             'file' => $file,
         ])->assertSuccessful();
 
+    $uploadedFilename = $response->json('file.filename');
+    Storage::disk('public')->assertExists("tmp/$uploadedFilename");
+
     $file = $response->json('file')['id'];
 
     $this->actingAs($user2)
@@ -84,6 +98,8 @@ test('user cannot remove another user file from temporary folder', function () {
     $this->assertDatabaseHas('temporary_files', [
         'id' => $file,
     ]);
+
+    Storage::disk('public')->assertExists("tmp/$uploadedFilename");
 });
 
 test('guest trying to upload file should failed', function () {
@@ -94,4 +110,7 @@ test('guest trying to upload file should failed', function () {
     ]);
 
     $response->assertUnauthorized();
+
+    $uploadedFilename = $response->json('file.filename');
+    Storage::disk('public')->assertMissing("tmp/$uploadedFilename");
 });

@@ -133,6 +133,11 @@ test('teacher can create task with complete attributes', function () {
         'original_name' => 'materi-pendukung.pdf',
         'fileable_type' => Task::class,
     ]);
+
+    Storage::disk('public')->assertExists('tasks/' . $uploadedFile1->json('file')['filename']);
+    Storage::disk('public')->assertExists('tasks/' . $uploadedFile2->json('file')['filename']);
+    Storage::disk('public')->assertMissing('tmp/' . $uploadedFile1->json('file')['filename']);
+    Storage::disk('public')->assertMissing('tmp/' . $uploadedFile2->json('file')['filename']);
 });
 
 test('teacher can create task without a file attachment', function () {

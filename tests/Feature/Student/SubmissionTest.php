@@ -42,18 +42,18 @@ function createEnrolledStudentWithTask(array $taskOverrides = []): array
     return compact('teacher', 'student', 'classroom', 'task', 'rubric1', 'rubric2');
 }
 
-// Helper: Upload multiple temporary files and return their IDs.
+// Helper: Upload multiple temporary files and return their responses.
 function uploadTemporaryFiles($testContext, User $student, int $count = 2): array
 {
-    $ids = [];
+    $responses = [];
     for ($i = 0; $i < $count; $i++) {
         $file = UploadedFile::fake()->create("essay-part-{$i}.pdf", 500);
         $uploaded = $testContext->actingAs($student)
             ->postJson(route('file.upload'), ['file' => $file])
             ->assertSuccessful();
-        $ids[] = $uploaded->json('file')['id'];
+        $responses[] = $uploaded;
     }
-    return $ids;
+    return $responses;
 }
 
 
@@ -141,7 +141,8 @@ test('student can make a submission for a task inside an enrolled classroom', fu
     SubmissionFeedbackAgent::fake();
 
     // Upload multiple temporary files owned by the student
-    $tempFileIds = uploadTemporaryFiles($this, $student, 2);
+    $uploadedFiles = uploadTemporaryFiles($this, $student, 2);
+    $tempFileIds = array_map(fn($f) => $f->json('file')['id'], $uploadedFiles);
 
     $response = $this->actingAs($student)
         ->post(route('student.classroom.task.submission.store', [$classroom, $task]), [
@@ -170,6 +171,9 @@ test('student can make a submission for a task inside an enrolled classroom', fu
         'fileable_type' => Submission::class,
         'fileable_id'   => $submission->id,
     ]);
+
+    Storage::disk('public')->assertExists('submissions/' . $uploadedFiles[0]->json('file')['filename']);
+    Storage::disk('public')->assertExists('submissions/' . $uploadedFiles[1]->json('file')['filename']);
 });
 
 test('student can make multiple submission attempts', function () {
@@ -187,7 +191,8 @@ test('student can make multiple submission attempts', function () {
         'status'    => 'graded',
     ]);
 
-    $tempFileIds = uploadTemporaryFiles($this, $student, 1);
+    $uploadedFiles = uploadTemporaryFiles($this, $student, 1);
+    $tempFileIds = array_map(fn($f) => $f->json('file')['id'], $uploadedFiles);
 
     $response = $this->actingAs($student)
         ->post(route('student.classroom.task.submission.store', [$classroom, $task]), [
@@ -208,6 +213,8 @@ test('student can make multiple submission attempts', function () {
         'is_latest' => true,
     ]);
 
+    Storage::disk('public')->assertExists('submissions/' . $uploadedFiles[0]->json('file')['filename']);
+
     // Previous submission should no longer be latest
     $this->assertDatabaseHas('submissions', [
         'user_id'   => $student->id,
@@ -227,7 +234,8 @@ test('student can make a submission EXACTLY at the deadline', function () {
 
     SubmissionFeedbackAgent::fake();
 
-    $tempFileIds = uploadTemporaryFiles($this, $student, 1);
+    $uploadedFiles = uploadTemporaryFiles($this, $student, 1);
+    $tempFileIds = array_map(fn($f) => $f->json('file')['id'], $uploadedFiles);
 
     // Freeze time exactly at the deadline
     Carbon::setTestNow($exactDeadline);
@@ -249,6 +257,8 @@ test('student can make a submission EXACTLY at the deadline', function () {
         'task_id' => $task->id,
     ]);
 
+    Storage::disk('public')->assertExists('submissions/' . $uploadedFiles[0]->json('file')['filename']);
+
     Carbon::setTestNow(); // Reset
 });
 
@@ -260,7 +270,8 @@ test('student cannot make a submission past task deadline', function () {
         'deadline' => $pastDeadline,
     ]);
 
-    $tempFileIds = uploadTemporaryFiles($this, $student, 1);
+    $uploadedFiles = uploadTemporaryFiles($this, $student, 1);
+    $tempFileIds = array_map(fn($f) => $f->json('file')['id'], $uploadedFiles);
 
     $response = $this->actingAs($student)
         ->post(route('student.classroom.task.submission.store', [$classroom, $task]), [
@@ -278,10 +289,16 @@ test('student cannot make a submission past task deadline', function () {
         'user_id' => $student->id,
         'task_id' => $task->id,
     ]);
+
+    // Temp file should be deleted
+    $this->assertDatabaseMissing('temporary_files', [
+        'id' => $uploadedFiles[0]->json('file')['id'],
+    ]);
+
+    Storage::disk('public')->assertMissing('tmp/' . $uploadedFiles[0]->json('file')['filename']);
 });
 
 test('student cannot submit using an UNOWNED or NON-EXISTENT temporary file ID', function () {
-    Storage::fake('public');
     ['student' => $student, 'classroom' => $classroom, 'task' => $task] = createEnrolledStudentWithTask();
 
     $otherStudent = User::factory()->create(['role' => 'student']);
@@ -328,7 +345,8 @@ test('student cannot make a new submission while the previous one is still being
         'status'    => 'processing',
     ]);
 
-    $tempFileIds = uploadTemporaryFiles($this, $student, 1);
+    $uploadedFiles = uploadTemporaryFiles($this, $student, 1);
+    $tempFileIds = array_map(fn($f) => $f->json('file')['id'], $uploadedFiles);
 
     $response = $this->actingAs($student)
         ->post(route('student.classroom.task.submission.store', [$classroom, $task]), [
@@ -344,6 +362,13 @@ test('student cannot make a new submission while the previous one is still being
 
     // Should still only have 1 submission
     $this->assertDatabaseCount('submissions', 1);
+
+    // Temp file should be deleted
+    $this->assertDatabaseMissing('temporary_files', [
+        'id' => $uploadedFiles[0]->json('file')['id'],
+    ]); 
+
+    Storage::disk('public')->assertMissing('tmp/' . $uploadedFiles[0]->json('file')['filename']);
 });
 
 test('submission creation triggers AI feedback service immediately', function () {
@@ -354,7 +379,8 @@ test('submission creation triggers AI feedback service immediately', function ()
     SubmissionFeedbackAgent::fake();
 
     // Upload multiple files — AI should process all of them as one submission
-    $tempFileIds = uploadTemporaryFiles($this, $student, 3);
+    $uploadedFiles = uploadTemporaryFiles($this, $student, 3);
+    $tempFileIds = array_map(fn($f) => $f->json('file')['id'], $uploadedFiles);
 
     $this->actingAs($student)
         ->post(route('student.classroom.task.submission.store', [$classroom, $task]), [
@@ -362,6 +388,10 @@ test('submission creation triggers AI feedback service immediately', function ()
             'temporary_file_ids' => $tempFileIds,
         ])
         ->assertRedirect(route('student.classroom.task.show', [$classroom, $task]));
+
+    foreach ($uploadedFiles as $uploadedFile) {
+        Storage::disk('public')->assertExists('submissions/' . $uploadedFile->json('file')['filename']);
+    }
 
     // Assert the AI agent was prompted (no draft mode — immediate call)
     SubmissionFeedbackAgent::assertPrompted(fn ($prompt) => true);
