@@ -27,6 +27,7 @@ return new class extends Migration
             $table->timestamp('submitted_at')->useCurrent();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['user_id', 'task_id', 'version']);
             $table->index(['user_id', 'task_id']);

@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ClassroomController as AdminClassroomController;
 use App\Http\Controllers\Teacher\ClassroomController as TeacherClassroomController;
 use App\Http\Controllers\Teacher\TaskController as TeacherTaskController;
-use App\Http\Controllers\Teacher\SubmissionController;
+use App\Http\Controllers\Teacher\SubmissionController as TeacherSubmissionController;
 use App\Http\Controllers\Student\ClassroomController as StudentClassroomController;
 use App\Http\Controllers\Student\TaskController as StudentTaskController;
+use App\Http\Controllers\Student\SubmissionController as StudentSubmissionController;
 
 Route::group(["prefix"=> "admin/classrooms", 'middleware' => ['auth', 'role:admin'], 'as' => 'admin.classroom.'], function () {
     Route::get("/", [AdminClassroomController::class, 'index'])->name("index");
@@ -29,9 +30,9 @@ Route::group(["prefix"=> "teacher/classrooms", 'middleware' => ['auth', 'role:te
         Route::delete("/{task}", [TeacherTaskController::class, "destroy"])->name("destroy");
 
         Route::group(["prefix" => "{task}/submissions", "as" => "submission."], function () {
-            Route::get("/", [SubmissionController::class, "index"])->name("index");
-            Route::get("/{submission}", [SubmissionController::class, "show"])->name("show");
-            Route::put("/{submission}/feedback", [SubmissionController::class, "feedback"])->name("feedback");
+            Route::get("/", [TeacherSubmissionController::class, "index"])->name("index");
+            Route::get("/{submission}", [TeacherSubmissionController::class, "show"])->name("show");
+            Route::put("/{submission}/feedback", [TeacherSubmissionController::class, "feedback"])->name("feedback");
         });
     });
 });
@@ -43,5 +44,11 @@ Route::group(["prefix"=> "student/classrooms", 'middleware' => ['auth', 'role:st
 
     Route::group(["prefix"=> "{classroom}/tasks", 'as' => 'task.'], function() {
         Route::get("/", [StudentTaskController::class, "index"])->name("index");
+        Route::get("/{task}", [StudentTaskController::class, "show"])->name("show");
+
+        Route::group(["prefix"=> "{task}/submissions", 'as' => 'submission.'], function() {
+            Route::get("/{submission}", [StudentSubmissionController::class, "show"])->name("show");
+            Route::post("/", [StudentSubmissionController::class, "store"])->name("store");
+        });
     });
 });
