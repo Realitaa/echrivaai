@@ -5,6 +5,7 @@ use App\Models\Classroom;
 use App\Models\Task;
 use App\Models\TaskRubric;
 use App\Models\Submission;
+use App\Models\TemporaryFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
@@ -100,7 +101,7 @@ test('teacher can create task with complete attributes', function () {
             ],
         ]);
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task created successfully!',
@@ -174,7 +175,7 @@ test('teacher can create task without a file attachment', function () {
             ],
         ]);
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task created successfully!',
@@ -196,6 +197,38 @@ test('teacher can create task without a file attachment', function () {
         'max_score' => 25,
         'order' => 1,
     ]);
+});
+
+test('teacher cannot create task using invalid or unowned temporary file id', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $otherUser = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+    
+    $unownedFile = TemporaryFile::create([
+        'filename' => 'some-file.pdf',
+        'original_name' => 'some-file.pdf',
+        'uploaded_by' => $otherUser->id
+    ]);
+
+    $response = $this->actingAs($teacher)
+        ->post(route('teacher.classroom.task.store', $classroom), [
+            'title' => 'Task Title',
+            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar description',
+                    'max_score' => 25, 
+                    'order' => 1,
+                ],
+            ],
+            'attachments' => [
+                'invalid-id',
+                $unownedFile->id,
+            ],
+        ]);
+
+    $response->assertSessionHasErrors(['attachments.0', 'attachments.1']);
 });
 
 test('teacher cannot create task with negative or zero rubric max_score', function () {

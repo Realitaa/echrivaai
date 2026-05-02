@@ -48,7 +48,7 @@ class TaskController extends Controller
             'message' => 'Task created successfully!',
         ]);
 
-        return to_route('teacher.classroom.show', $classroom);
+        return to_route('teacher.classroom.task.index', $classroom);
     }
 
     /**
