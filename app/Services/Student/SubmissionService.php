@@ -2,7 +2,7 @@
 
 namespace App\Services\Student;
 
-use App\Ai\Agents\SubmissionFeedbackAgent;
+use App\Jobs\ProcessAiFeedbackJob;
 use App\Models\Submission;
 use App\Models\Task;
 use App\Models\TemporaryFile;
@@ -23,11 +23,11 @@ class SubmissionService
     }
 
     /**
-     * Create a new submission, move files, and trigger AI feedback.
+     * Create a new submission, move files, and dispatch AI feedback job.
      */
     public function createSubmission(Task $task, array $data): Submission
     {
-        return DB::transaction(function () use ($task, $data) {
+        $submission = DB::transaction(function () use ($task, $data) {
             $userId = auth()->id();
 
             // Calculate next version
@@ -57,11 +57,13 @@ class SubmissionService
             // Move temporary files to permanent storage
             $this->attachFiles($submission, $data['temporary_file_ids']);
 
-            // Trigger AI feedback
-            $this->triggerAiFeedback($submission, $task);
-
             return $submission;
         });
+
+        // Dispatch AI feedback job to queue (outside of DB transaction)
+        ProcessAiFeedbackJob::dispatch($submission);
+
+        return $submission;
     }
 
     /**
@@ -97,28 +99,6 @@ class SubmissionService
 
             $tempFile->delete();
         }
-    }
-
-    /**
-     * Trigger AI feedback processing for a submission.
-     */
-    private function triggerAiFeedback(Submission $submission, Task $task): void
-    {
-        $rubrics = $task->rubrics()->orderBy('order')->get();
-
-        // Get previous submission for progress comparison
-        $previousSubmission = Submission::where('user_id', $submission->user_id)
-            ->where('task_id', $task->id)
-            ->where('version', $submission->version - 1)
-            ->first();
-
-        $agent = new SubmissionFeedbackAgent(
-            submission: $submission,
-            rubrics: $rubrics->all(),
-            previousSubmission: $previousSubmission,
-        );
-
-        $agent->prompt($submission->content);
     }
 
     /**

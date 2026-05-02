@@ -10,7 +10,9 @@ use App\Models\AiFeedback;
 use App\Models\SubmissionRubricScore;
 use App\Models\TemporaryFile;
 use App\Ai\Agents\SubmissionFeedbackAgent;
+use App\Jobs\ProcessAiFeedbackJob;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -132,13 +134,11 @@ test('student cannot view an UNPUBLISHED task', function () {
 });
 
 
-// === Student/TaskController.show ===
+// === Student/TaskController.submission ===
 test('student can make a submission for a task inside an enrolled classroom', function () {
     Storage::fake('public');
+    Queue::fake();
     ['student' => $student, 'classroom' => $classroom, 'task' => $task] = createEnrolledStudentWithTask();
-
-    // Mock the AI Agent so no real API call is made
-    SubmissionFeedbackAgent::fake();
 
     // Upload multiple temporary files owned by the student
     $uploadedFiles = uploadTemporaryFiles($this, $student, 2);
@@ -174,13 +174,17 @@ test('student can make a submission for a task inside an enrolled classroom', fu
 
     Storage::disk('public')->assertExists('submissions/' . $uploadedFiles[0]->json('file')['filename']);
     Storage::disk('public')->assertExists('submissions/' . $uploadedFiles[1]->json('file')['filename']);
+
+    // AI processing should be dispatched to queue, not executed synchronously
+    Queue::assertPushed(ProcessAiFeedbackJob::class, function ($job) use ($submission) {
+        return $job->submission->id === $submission->id;
+    });
 });
 
 test('student can make multiple submission attempts', function () {
     Storage::fake('public');
+    Queue::fake();
     ['student' => $student, 'classroom' => $classroom, 'task' => $task] = createEnrolledStudentWithTask();
-
-    SubmissionFeedbackAgent::fake();
 
     // First submission (already graded)
     Submission::factory()->create([
@@ -226,13 +230,12 @@ test('student can make multiple submission attempts', function () {
 
 test('student can make a submission EXACTLY at the deadline', function () {
     Storage::fake('public');
+    Queue::fake();
     $exactDeadline = Carbon::create(2026, 6, 1, 23, 59, 59);
 
     ['student' => $student, 'classroom' => $classroom, 'task' => $task] = createEnrolledStudentWithTask([
         'deadline' => $exactDeadline,
     ]);
-
-    SubmissionFeedbackAgent::fake();
 
     $uploadedFiles = uploadTemporaryFiles($this, $student, 1);
     $tempFileIds = array_map(fn($f) => $f->json('file')['id'], $uploadedFiles);
@@ -371,12 +374,10 @@ test('student cannot make a new submission while the previous one is still being
     Storage::disk('public')->assertMissing('tmp/' . $uploadedFiles[0]->json('file')['filename']);
 });
 
-test('submission creation triggers AI feedback service immediately', function () {
+test('submission creation dispatches AI feedback job to queue', function () {
     Storage::fake('public');
+    Queue::fake();
     ['student' => $student, 'classroom' => $classroom, 'task' => $task] = createEnrolledStudentWithTask();
-
-    // Fake the agent and prepare to assert it gets called
-    SubmissionFeedbackAgent::fake();
 
     // Upload multiple files — AI should process all of them as one submission
     $uploadedFiles = uploadTemporaryFiles($this, $student, 3);
@@ -393,16 +394,158 @@ test('submission creation triggers AI feedback service immediately', function ()
         Storage::disk('public')->assertExists('submissions/' . $uploadedFile->json('file')['filename']);
     }
 
-    // Assert the AI agent was prompted (no draft mode — immediate call)
-    SubmissionFeedbackAgent::assertPrompted(fn ($prompt) => true);
+    // Assert the AI feedback job was dispatched to queue (not executed synchronously)
+    Queue::assertPushed(ProcessAiFeedbackJob::class, 1);
 
     // All 3 files should be attached to the submission
     $submission = Submission::where('user_id', $student->id)->where('task_id', $task->id)->first();
     $this->assertCount(3, $submission->files);
+
+    // Status should still be 'processing' since job hasn't run yet
+    expect($submission->status)->toBe('processing');
 });
 
 
-// === Student/TaskController.submission.show ===
+// === ProcessAiFeedbackJob Integration Tests ===
+
+test('AI feedback job processes submission and saves feedback with rubric scores to database', function () {
+    ['student' => $student, 'classroom' => $classroom, 'task' => $task, 'rubric1' => $rubric1, 'rubric2' => $rubric2] = createEnrolledStudentWithTask();
+
+    $submission = Submission::factory()->create([
+        'user_id' => $student->id,
+        'task_id' => $task->id,
+        'version' => 1,
+        'is_latest' => true,
+        'status' => 'processing',
+        'content' => 'This is my essay about climate change.',
+    ]);
+
+    // Fake the AI agent with a structured response (wrapped in array as list of responses)
+    SubmissionFeedbackAgent::fake([[
+        'feedback'       => 'Great essay! Your arguments are well-structured.',
+        'score'          => 85,
+        'rubric_scores'  => [
+            ['rubric_id' => $rubric1->id, 'score' => 22, 'feedback' => 'Excellent grammar usage.'],
+            ['rubric_id' => $rubric2->id, 'score' => 20, 'feedback' => 'Good vocabulary range.'],
+        ],
+        'progress_label' => 'Tetap',
+    ]]);
+
+    // Execute the job directly
+    (new ProcessAiFeedbackJob($submission))->handle();
+
+    // Verify submission status transitioned to 'graded'
+    $submission->refresh();
+    expect($submission->status)->toBe('graded');
+
+    // Verify AI feedback was saved to database
+    $this->assertDatabaseHas('ai_feedbacks', [
+        'submission_id' => $submission->id,
+        'result'        => 'Great essay! Your arguments are well-structured.',
+        'score'         => 85,
+    ]);
+
+    // Verify rubric scores were saved
+    $this->assertDatabaseHas('submission_rubric_scores', [
+        'submission_id'  => $submission->id,
+        'task_rubric_id' => $rubric1->id,
+        'score_ai'       => 22,
+        'feedback_ai'    => 'Excellent grammar usage.',
+    ]);
+    $this->assertDatabaseHas('submission_rubric_scores', [
+        'submission_id'  => $submission->id,
+        'task_rubric_id' => $rubric2->id,
+        'score_ai'       => 20,
+        'feedback_ai'    => 'Good vocabulary range.',
+    ]);
+});
+
+test('AI feedback job transitions submission to failed status when AI agent throws an exception', function () {
+    ['student' => $student, 'task' => $task] = createEnrolledStudentWithTask();
+
+    $submission = Submission::factory()->create([
+        'user_id' => $student->id,
+        'task_id' => $task->id,
+        'version' => 1,
+        'is_latest' => true,
+        'status' => 'processing',
+        'content' => 'Essay that will cause AI failure.',
+    ]);
+
+    // Fake the AI agent to throw an exception
+    SubmissionFeedbackAgent::fake(fn () => throw new \RuntimeException('AI Provider Quota Exceeded'));
+
+    // Execute the job — it should handle the exception gracefully
+    (new ProcessAiFeedbackJob($submission))->handle();
+
+    // Verify submission status transitioned to 'failed'
+    $submission->refresh();
+    expect($submission->status)->toBe('failed');
+
+    // No AI feedback should be saved
+    $this->assertDatabaseMissing('ai_feedbacks', [
+        'submission_id' => $submission->id,
+    ]);
+
+    // Submission data itself should still exist (not rolled back)
+    $this->assertDatabaseHas('submissions', [
+        'id' => $submission->id,
+    ]);
+});
+
+test('AI feedback job includes previous submission context for comparison on version 2+', function () {
+    ['student' => $student, 'task' => $task, 'rubric1' => $rubric1, 'rubric2' => $rubric2] = createEnrolledStudentWithTask();
+
+    // Version 1 (graded, score 70)
+    $sub1 = Submission::factory()->create([
+        'user_id' => $student->id,
+        'task_id' => $task->id,
+        'version' => 1,
+        'is_latest' => false,
+        'status' => 'graded',
+        'content' => 'First attempt essay.',
+    ]);
+    AiFeedback::factory()->create(['submission_id' => $sub1->id, 'score' => 70, 'result' => 'Needs improvement.']);
+
+    // Version 2 (processing)
+    $sub2 = Submission::factory()->create([
+        'user_id' => $student->id,
+        'task_id' => $task->id,
+        'version' => 2,
+        'is_latest' => true,
+        'status' => 'processing',
+        'content' => 'Revised and improved essay.',
+    ]);
+
+    // Fake the AI agent — it should receive previous submission context (wrapped in array as list of responses)
+    SubmissionFeedbackAgent::fake([[
+        'feedback'       => 'Much better! Great improvement from previous attempt.',
+        'score'          => 88,
+        'rubric_scores'  => [
+            ['rubric_id' => $rubric1->id, 'score' => 23, 'feedback' => 'Improved grammar.'],
+            ['rubric_id' => $rubric2->id, 'score' => 22, 'feedback' => 'Better vocabulary.'],
+        ],
+        'progress_label' => 'Meningkat',
+    ]]);
+
+    // Execute the job
+    (new ProcessAiFeedbackJob($sub2))->handle();
+
+    // Verify the submission was graded with correct score
+    $sub2->refresh();
+    expect($sub2->status)->toBe('graded');
+
+    $this->assertDatabaseHas('ai_feedbacks', [
+        'submission_id' => $sub2->id,
+        'score'         => 88,
+    ]);
+
+    // Verify the AI agent was prompted (it was called via the job)
+    SubmissionFeedbackAgent::assertPrompted(fn ($prompt) => $prompt->contains('Revised and improved essay.'));
+});
+
+
+// === Student/TaskController.submission ===
 test('student can view specific submission details via AJAX', function () {
     ['student' => $student, 'classroom' => $classroom, 'task' => $task] = createEnrolledStudentWithTask();
 
