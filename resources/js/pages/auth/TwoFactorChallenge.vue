@@ -83,7 +83,10 @@ const code = ref<string>('');
                     </div>
                     <InputError :message="errors.code" />
                 </div>
-                <Button type="submit" class="w-full" :disabled="processing"
+                <Button
+                    type="submit"
+                    class="w-full bg-purple-600 text-white hover:bg-purple-700"
+                    :disabled="processing"
                     >Continue</Button
                 >
                 <div class="text-center text-sm text-muted-foreground">
@@ -114,7 +117,10 @@ const code = ref<string>('');
                     required
                 />
                 <InputError :message="errors.recovery_code" />
-                <Button type="submit" class="w-full" :disabled="processing"
+                <Button
+                    type="submit"
+                    class="w-full bg-purple-600 text-white hover:bg-purple-700"
+                    :disabled="processing"
                     >Continue</Button
                 >
 

@@ -48,7 +48,7 @@ defineProps<{
 
             <div class="my-6 flex items-center justify-start">
                 <Button
-                    class="w-full"
+                    class="w-full bg-purple-600 text-white hover:bg-purple-700"
                     :disabled="processing"
                     data-test="email-password-reset-link-button"
                 >
