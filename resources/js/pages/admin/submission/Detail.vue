@@ -1,3 +1,3 @@
 <template>
-  Ini adalah halaman detail submission lengkap dengan feedback AI
+    Ini adalah halaman detail submission lengkap dengan feedback AI
 </template>

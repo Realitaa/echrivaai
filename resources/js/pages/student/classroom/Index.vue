@@ -1,8 +1,5 @@
 <template>
-  <div>
-    Student Classroom Index
-  </div>
+    <div>Student Classroom Index</div>
 </template>
 
-<script setup>
-</script>
+<script setup lang="ts"></script>

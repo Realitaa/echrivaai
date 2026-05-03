@@ -1,8 +1,5 @@
 <template>
-  <div>
-    Student Classroom Show
-  </div>
+    <div>Student Classroom Show</div>
 </template>
 
-<script setup>
-</script>
+<script setup lang="ts"></script>

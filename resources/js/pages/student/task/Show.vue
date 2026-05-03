@@ -1,8 +1,8 @@
 <script setup lang="ts">
 defineProps<{
-    task: object
-    submissions: Array<object>
-}>()
+    task: object;
+    submissions: Array<object>;
+}>();
 </script>
 
 <template>

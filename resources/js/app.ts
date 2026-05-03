@@ -1,5 +1,6 @@
-import { createInertiaApp } from '@inertiajs/vue3';
-import { initializeTheme } from '@/composables/useAppearance';
+import { createInertiaApp, router } from '@inertiajs/vue3';
+import { initializeTheme, updateTheme } from '@/composables/useAppearance';
+import type { Appearance } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
@@ -28,6 +29,18 @@ createInertiaApp({
 
 // This will set light / dark mode on page load...
 initializeTheme();
+
+router.on('navigate', (event) => {
+    const isAuth = event.detail.page.component.startsWith('auth/');
+    const isWelcome = event.detail.page.component === 'Welcome';
+
+    if (isAuth || isWelcome) {
+        document.documentElement.classList.remove('dark');
+    } else {
+        const savedAppearance = localStorage.getItem('appearance');
+        updateTheme((savedAppearance as Appearance) || 'system');
+    }
+});
 
 // This will listen for flash toast data from the server...
 initializeFlashToast();
