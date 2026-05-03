@@ -12,9 +12,7 @@ use Illuminate\Routing\Attributes\Controllers\Authorize;
 
 class ClassroomController extends Controller
 {
-    public function __construct(protected ClassroomService $classroomService)
-    {
-    }
+    public function __construct(protected ClassroomService $classroomService) {}
 
     public function index()
     {
@@ -48,9 +46,14 @@ class ClassroomController extends Controller
     }
 
     #[Authorize('update', 'classroom')]
-    public function update(UpdateClassroomRequest $request, Classroom $classroom)
-    {
-        $this->classroomService->updateClassroom($classroom, $request->validated());
+    public function update(
+        UpdateClassroomRequest $request,
+        Classroom $classroom,
+    ) {
+        $this->classroomService->updateClassroom(
+            $classroom,
+            $request->validated(),
+        );
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -64,10 +67,12 @@ class ClassroomController extends Controller
     public function destroy(Classroom $classroom)
     {
         if (!$this->classroomService->deleteClassroom($classroom)) {
-            return redirect()->route('teacher.classroom.index')
+            return redirect()
+                ->route('teacher.classroom.index')
                 ->with('toast', [
                     'type' => 'error',
-                    'message' => 'Classroom cannot be deleted because it has active tasks.',
+                    'message' =>
+                        'Classroom cannot be deleted because it has active tasks.',
                 ]);
         }
 

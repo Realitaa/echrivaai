@@ -17,7 +17,8 @@ class SubmissionService
     {
         return DB::transaction(function () use ($submission, $data) {
             foreach ($data['rubrics'] as $rubricData) {
-                $submission->rubricScores()
+                $submission
+                    ->rubricScores()
                     ->where('task_rubric_id', $rubricData['task_rubric_id'])
                     ->update([
                         'score_teacher' => $rubricData['score_teacher'],

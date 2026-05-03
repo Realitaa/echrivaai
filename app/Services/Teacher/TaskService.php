@@ -64,7 +64,6 @@ class TaskService
         return true;
     }
 
-    
     public function attachFiles(Task $task, array $fileIds)
     {
         foreach ($fileIds as $fileId) {
@@ -84,12 +83,14 @@ class TaskService
                 if (Storage::disk('public')->exists($oldPath)) {
                     Storage::disk('public')->move($oldPath, $newPath);
                 }
-                
+
                 $task->files()->create([
                     'path' => $newPath,
                     'filename' => $tempFile->filename,
                     'original_name' => $tempFile->original_name,
-                    'mime_type' => Storage::disk('public')->mimeType($newPath) ?? 'application/octet-stream',
+                    'mime_type' =>
+                        Storage::disk('public')->mimeType($newPath) ??
+                        'application/octet-stream',
                     'size' => Storage::disk('public')->size($newPath) ?? 0,
                     'uploaded_by' => auth()->id(),
                 ]);

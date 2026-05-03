@@ -32,25 +32,31 @@ class SubmissionRubricScoreFactory extends Factory
 
     public function aiOnly(): static
     {
-        return $this->state(fn () => [
-            'score_teacher' => null,
-            'feedback_teacher' => null,
-        ]);
+        return $this->state(
+            fn() => [
+                'score_teacher' => null,
+                'feedback_teacher' => null,
+            ],
+        );
     }
 
     public function teacherOnly(): static
     {
-        return $this->state(fn () => [
-            'score_ai' => null,
-            'feedback_ai' => null,
-        ]);
+        return $this->state(
+            fn() => [
+                'score_ai' => null,
+                'feedback_ai' => null,
+            ],
+        );
     }
 
     public function reviewed(): static
     {
-        return $this->state(fn () => [
-            'score_teacher' => fake()->numberBetween(0, 40),
-            'feedback_teacher' => fake()->sentence(),
-        ]);
+        return $this->state(
+            fn() => [
+                'score_teacher' => fake()->numberBetween(0, 40),
+                'feedback_teacher' => fake()->sentence(),
+            ],
+        );
     }
 }

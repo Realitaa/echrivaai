@@ -16,8 +16,11 @@ class ClassroomService
             ->when($request->search, function ($query) use ($request) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%");
+                    $q->where('name', 'like', "%{$search}%")->orWhere(
+                        'code',
+                        'like',
+                        "%{$search}%",
+                    );
                 });
             })
             ->latest()
@@ -37,8 +40,6 @@ class ClassroomService
 
     public function getEnrollments(Classroom $classroom)
     {
-        return $classroom->enrollments()
-            ->with('user:id,name,email')
-            ->get();
+        return $classroom->enrollments()->with('user:id,name,email')->get();
     }
 }

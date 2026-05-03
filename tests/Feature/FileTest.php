@@ -10,23 +10,18 @@ beforeEach(function () {
 
 test('user can upload file to temporary folder', function () {
     $user = User::factory()->create();
-    $fileOriginalName = "materi-tambahan.pdf";
+    $fileOriginalName = 'materi-tambahan.pdf';
     $file = UploadedFile::fake()->create($fileOriginalName, 1000);
 
-    $response = $this->actingAs($user)
-        ->postJson(route('file.upload'), [
-            'file' => $file,
-        ]);
+    $response = $this->actingAs($user)->postJson(route('file.upload'), [
+        'file' => $file,
+    ]);
 
     $response->assertSuccessful();
 
     $response->assertJsonStructure([
         'success',
-        'file' => [
-            'id',
-            'filename',
-            'original_name',
-        ],
+        'file' => ['id', 'filename', 'original_name'],
     ]);
 
     $uploadedFilename = $response->json('file.filename');
@@ -45,7 +40,8 @@ test('user can remove file from temporary folder', function () {
     $response = $this->actingAs($user)
         ->postJson(route('file.upload'), [
             'file' => $file,
-        ])->assertSuccessful();
+        ])
+        ->assertSuccessful();
 
     $uploadedFilename = $response->json('file.filename');
     Storage::disk('public')->assertExists("tmp/$uploadedFilename");
@@ -53,7 +49,8 @@ test('user can remove file from temporary folder', function () {
     $file = $response->json('file')['id'];
 
     $this->actingAs($user)
-        ->deleteJson(route('file.remove', $file))->assertSuccessful();
+        ->deleteJson(route('file.remove', $file))
+        ->assertSuccessful();
 
     $this->assertDatabaseMissing('temporary_files', [
         'id' => $file,
@@ -62,20 +59,22 @@ test('user can remove file from temporary folder', function () {
     Storage::disk('public')->assertMissing("tmp/$uploadedFilename");
 });
 
-test('user trying to upload file exceeding upload size limit should failed', function () {
-    $user = User::factory()->create();
-    $file = UploadedFile::fake()->create('materi-tambahan.pdf', 25000);
+test(
+    'user trying to upload file exceeding upload size limit should failed',
+    function () {
+        $user = User::factory()->create();
+        $file = UploadedFile::fake()->create('materi-tambahan.pdf', 25000);
 
-    $response = $this->actingAs($user)
-        ->postJson(route('file.upload'), [
+        $response = $this->actingAs($user)->postJson(route('file.upload'), [
             'file' => $file,
         ]);
 
-    $response->assertJsonValidationErrors(['file']);
+        $response->assertJsonValidationErrors(['file']);
 
-    $uploadedFilename = $response->json('file.filename');
-    Storage::disk('public')->assertMissing("tmp/$uploadedFilename");
-});
+        $uploadedFilename = $response->json('file.filename');
+        Storage::disk('public')->assertMissing("tmp/$uploadedFilename");
+    },
+);
 
 test('user cannot remove another user file from temporary folder', function () {
     $user1 = User::factory()->create();
@@ -85,7 +84,8 @@ test('user cannot remove another user file from temporary folder', function () {
     $response = $this->actingAs($user1)
         ->postJson(route('file.upload'), [
             'file' => $file,
-        ])->assertSuccessful();
+        ])
+        ->assertSuccessful();
 
     $uploadedFilename = $response->json('file.filename');
     Storage::disk('public')->assertExists("tmp/$uploadedFilename");
@@ -93,7 +93,8 @@ test('user cannot remove another user file from temporary folder', function () {
     $file = $response->json('file')['id'];
 
     $this->actingAs($user2)
-        ->deleteJson(route('file.remove', $file))->assertForbidden();
+        ->deleteJson(route('file.remove', $file))
+        ->assertForbidden();
 
     $this->assertDatabaseHas('temporary_files', [
         'id' => $file,

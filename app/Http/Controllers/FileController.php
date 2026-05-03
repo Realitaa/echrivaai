@@ -10,17 +10,18 @@ use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
-    public function __construct(protected FileService $fileService) 
-    {
-    }
+    public function __construct(protected FileService $fileService) {}
 
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:20480|mimes:pdf,doc,docx,ppt,pptx,jpg,jpeg,png,gif',
+            'file' =>
+                'required|file|max:20480|mimes:pdf,doc,docx,ppt,pptx,jpg,jpeg,png,gif',
         ]);
 
-        $temporaryFile = $this->fileService->putTempFile($request->file('file'));
+        $temporaryFile = $this->fileService->putTempFile(
+            $request->file('file'),
+        );
 
         return response()->json([
             'success' => true,
@@ -31,10 +32,13 @@ class FileController extends Controller
     public function remove(TemporaryFile $file)
     {
         if ($file->uploaded_by != auth()->id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-            ], 403);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ],
+                403,
+            );
         }
 
         $this->fileService->deleteTempFileByName($file->filename);

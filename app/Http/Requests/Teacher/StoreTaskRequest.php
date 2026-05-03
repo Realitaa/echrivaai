@@ -27,7 +27,10 @@ class StoreTaskRequest extends FormRequest
             'attachments' => ['nullable', 'array'],
             'attachments.*' => [
                 'required',
-                \Illuminate\Validation\Rule::exists('temporary_files', 'id')->where(function ($query) {
+                \Illuminate\Validation\Rule::exists(
+                    'temporary_files',
+                    'id',
+                )->where(function ($query) {
                     $query->where('uploaded_by', auth()->id());
                 }),
             ],

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +13,10 @@ return new class extends Migration
         Schema::create('ai_feedbacks', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('submission_id')->constrained()->cascadeOnDelete();
+            $table
+                ->foreignId('submission_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->string('model_name')->nullable();
             $table->longText('prompt')->nullable();
@@ -22,7 +24,7 @@ return new class extends Migration
 
             $table->integer('score')->nullable();
             $table->integer('tokens_used')->nullable();
-            
+
             $table->timestamps();
         });
     }

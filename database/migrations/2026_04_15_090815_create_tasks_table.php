@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,10 +17,13 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->timestamp('deadline')->nullable();
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table
+                ->foreignId('created_by')
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->boolean('is_published')->default(false);
             $table->integer('minimal_score')->default(85);
-            
+
             $table->timestamps();
         });
     }

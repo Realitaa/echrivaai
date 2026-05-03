@@ -18,9 +18,10 @@ test('admin can view submission list table', function () {
     $this->actingAs($admin)
         ->get(route('admin.submission.index'))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('admin/submission/Index')
-                 ->has('submissions.data', 5)
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('admin/submission/Index')
+                ->has('submissions.data', 5),
         );
 });
 
@@ -32,7 +33,6 @@ test('non-admin cannot access submission list table', function () {
         ->assertForbidden();
 });
 
-
 // === Admin/SubmissionController.show ===
 
 test('admin can view submission detail with ai feedback', function () {
@@ -40,17 +40,20 @@ test('admin can view submission detail with ai feedback', function () {
 
     $submission = Submission::factory()->create();
 
-    AiFeedback::factory()->count(2)->create([
-        'submission_id' => $submission->id
-    ]);
+    AiFeedback::factory()
+        ->count(2)
+        ->create([
+            'submission_id' => $submission->id,
+        ]);
 
     $this->actingAs($admin)
         ->get(route('admin.submission.show', $submission))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('admin/submission/Detail')
-                 ->where('submission.id', $submission->id)
-                 ->has('submission.ai_feedbacks', 2)
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('admin/submission/Detail')
+                ->where('submission.id', $submission->id)
+                ->has('submission.ai_feedbacks', 2),
         );
 });
 
@@ -79,8 +82,8 @@ test('submission detail works without ai feedback', function () {
 
     $this->actingAs($admin)
         ->get(route('admin.submission.show', $submission))
-        ->assertInertia(fn (Assert $page) =>
-            $page->has('submission.ai_feedbacks', 0)
+        ->assertInertia(
+            fn(Assert $page) => $page->has('submission.ai_feedbacks', 0),
         );
 });
 

@@ -31,9 +31,10 @@ class SubmissionService
             $userId = auth()->id();
 
             // Calculate next version
-            $latestVersion = Submission::where('user_id', $userId)
-                ->where('task_id', $task->id)
-                ->max('version') ?? 0;
+            $latestVersion =
+                Submission::where('user_id', $userId)
+                    ->where('task_id', $task->id)
+                    ->max('version') ?? 0;
 
             $nextVersion = $latestVersion + 1;
 
@@ -45,12 +46,12 @@ class SubmissionService
 
             // Create the submission
             $submission = Submission::create([
-                'user_id'      => $userId,
-                'task_id'      => $task->id,
-                'version'      => $nextVersion,
-                'is_latest'    => true,
-                'content'      => $data['content'],
-                'status'       => 'processing',
+                'user_id' => $userId,
+                'task_id' => $task->id,
+                'version' => $nextVersion,
+                'is_latest' => true,
+                'content' => $data['content'],
+                'status' => 'processing',
                 'submitted_at' => now(),
             ]);
 
@@ -69,11 +70,13 @@ class SubmissionService
     /**
      * Move temporary files to permanent storage and attach to submission.
      */
-    private function attachFiles(Submission $submission, array $tempFileIds): void
-    {
+    private function attachFiles(
+        Submission $submission,
+        array $tempFileIds,
+    ): void {
         foreach ($tempFileIds as $tempFileId) {
             $tempFile = TemporaryFile::find($tempFileId);
-            if (! $tempFile) {
+            if (!$tempFile) {
                 continue;
             }
 
@@ -85,16 +88,17 @@ class SubmissionService
             }
 
             $submission->files()->create([
-                'path'          => $newPath,
-                'filename'      => $tempFile->filename,
+                'path' => $newPath,
+                'filename' => $tempFile->filename,
                 'original_name' => $tempFile->original_name,
-                'mime_type'     => Storage::disk('public')->exists($newPath)
-                    ? (Storage::disk('public')->mimeType($newPath) ?? 'application/octet-stream')
+                'mime_type' => Storage::disk('public')->exists($newPath)
+                    ? Storage::disk('public')->mimeType($newPath) ??
+                        'application/octet-stream'
                     : 'application/octet-stream',
-                'size'          => Storage::disk('public')->exists($newPath)
-                    ? (Storage::disk('public')->size($newPath) ?? 0)
+                'size' => Storage::disk('public')->exists($newPath)
+                    ? Storage::disk('public')->size($newPath) ?? 0
                     : 0,
-                'uploaded_by'   => auth()->id(),
+                'uploaded_by' => auth()->id(),
             ]);
 
             $tempFile->delete();
@@ -111,7 +115,10 @@ class SubmissionService
         $progress = null;
 
         if ($submission->version > 1) {
-            $previousSubmission = Submission::where('user_id', $submission->user_id)
+            $previousSubmission = Submission::where(
+                'user_id',
+                $submission->user_id,
+            )
                 ->where('task_id', $submission->task_id)
                 ->where('version', $submission->version - 1)
                 ->first();
@@ -131,15 +138,15 @@ class SubmissionService
 
                 $progress = [
                     'previous_score' => $previousScore,
-                    'current_score'  => $currentScore,
-                    'label'          => $label,
+                    'current_score' => $currentScore,
+                    'label' => $label,
                 ];
             }
         }
 
         return [
             'submission' => $submission,
-            'progress'   => $progress,
+            'progress' => $progress,
         ];
     }
 }

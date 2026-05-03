@@ -6,9 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class TemporaryFile extends Model
 {
-    protected $fillable = [
-        'filename',
-        'original_name',
-        'uploaded_by'
-    ];
+    protected $fillable = ['filename', 'original_name', 'uploaded_by'];
 }

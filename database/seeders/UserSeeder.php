@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
-            'is_approved' => true
+            'is_approved' => true,
         ]);
 
         // Teacher
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             'email' => 'teacher@example.com',
             'password' => Hash::make('password'),
             'role' => 'teacher',
-            'is_approved' => true
+            'is_approved' => true,
         ]);
 
         // Students
@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
                 'email' => "student$i@example.com",
                 'password' => Hash::make('password'),
                 'role' => 'student',
-                'is_approved' => true
+                'is_approved' => true,
             ]);
         }
     }

@@ -35,7 +35,10 @@ class ClassroomController extends Controller
             return redirect()->route('student.classroom.index');
         }
 
-        $isEnrolled = app(Enrollment::class)->isEnrolled(auth()->id(), $classroom->id);
+        $isEnrolled = app(Enrollment::class)->isEnrolled(
+            auth()->id(),
+            $classroom->id,
+        );
 
         if ($isEnrolled) {
             Inertia::flash('toast', [
@@ -60,7 +63,10 @@ class ClassroomController extends Controller
 
     public function show(Classroom $classroom)
     {
-        $isEnrolled = app(Enrollment::class)->isEnrolled(auth()->id(), $classroom->id);
+        $isEnrolled = app(Enrollment::class)->isEnrolled(
+            auth()->id(),
+            $classroom->id,
+        );
 
         abort_if(!$isEnrolled, 403);
 

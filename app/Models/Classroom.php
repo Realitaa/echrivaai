@@ -13,12 +13,7 @@ class Classroom extends Model
     /** @use HasFactory<\Database\Factories\ClassroomFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'description',
-        'teacher_id',
-        'code',
-    ];
+    protected $fillable = ['name', 'description', 'teacher_id', 'code'];
 
     public function teacher(): BelongsTo
     {
@@ -37,7 +32,12 @@ class Classroom extends Model
 
     public function students()
     {
-        return $this->belongsToMany(User::class, 'enrollments', 'classroom_id', 'user_id');
+        return $this->belongsToMany(
+            User::class,
+            'enrollments',
+            'classroom_id',
+            'user_id',
+        );
     }
 
     public function hasActiveTasks(): bool

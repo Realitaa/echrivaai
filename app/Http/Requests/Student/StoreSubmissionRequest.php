@@ -30,10 +30,12 @@ class StoreSubmissionRequest extends FormRequest
             'temporary_file_ids.*' => [
                 'required',
                 'integer',
-                function (string $attribute, mixed $value, \Closure $fail) use ($userId) {
+                function (string $attribute, mixed $value, \Closure $fail) use (
+                    $userId,
+                ) {
                     $tempFile = TemporaryFile::find($value);
 
-                    if (! $tempFile) {
+                    if (!$tempFile) {
                         $fail('The selected file does not exist.');
                         return;
                     }

@@ -12,9 +12,7 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    public function __construct(protected TaskService $taskService)
-    {
-    }
+    public function __construct(protected TaskService $taskService) {}
 
     /**
      * Display a listing of the resource.
@@ -37,10 +35,16 @@ class TaskController extends Controller
     {
         $this->authorizeClassroomAccess($classroom);
 
-        $task = $this->taskService->createTask($classroom, $request->validated());
+        $task = $this->taskService->createTask(
+            $classroom,
+            $request->validated(),
+        );
 
         if ($request->has('attachments')) {
-            $this->taskService->attachFiles($task, $request->input('attachments'));
+            $this->taskService->attachFiles(
+                $task,
+                $request->input('attachments'),
+            );
         }
 
         Inertia::flash('toast', [
@@ -66,8 +70,11 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTaskRequest $request, Classroom $classroom, Task $task)
-    {
+    public function update(
+        UpdateTaskRequest $request,
+        Classroom $classroom,
+        Task $task,
+    ) {
         $this->authorizeTaskAccess($classroom, $task);
 
         if ($task->is_published) {
@@ -108,7 +115,8 @@ class TaskController extends Controller
         if (!$this->taskService->deleteTask($task)) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Task cannot be deleted because it has submissions!',
+                'message' =>
+                    'Task cannot be deleted because it has submissions!',
             ]);
 
             return to_route('teacher.classroom.show', $classroom);

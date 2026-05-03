@@ -16,8 +16,8 @@ test('admin can view classroom list table', function () {
     $this->actingAs($admin)
         ->get(route('admin.classroom.index'))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('admin/Classroom')
+        ->assertInertia(
+            fn(Assert $page) => $page->component('admin/Classroom'),
         );
 });
 
@@ -46,16 +46,20 @@ test('admin can filter classroom by teacher_id', function () {
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.classroom.index', [
-            'teacher_id' => $teacher1->id
-        ]))
-        ->assertInertia(fn (Assert $page) =>
-            $page->where('classroom.data', function ($classroomroom) {
+        ->get(
+            route('admin.classroom.index', [
+                'teacher_id' => $teacher1->id,
+            ]),
+        )
+        ->assertInertia(
+            fn(Assert $page) => $page->where('classroom.data', function (
+                $classroomroom,
+            ) {
                 $names = collect($classroomroom)->pluck('name');
 
-                return $names->contains('CLASS_A')
-                    && !$names->contains('CLASS_B');
-            })
+                return $names->contains('CLASS_A') &&
+                    !$names->contains('CLASS_B');
+            }),
         );
 });
 
@@ -67,13 +71,15 @@ test('admin can search classroom by name', function () {
 
     $this->actingAs($admin)
         ->get(route('admin.classroom.index', ['search' => 'Laravel']))
-        ->assertInertia(fn (Assert $page) =>
-            $page->where('classroom.data', function ($classroomroom) {
+        ->assertInertia(
+            fn(Assert $page) => $page->where('classroom.data', function (
+                $classroomroom,
+            ) {
                 $names = collect($classroomroom)->pluck('name');
 
-                return $names->contains('Laravel Mastery')
-                    && !$names->contains('Vue Beginner');
-            })
+                return $names->contains('Laravel Mastery') &&
+                    !$names->contains('Vue Beginner');
+            }),
         );
 });
 
@@ -82,23 +88,25 @@ test('admin can search classroom by code', function () {
 
     Classroom::factory()->create([
         'name' => 'CLASS_X',
-        'code' => 'ABC123'
+        'code' => 'ABC123',
     ]);
 
     Classroom::factory()->create([
         'name' => 'CLASS_Y',
-        'code' => 'XYZ999'
+        'code' => 'XYZ999',
     ]);
 
     $this->actingAs($admin)
         ->get(route('admin.classroom.index', ['search' => 'ABC123']))
-        ->assertInertia(fn (Assert $page) =>
-            $page->where('classroom.data', function ($classroomroom) {
+        ->assertInertia(
+            fn(Assert $page) => $page->where('classroom.data', function (
+                $classroomroom,
+            ) {
                 $codes = collect($classroomroom)->pluck('code');
 
-                return $codes->contains('ABC123')
-                    && !$codes->contains('XYZ999');
-            })
+                return $codes->contains('ABC123') &&
+                    !$codes->contains('XYZ999');
+            }),
         );
 });
 
@@ -109,8 +117,11 @@ test('filter with invalid teacher_id returns empty result', function () {
 
     $this->actingAs($admin)
         ->get(route('admin.classroom.index', ['teacher_id' => 999]))
-        ->assertInertia(fn (Assert $page) =>
-            $page->where('classroom.data', fn ($classroomroom) => count($classroomroom) === 0)
+        ->assertInertia(
+            fn(Assert $page) => $page->where(
+                'classroom.data',
+                fn($classroomroom) => count($classroomroom) === 0,
+            ),
         );
 });
 
@@ -121,9 +132,7 @@ test('empty search returns all classroom', function () {
 
     $this->actingAs($admin)
         ->get(route('admin.classroom.index', ['search' => '']))
-        ->assertInertia(fn (Assert $page) =>
-            $page->has('classroom.data', 3)
-        );
+        ->assertInertia(fn(Assert $page) => $page->has('classroom.data', 3));
 });
 
 test('pagination works correctly', function () {
@@ -133,9 +142,7 @@ test('pagination works correctly', function () {
 
     $this->actingAs($admin)
         ->get(route('admin.classroom.index'))
-        ->assertInertia(fn (Assert $page) =>
-            $page->has('classroom.data', 10)
-        );
+        ->assertInertia(fn(Assert $page) => $page->has('classroom.data', 10));
 });
 
 // === Admin/ClassroomController.destroy ===
@@ -145,8 +152,9 @@ test('admin can delete classroom', function () {
 
     $classroom = Classroom::factory()->create();
 
-    $response = $this->actingAs($admin)
-        ->delete(route('admin.classroom.destroy', $classroom));
+    $response = $this->actingAs($admin)->delete(
+        route('admin.classroom.destroy', $classroom),
+    );
 
     $response->assertRedirect(route('admin.classroom.index'));
 
@@ -156,7 +164,7 @@ test('admin can delete classroom', function () {
     ]);
 
     $this->assertDatabaseMissing('classrooms', [
-        'id' => $classroom->id
+        'id' => $classroom->id,
     ]);
 });
 
@@ -169,8 +177,9 @@ test('admin cannot delete class with active tasks', function () {
         'is_published' => true,
     ]);
 
-    $response = $this->actingAs($admin)
-        ->delete(route('admin.classroom.destroy', $classroom));
+    $response = $this->actingAs($admin)->delete(
+        route('admin.classroom.destroy', $classroom),
+    );
 
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
@@ -178,7 +187,7 @@ test('admin cannot delete class with active tasks', function () {
     ]);
 
     $this->assertDatabaseHas('classrooms', [
-        'id' => $classroom->id
+        'id' => $classroom->id,
     ]);
 });
 
@@ -206,11 +215,11 @@ test('admin can view enrollments of a classroom', function () {
         ]);
     }
 
-    $response = $this->actingAs($admin)
-        ->get(route('admin.classroom.enrollments', $classroom));
+    $response = $this->actingAs($admin)->get(
+        route('admin.classroom.enrollments', $classroom),
+    );
 
-    $response->assertSuccessful()
-        ->assertJsonCount(3, 'data');
+    $response->assertSuccessful()->assertJsonCount(3, 'data');
 });
 
 test('non-admin cannot view enrollments', function () {
@@ -227,7 +236,7 @@ test('enrollments include user data', function () {
     $classroom = Classroom::factory()->create();
 
     $user = User::factory()->create([
-        'name' => 'TEST_USER'
+        'name' => 'TEST_USER',
     ]);
 
     Enrollment::factory()->create([
@@ -235,10 +244,11 @@ test('enrollments include user data', function () {
         'user_id' => $user->id,
     ]);
 
-    $response = $this->actingAs($admin)
-        ->get(route('admin.classroom.enrollments', $classroom));
+    $response = $this->actingAs($admin)->get(
+        route('admin.classroom.enrollments', $classroom),
+    );
 
     $response->assertJsonFragment([
-        'name' => 'TEST_USER'
+        'name' => 'TEST_USER',
     ]);
 });

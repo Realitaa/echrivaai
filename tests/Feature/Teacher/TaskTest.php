@@ -16,18 +16,21 @@ use Inertia\Testing\AssertableInertia as Assert;
 test('teacher can view task list card inside a classroom', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    
-    Task::factory()->count(3)->create([
-        'classroom_id' => $classroom->id,
-        'created_by' => $teacher->id
-    ]);
+
+    Task::factory()
+        ->count(3)
+        ->create([
+            'classroom_id' => $classroom->id,
+            'created_by' => $teacher->id,
+        ]);
 
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.task.index', $classroom))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('teacher/task/Index')
-                 ->has('tasks.data', 3)
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('teacher/task/Index')
+                ->has('tasks.data', 3),
         );
 });
 
@@ -56,15 +59,18 @@ test('teacher can create task with complete attributes', function () {
     $uploadedFile1 = $this->actingAs($teacher)
         ->postJson(route('file.upload'), [
             'file' => $file1,
-        ])->assertSuccessful();
+        ])
+        ->assertSuccessful();
 
     $uploadedFile2 = $this->actingAs($teacher)
         ->postJson(route('file.upload'), [
             'file' => $file2,
-        ])->assertSuccessful();
+        ])
+        ->assertSuccessful();
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Complete Task',
             'description' => 'This is a complete description',
             'deadline' => $deadline,
@@ -99,9 +105,12 @@ test('teacher can create task with complete attributes', function () {
                 $uploadedFile1->json('file')['id'],
                 $uploadedFile2->json('file')['id'],
             ],
-        ]);
+        ],
+    );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task created successfully!',
@@ -115,8 +124,8 @@ test('teacher can create task with complete attributes', function () {
     ]);
 
     $task = Task::where('title', 'Complete Task')->first();
-    
-    $this->assertDatabaseCount('task_rubrics', 4); 
+
+    $this->assertDatabaseCount('task_rubrics', 4);
     $this->assertDatabaseHas('task_rubrics', [
         'task_id' => $task->id,
         'title' => 'Grammar',
@@ -134,10 +143,18 @@ test('teacher can create task with complete attributes', function () {
         'fileable_type' => Task::class,
     ]);
 
-    Storage::disk('public')->assertExists('tasks/' . $uploadedFile1->json('file')['filename']);
-    Storage::disk('public')->assertExists('tasks/' . $uploadedFile2->json('file')['filename']);
-    Storage::disk('public')->assertMissing('tmp/' . $uploadedFile1->json('file')['filename']);
-    Storage::disk('public')->assertMissing('tmp/' . $uploadedFile2->json('file')['filename']);
+    Storage::disk('public')->assertExists(
+        'tasks/' . $uploadedFile1->json('file')['filename'],
+    );
+    Storage::disk('public')->assertExists(
+        'tasks/' . $uploadedFile2->json('file')['filename'],
+    );
+    Storage::disk('public')->assertMissing(
+        'tmp/' . $uploadedFile1->json('file')['filename'],
+    );
+    Storage::disk('public')->assertMissing(
+        'tmp/' . $uploadedFile2->json('file')['filename'],
+    );
 });
 
 test('teacher can create task without a file attachment', function () {
@@ -146,8 +163,9 @@ test('teacher can create task without a file attachment', function () {
 
     $deadline = Carbon::now()->addDays(7)->toDateTimeString();
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Complete Task',
             'description' => 'This is a complete description',
             'deadline' => $deadline,
@@ -178,9 +196,12 @@ test('teacher can create task without a file attachment', function () {
                     'order' => 4,
                 ],
             ],
-        ]);
+        ],
+    );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task created successfully!',
@@ -194,8 +215,8 @@ test('teacher can create task without a file attachment', function () {
     ]);
 
     $task = Task::where('title', 'Complete Task')->first();
-    
-    $this->assertDatabaseCount('task_rubrics', 4); 
+
+    $this->assertDatabaseCount('task_rubrics', 4);
     $this->assertDatabaseHas('task_rubrics', [
         'task_id' => $task->id,
         'title' => 'Grammar',
@@ -204,64 +225,76 @@ test('teacher can create task without a file attachment', function () {
     ]);
 });
 
-test('teacher cannot create task using invalid or unowned temporary file id', function () {
-    $teacher = User::factory()->create(['role' => 'teacher']);
-    $otherUser = User::factory()->create(['role' => 'teacher']);
-    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    
-    $unownedFile = TemporaryFile::create([
-        'filename' => 'some-file.pdf',
-        'original_name' => 'some-file.pdf',
-        'uploaded_by' => $otherUser->id
-    ]);
-
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
-            'title' => 'Task Title',
-            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
-            'rubrics' => [
-                [
-                    'title' => 'Grammar',
-                    'description' => 'Grammar description',
-                    'max_score' => 25, 
-                    'order' => 1,
-                ],
-            ],
-            'attachments' => [
-                'invalid-id',
-                $unownedFile->id,
-            ],
+test(
+    'teacher cannot create task using invalid or unowned temporary file id',
+    function () {
+        $teacher = User::factory()->create(['role' => 'teacher']);
+        $otherUser = User::factory()->create(['role' => 'teacher']);
+        $classroom = Classroom::factory()->create([
+            'teacher_id' => $teacher->id,
         ]);
 
-    $response->assertSessionHasErrors(['attachments.0', 'attachments.1']);
-});
-
-test('teacher cannot create task with negative or zero rubric max_score', function () {
-    $teacher = User::factory()->create(['role' => 'teacher']);
-    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
-            'title' => 'Task Title',
-            'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
-            'rubrics' => [
-                [
-                    'title' => 'Grammar',
-                    'max_score' => 0, 
-                    'order' => 1,
-                ],
-            ],
+        $unownedFile = TemporaryFile::create([
+            'filename' => 'some-file.pdf',
+            'original_name' => 'some-file.pdf',
+            'uploaded_by' => $otherUser->id,
         ]);
 
-    $response->assertSessionHasErrors('rubrics.0.max_score');
-});
+        $response = $this->actingAs($teacher)->post(
+            route('teacher.classroom.task.store', $classroom),
+            [
+                'title' => 'Task Title',
+                'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+                'rubrics' => [
+                    [
+                        'title' => 'Grammar',
+                        'description' => 'Grammar description',
+                        'max_score' => 25,
+                        'order' => 1,
+                    ],
+                ],
+                'attachments' => ['invalid-id', $unownedFile->id],
+            ],
+        );
+
+        $response->assertSessionHasErrors(['attachments.0', 'attachments.1']);
+    },
+);
+
+test(
+    'teacher cannot create task with negative or zero rubric max_score',
+    function () {
+        $teacher = User::factory()->create(['role' => 'teacher']);
+        $classroom = Classroom::factory()->create([
+            'teacher_id' => $teacher->id,
+        ]);
+
+        $response = $this->actingAs($teacher)->post(
+            route('teacher.classroom.task.store', $classroom),
+            [
+                'title' => 'Task Title',
+                'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
+                'rubrics' => [
+                    [
+                        'title' => 'Grammar',
+                        'max_score' => 0,
+                        'order' => 1,
+                    ],
+                ],
+            ],
+        );
+
+        $response->assertSessionHasErrors('rubrics.0.max_score');
+    },
+);
 
 test('teacher cannot create task with missing rubric title', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Task Title',
             'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
             'rubrics' => [
@@ -271,7 +304,8 @@ test('teacher cannot create task with missing rubric title', function () {
                     'order' => 1,
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertSessionHasErrors('rubrics.0.title');
 });
@@ -280,8 +314,9 @@ test('teacher cannot create task with missing rubric description', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Task Title',
             'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
             'rubrics' => [
@@ -292,7 +327,8 @@ test('teacher cannot create task with missing rubric description', function () {
                     'order' => 1,
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertSessionHasErrors('rubrics.0.description');
 });
@@ -301,8 +337,9 @@ test('teacher cannot create task with missing rubric order', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Task Title',
             'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
             'rubrics' => [
@@ -313,7 +350,8 @@ test('teacher cannot create task with missing rubric order', function () {
                     // 'order' => 1, // Missing order
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertSessionHasErrors('rubrics.0.order');
 });
@@ -322,8 +360,9 @@ test('teacher cannot create task with non-integer rubric order', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Task Title',
             'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
             'rubrics' => [
@@ -334,7 +373,8 @@ test('teacher cannot create task with non-integer rubric order', function () {
                     'order' => 'satu', // Non-integer
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertSessionHasErrors('rubrics.0.order');
 });
@@ -343,8 +383,9 @@ test('teacher cannot create task with duplicate rubric title', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Task Title',
             'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
             'rubrics' => [
@@ -361,7 +402,8 @@ test('teacher cannot create task with duplicate rubric title', function () {
                     'order' => 2,
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertSessionHasErrors('rubrics.1.title');
 });
@@ -370,8 +412,9 @@ test('teacher cannot create task with duplicate rubric order', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Task Title',
             'deadline' => Carbon::now()->addDays(7)->toDateTimeString(),
             'rubrics' => [
@@ -388,12 +431,11 @@ test('teacher cannot create task with duplicate rubric order', function () {
                     'order' => 1, // Duplicate order
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertSessionHasErrors('rubrics.1.order');
 });
-
-
 
 test('teacher cannot create task without rubric', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
@@ -401,13 +443,15 @@ test('teacher cannot create task without rubric', function () {
 
     $deadline = Carbon::now()->addDays(7)->toDateTimeString();
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.task.store', $classroom), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.task.store', $classroom),
+        [
             'title' => 'Complete Task',
             'description' => 'This is a complete description',
             'deadline' => $deadline,
             'is_published' => true,
-        ]);
+        ],
+    );
 
     $response->assertSessionHasErrors('rubrics');
 });
@@ -440,7 +484,7 @@ test('teacher cannot create task with invalid title format', function () {
 
     $this->actingAs($teacher)
         ->post(route('teacher.classroom.task.store', $classroom), [
-            'title' => '   ', 
+            'title' => '   ',
             'deadline' => Carbon::now()->addDays(3)->toDateTimeString(),
         ])
         ->assertSessionHasErrors('title');
@@ -488,13 +532,18 @@ test('teacher cannot create task in other teacher classroom', function () {
 test('teacher can update task attributes while still a draft', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => false,
+    ]);
     TaskRubric::factory()->create(['task_id' => $task->id]);
 
     $newDeadline = Carbon::now()->addDays(10)->toDateTimeString();
 
-    $response = $this->actingAs($teacher)
-        ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
+    $response = $this->actingAs($teacher)->put(
+        route('teacher.classroom.task.update', [$classroom, $task]),
+        [
             'title' => 'Updated Task Title',
             'description' => 'Updated description',
             'deadline' => $newDeadline,
@@ -525,7 +574,8 @@ test('teacher can update task attributes while still a draft', function () {
                     'order' => 4,
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
     $response->assertInertiaFlash('toast', [
@@ -552,17 +602,30 @@ test('teacher can update task attributes while still a draft', function () {
 test('teacher can remove a rubric during task update', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
-    
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => false,
+    ]);
+
     // Asumsi task ini awalnya punya 2 rubrik
-    TaskRubric::factory()->create(['task_id' => $task->id, 'title' => 'Grammar', 'order' => 1]);
-    TaskRubric::factory()->create(['task_id' => $task->id, 'title' => 'Vocabulary', 'order' => 2]);
+    TaskRubric::factory()->create([
+        'task_id' => $task->id,
+        'title' => 'Grammar',
+        'order' => 1,
+    ]);
+    TaskRubric::factory()->create([
+        'task_id' => $task->id,
+        'title' => 'Vocabulary',
+        'order' => 2,
+    ]);
 
     $this->assertDatabaseCount('task_rubrics', 2);
 
     // Saat update, teacher HANYA mengirimkan 1 rubrik (Vocabulary dihapus)
-    $response = $this->actingAs($teacher)
-        ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
+    $response = $this->actingAs($teacher)->put(
+        route('teacher.classroom.task.update', [$classroom, $task]),
+        [
             'title' => 'Updated Task',
             'deadline' => Carbon::now()->addDays(10)->toDateTimeString(),
             'is_published' => false,
@@ -572,9 +635,10 @@ test('teacher can remove a rubric during task update', function () {
                     'description' => 'Grammar description',
                     'max_score' => 25,
                     'order' => 1,
-                ]
+                ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
 
@@ -588,11 +652,16 @@ test('teacher can remove a rubric during task update', function () {
 test('teacher cannot update publised task', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => true]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => true,
+    ]);
     TaskRubric::factory()->create(['task_id' => $task->id, 'max_score' => 25]);
-    
-    $response = $this->actingAs($teacher)
-        ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
+
+    $response = $this->actingAs($teacher)->put(
+        route('teacher.classroom.task.update', [$classroom, $task]),
+        [
             'title' => 'Updated Task Title',
             'description' => 'Updated description',
             'deadline' => Carbon::now()->addDays(10)->toDateTimeString(),
@@ -600,7 +669,7 @@ test('teacher cannot update publised task', function () {
             'rubrics' => [
                 [
                     'title' => 'Grammar',
-                    'description' => 'Grammar is good', 
+                    'description' => 'Grammar is good',
                     'max_score' => 25,
                     'order' => 1,
                 ],
@@ -623,7 +692,8 @@ test('teacher cannot update publised task', function () {
                     'order' => 4,
                 ],
             ],
-        ]);
+        ],
+    );
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
     $response->assertInertiaFlash('toast', [
@@ -635,7 +705,10 @@ test('teacher cannot update publised task', function () {
 test('teacher cannot update task without title', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+    ]);
 
     $this->actingAs($teacher)
         ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
@@ -648,7 +721,10 @@ test('teacher cannot update task without title', function () {
 test('teacher cannot update task with invalid title format', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+    ]);
 
     $this->actingAs($teacher)
         ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
@@ -662,7 +738,10 @@ test('teacher cannot update other teacher classroom task', function () {
     $teacher1 = User::factory()->create(['role' => 'teacher']);
     $teacher2 = User::factory()->create(['role' => 'teacher']);
     $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
-    $task2 = Task::factory()->create(['classroom_id' => $classroom2->id, 'created_by' => $teacher2->id]);
+    $task2 = Task::factory()->create([
+        'classroom_id' => $classroom2->id,
+        'created_by' => $teacher2->id,
+    ]);
 
     $this->actingAs($teacher1)
         ->put(route('teacher.classroom.task.update', [$classroom2, $task2]), [
@@ -675,7 +754,10 @@ test('teacher cannot update other teacher classroom task', function () {
 test('teacher cannot update deadline with past date', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+    ]);
 
     $this->actingAs($teacher)
         ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
@@ -689,7 +771,10 @@ test('teacher cannot update deadline with past date', function () {
 test('teacher cannot update deadline with invalid date format', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+    ]);
 
     $this->actingAs($teacher)
         ->put(route('teacher.classroom.task.update', [$classroom, $task]), [
@@ -704,7 +789,10 @@ test('teacher cannot update other teacher tasks', function () {
     $teacher1 = User::factory()->create(['role' => 'teacher']);
     $teacher2 = User::factory()->create(['role' => 'teacher']);
     $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
-    $task2 = Task::factory()->create(['classroom_id' => $classroom2->id, 'created_by' => $teacher2->id]);
+    $task2 = Task::factory()->create([
+        'classroom_id' => $classroom2->id,
+        'created_by' => $teacher2->id,
+    ]);
 
     $this->actingAs($teacher1)
         ->put(route('teacher.classroom.task.update', [$classroom2, $task2]), [
@@ -720,37 +808,54 @@ test('teacher cannot update other teacher tasks', function () {
 test('teacher can view task details', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+    ]);
 
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.task.show', [$classroom, $task]))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('teacher/task/Show')
-                 ->where('task.id', $task->id)
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('teacher/task/Show')
+                ->where('task.id', $task->id),
         );
 });
 
-test('teacher cannot view task details from other classroom teacher', function () {
-    $teacher1 = User::factory()->create(['role' => 'teacher']);
-    $teacher2 = User::factory()->create(['role' => 'teacher']);
-    $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
-    $task2 = Task::factory()->create(['classroom_id' => $classroom2->id, 'created_by' => $teacher2->id]);
+test(
+    'teacher cannot view task details from other classroom teacher',
+    function () {
+        $teacher1 = User::factory()->create(['role' => 'teacher']);
+        $teacher2 = User::factory()->create(['role' => 'teacher']);
+        $classroom2 = Classroom::factory()->create([
+            'teacher_id' => $teacher2->id,
+        ]);
+        $task2 = Task::factory()->create([
+            'classroom_id' => $classroom2->id,
+            'created_by' => $teacher2->id,
+        ]);
 
-    $this->actingAs($teacher1)
-        ->get(route('teacher.classroom.task.show', [$classroom2, $task2]))
-        ->assertForbidden();
-});
+        $this->actingAs($teacher1)
+            ->get(route('teacher.classroom.task.show', [$classroom2, $task2]))
+            ->assertForbidden();
+    },
+);
 
 // === DESTROY ===
 
 test('teacher can delete unpublished task', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => false,
+    ]);
 
-    $response = $this->actingAs($teacher)
-        ->delete(route('teacher.classroom.task.destroy', [$classroom, $task]));
+    $response = $this->actingAs($teacher)->delete(
+        route('teacher.classroom.task.destroy', [$classroom, $task]),
+    );
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
     $response->assertInertiaFlash('toast', [
@@ -764,10 +869,15 @@ test('teacher can delete unpublished task', function () {
 test('teacher cannot delete published task', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => true]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => true,
+    ]);
 
-    $response = $this->actingAs($teacher)
-        ->delete(route('teacher.classroom.task.destroy', [$classroom, $task]));
+    $response = $this->actingAs($teacher)->delete(
+        route('teacher.classroom.task.destroy', [$classroom, $task]),
+    );
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
     $response->assertInertiaFlash('toast', [
@@ -782,7 +892,10 @@ test('teacher cannot delete other teacher task', function () {
     $teacher1 = User::factory()->create(['role' => 'teacher']);
     $teacher2 = User::factory()->create(['role' => 'teacher']);
     $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
-    $task2 = Task::factory()->create(['classroom_id' => $classroom2->id, 'created_by' => $teacher2->id]);
+    $task2 = Task::factory()->create([
+        'classroom_id' => $classroom2->id,
+        'created_by' => $teacher2->id,
+    ]);
 
     $this->actingAs($teacher1)
         ->delete(route('teacher.classroom.task.destroy', [$classroom2, $task2]))
@@ -792,20 +905,25 @@ test('teacher cannot delete other teacher task', function () {
 test('teacher cannot delete task that already has submissions', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id, 'is_published' => false]);
-    
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => false,
+    ]);
+
     // Asumsi ada submission
     Submission::factory()->create(['task_id' => $task->id]);
 
-    $response = $this->actingAs($teacher)
-        ->delete(route('teacher.classroom.task.destroy', [$classroom, $task]));
+    $response = $this->actingAs($teacher)->delete(
+        route('teacher.classroom.task.destroy', [$classroom, $task]),
+    );
 
     $response->assertRedirect(route('teacher.classroom.show', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'Task cannot be deleted because it has submissions!',
     ]);
-    
+
     $this->assertDatabaseHas('tasks', ['id' => $task->id]);
 });
 
@@ -815,12 +933,15 @@ test('non-teacher cannot access teacher task routes', function () {
     $student = User::factory()->create(['role' => 'student']);
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create(['classroom_id' => $classroom->id, 'created_by' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+    ]);
 
     $this->actingAs($student)
         ->post(route('teacher.classroom.task.store', $classroom), [])
         ->assertForbidden();
-        
+
     $this->actingAs($student)
         ->put(route('teacher.classroom.task.update', [$classroom, $task]), [])
         ->assertForbidden();
@@ -834,6 +955,7 @@ test('guest cannot access teacher task routes', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
     $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
 
-    $this->get(route('teacher.classroom.task.index', $classroom))
-        ->assertRedirect('/login');
+    $this->get(
+        route('teacher.classroom.task.index', $classroom),
+    )->assertRedirect('/login');
 });

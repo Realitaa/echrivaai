@@ -14,12 +14,7 @@ class Enrollment extends Model
 
     public $timestamps = false;
 
-    protected $fillable = [
-        'user_id',
-        'classroom_id',
-        'role',
-        'joined_at',
-    ];
+    protected $fillable = ['user_id', 'classroom_id', 'role', 'joined_at'];
 
     public function user(): BelongsTo
     {

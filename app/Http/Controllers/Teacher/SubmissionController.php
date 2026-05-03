@@ -12,9 +12,9 @@ use Inertia\Inertia;
 
 class SubmissionController extends Controller
 {
-    public function __construct(protected SubmissionService $submissionService)
-    {
-    }
+    public function __construct(
+        protected SubmissionService $submissionService,
+    ) {}
 
     public function index(Classroom $classroom, Task $task)
     {
@@ -27,8 +27,11 @@ class SubmissionController extends Controller
         ]);
     }
 
-    public function show(Classroom $classroom, Task $task, Submission $submission)
-    {
+    public function show(
+        Classroom $classroom,
+        Task $task,
+        Submission $submission,
+    ) {
         $this->authorizeAccess($classroom, $task, $submission);
 
         return Inertia::render('teacher/submission/Show', [
@@ -36,20 +39,34 @@ class SubmissionController extends Controller
         ]);
     }
 
-    public function feedback(FeedbackSubmissionRequest $request, Classroom $classroom, Task $task, Submission $submission)
-    {
-        $this->submissionService->updateFeedback($submission, $request->validated());
+    public function feedback(
+        FeedbackSubmissionRequest $request,
+        Classroom $classroom,
+        Task $task,
+        Submission $submission,
+    ) {
+        $this->submissionService->updateFeedback(
+            $submission,
+            $request->validated(),
+        );
 
         Inertia::flash('toast', [
             'type' => 'success',
             'message' => 'Feedback submitted successfully!',
         ]);
 
-        return to_route('teacher.classroom.task.submission.show', [$classroom, $task, $submission]);
+        return to_route('teacher.classroom.task.submission.show', [
+            $classroom,
+            $task,
+            $submission,
+        ]);
     }
 
-    private function authorizeAccess(Classroom $classroom, Task $task, Submission $submission = null): void
-    {
+    private function authorizeAccess(
+        Classroom $classroom,
+        Task $task,
+        Submission $submission = null,
+    ): void {
         abort_if($classroom->teacher_id !== auth()->id(), 403);
         abort_if($task->classroom_id !== $classroom->id, 403);
         if ($submission) {

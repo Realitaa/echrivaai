@@ -28,8 +28,10 @@ class TaskRubricFactory extends Factory
 
     public function ordered(int $order): static
     {
-        return $this->state(fn () => [
-            'order' => $order,
-        ]);
+        return $this->state(
+            fn() => [
+                'order' => $order,
+            ],
+        );
     }
 }

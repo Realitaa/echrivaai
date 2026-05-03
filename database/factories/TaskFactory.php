@@ -34,8 +34,10 @@ class TaskFactory extends Factory
 
     public function unpublished(): static
     {
-        return $this->state(fn () => [
-            'is_published' => false,
-        ]);
+        return $this->state(
+            fn() => [
+                'is_published' => false,
+            ],
+        );
     }
 }

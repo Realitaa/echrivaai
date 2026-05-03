@@ -8,50 +8,59 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 // === Student/TaskController.index ===
 
-test('student can view task list card inside an enrolled classroom', function () {
-    $student = User::factory()->create(['role' => 'student']);
-    $classroom = Classroom::factory()->create();
-    
-    Enrollment::factory()->create([
-        'user_id' => $student->id,
-        'classroom_id' => $classroom->id,
-    ]);
+test(
+    'student can view task list card inside an enrolled classroom',
+    function () {
+        $student = User::factory()->create(['role' => 'student']);
+        $classroom = Classroom::factory()->create();
 
-    Task::factory()->count(3)->create([
-        'classroom_id' => $classroom->id,
-        'is_published' => true,
-    ]);
+        Enrollment::factory()->create([
+            'user_id' => $student->id,
+            'classroom_id' => $classroom->id,
+        ]);
 
-    $this->actingAs($student)
-        ->get(route('student.classroom.task.index', $classroom))
-        ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('student/task/Index')
-                 ->has('tasks.data', 3)
-        );
-});
+        Task::factory()
+            ->count(3)
+            ->create([
+                'classroom_id' => $classroom->id,
+                'is_published' => true,
+            ]);
 
-test('student cannot view task list card inside an unenrolled classroom', function () {
-    $student = User::factory()->create(['role' => 'student']);
-    $classroom = Classroom::factory()->create();
+        $this->actingAs($student)
+            ->get(route('student.classroom.task.index', $classroom))
+            ->assertSuccessful()
+            ->assertInertia(
+                fn(Assert $page) => $page
+                    ->component('student/task/Index')
+                    ->has('tasks.data', 3),
+            );
+    },
+);
 
-    $this->actingAs($student)
-        ->get(route('student.classroom.task.index', $classroom))
-        ->assertForbidden();
-});
+test(
+    'student cannot view task list card inside an unenrolled classroom',
+    function () {
+        $student = User::factory()->create(['role' => 'student']);
+        $classroom = Classroom::factory()->create();
+
+        $this->actingAs($student)
+            ->get(route('student.classroom.task.index', $classroom))
+            ->assertForbidden();
+    },
+);
 
 test('student cannot view other student task list card', function () {
     $student1 = User::factory()->create(['role' => 'student']);
     $student2 = User::factory()->create(['role' => 'student']);
-    
+
     $classroom1 = Classroom::factory()->create();
     $classroom2 = Classroom::factory()->create();
-    
+
     Enrollment::factory()->create([
         'user_id' => $student1->id,
         'classroom_id' => $classroom1->id,
     ]);
-    
+
     Enrollment::factory()->create([
         'user_id' => $student2->id,
         'classroom_id' => $classroom2->id,
@@ -65,7 +74,7 @@ test('student cannot view other student task list card', function () {
 test('student cannot view unpublished task', function () {
     $student = User::factory()->create(['role' => 'student']);
     $classroom = Classroom::factory()->create();
-    
+
     Enrollment::factory()->create([
         'user_id' => $student->id,
         'classroom_id' => $classroom->id,
@@ -86,11 +95,12 @@ test('student cannot view unpublished task', function () {
     $this->actingAs($student)
         ->get(route('student.classroom.task.index', $classroom))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('student/task/Index')
-                 ->where('tasks.data', function ($tasks) {
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('student/task/Index')
+                ->where('tasks.data', function ($tasks) {
                     return $tasks->where('is_published', true)->count() === 1;
-                 })
+                }),
         );
 });
 
@@ -108,6 +118,7 @@ test('non-student cannot access student task route', function () {
 test('guest cannot access student task route', function () {
     $classroom = Classroom::factory()->create();
 
-    $this->get(route('student.classroom.task.index', $classroom))
-        ->assertRedirect('/login');
+    $this->get(
+        route('student.classroom.task.index', $classroom),
+    )->assertRedirect('/login');
 });

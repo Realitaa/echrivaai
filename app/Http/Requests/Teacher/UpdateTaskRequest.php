@@ -10,9 +10,11 @@ class UpdateTaskRequest extends FormRequest
     {
         $classroom = $this->route('classroom');
         $task = $this->route('task');
-        
-        return $classroom && $classroom->teacher_id === auth()->id() &&
-               $task && $task->classroom_id === $classroom->id;
+
+        return $classroom &&
+            $classroom->teacher_id === auth()->id() &&
+            $task &&
+            $task->classroom_id === $classroom->id;
     }
 
     public function rules(): array

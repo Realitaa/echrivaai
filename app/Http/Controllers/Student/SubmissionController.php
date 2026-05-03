@@ -14,15 +14,19 @@ use Inertia\Inertia;
 
 class SubmissionController extends Controller
 {
-    public function __construct(protected SubmissionService $submissionService, protected FileService $fileService)
-    {
-    }
+    public function __construct(
+        protected SubmissionService $submissionService,
+        protected FileService $fileService,
+    ) {}
 
     /**
      * Display submission detail via AJAX (JSON response).
      */
-    public function show(Classroom $classroom, Task $task, Submission $submission)
-    {
+    public function show(
+        Classroom $classroom,
+        Task $task,
+        Submission $submission,
+    ) {
         $this->authorizeAccess($classroom, $task, $submission);
 
         $data = $this->submissionService->getSubmissionDetail($submission);
@@ -33,12 +37,15 @@ class SubmissionController extends Controller
     /**
      * Store a new submission for a task.
      */
-    public function store(StoreSubmissionRequest $request, Classroom $classroom, Task $task)
-    {
+    public function store(
+        StoreSubmissionRequest $request,
+        Classroom $classroom,
+        Task $task,
+    ) {
         $this->authorizeAccess($classroom, $task);
 
         // Check task is published
-        if (! $task->is_published) {
+        if (!$task->is_published) {
             abort(403);
         }
 
@@ -50,7 +57,7 @@ class SubmissionController extends Controller
             }
 
             Inertia::flash('toast', [
-                'type'    => 'error',
+                'type' => 'error',
                 'message' => 'The deadline for this task has passed.',
             ]);
 
@@ -58,25 +65,35 @@ class SubmissionController extends Controller
         }
 
         // Check no processing submission exists (concurrency lock)
-        if ($this->submissionService->hasProcessingSubmission(auth()->id(), $task->id)) {
+        if (
+            $this->submissionService->hasProcessingSubmission(
+                auth()->id(),
+                $task->id,
+            )
+        ) {
             $files = $request->validated('temporary_file_ids') ?? [];
             foreach ($files as $fileId) {
                 $this->fileService->deleteTempFileById($fileId);
             }
 
             Inertia::flash('toast', [
-                'type'    => 'error',
-                'message' => 'Your previous submission is still being processed. Please wait.',
+                'type' => 'error',
+                'message' =>
+                    'Your previous submission is still being processed. Please wait.',
             ]);
 
             return to_route('student.classroom.task.show', [$classroom, $task]);
         }
 
-        $this->submissionService->createSubmission($task, $request->validated());
+        $this->submissionService->createSubmission(
+            $task,
+            $request->validated(),
+        );
 
         Inertia::flash('toast', [
-            'type'    => 'success',
-            'message' => 'Submission created successfully! Please wait while AI processes your feedback.',
+            'type' => 'success',
+            'message' =>
+                'Submission created successfully! Please wait while AI processes your feedback.',
         ]);
 
         return to_route('student.classroom.task.show', [$classroom, $task]);
@@ -86,14 +103,18 @@ class SubmissionController extends Controller
      * Authorize access: check enrollment, task belongs to classroom,
      * and optionally check submission ownership.
      */
-    private function authorizeAccess(Classroom $classroom, Task $task, ?Submission $submission = null): void
-    {
+    private function authorizeAccess(
+        Classroom $classroom,
+        Task $task,
+        ?Submission $submission = null,
+    ): void {
         // Check student is enrolled in the classroom
-        $isEnrolled = $classroom->enrollments()
+        $isEnrolled = $classroom
+            ->enrollments()
             ->where('user_id', auth()->id())
             ->exists();
 
-        abort_if(! $isEnrolled, 403);
+        abort_if(!$isEnrolled, 403);
 
         // Check task belongs to classroom
         abort_if($task->classroom_id !== $classroom->id, 403);

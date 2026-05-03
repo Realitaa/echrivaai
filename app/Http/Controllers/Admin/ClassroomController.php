@@ -10,9 +10,7 @@ use Inertia\Inertia;
 
 class ClassroomController extends Controller
 {
-    public function __construct(protected ClassroomService $classroomService)
-    {
-    }
+    public function __construct(protected ClassroomService $classroomService) {}
 
     public function index(Request $request)
     {
@@ -28,7 +26,8 @@ class ClassroomController extends Controller
         if (!$this->classroomService->deleteClassroom($classroom)) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Classroom cannot be deleted because it has active tasks.',
+                'message' =>
+                    'Classroom cannot be deleted because it has active tasks.',
             ]);
 
             return to_route('admin.classroom.index');
@@ -47,7 +46,7 @@ class ClassroomController extends Controller
         $enrollments = $this->classroomService->getEnrollments($classroom);
 
         return response()->json([
-            'data' => $enrollments
+            'data' => $enrollments,
         ]);
     }
 }

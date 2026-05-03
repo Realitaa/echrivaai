@@ -10,9 +10,7 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    public function __construct(protected TaskService $taskService)
-    {
-    }
+    public function __construct(protected TaskService $taskService) {}
 
     public function index(Request $request)
     {
@@ -20,7 +18,12 @@ class TaskController extends Controller
 
         return Inertia::render('admin/Task', [
             'tasks' => $tasks,
-            'filters' => $request->only(['search', 'teacher_id', 'classroom_id', 'is_published']),
+            'filters' => $request->only([
+                'search',
+                'teacher_id',
+                'classroom_id',
+                'is_published',
+            ]),
         ]);
     }
 
@@ -29,7 +32,8 @@ class TaskController extends Controller
         if (!$this->taskService->deleteTask($task)) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Task cannot be deleted because it has submissions.',
+                'message' =>
+                    'Task cannot be deleted because it has submissions.',
             ]);
 
             return back();

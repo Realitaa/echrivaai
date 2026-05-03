@@ -11,18 +11,22 @@ class TaskController extends Controller
 {
     public function index(Classroom $classroom)
     {
-        if (!$classroom->enrollments()->where('user_id', auth()->id())->exists()) {
+        if (
+            !$classroom->enrollments()->where('user_id', auth()->id())->exists()
+        ) {
             abort(403);
         }
 
         return Inertia::render('student/task/Index', [
-            'tasks' => $classroom->publishedTasks()->latest()->paginate(10)
+            'tasks' => $classroom->publishedTasks()->latest()->paginate(10),
         ]);
     }
 
     public function show(Classroom $classroom, Task $task)
     {
-        if (!$classroom->enrollments()->where('user_id', auth()->id())->exists()) {
+        if (
+            !$classroom->enrollments()->where('user_id', auth()->id())->exists()
+        ) {
             abort(403);
         }
 
@@ -35,13 +39,14 @@ class TaskController extends Controller
         abort_if($task->classroom_id !== $classroom->id, 403);
 
         // Get the authenticated student's submissions for this task
-        $submissions = $task->submissions()
+        $submissions = $task
+            ->submissions()
             ->where('user_id', auth()->id())
             ->orderBy('version', 'desc')
             ->get();
 
         return Inertia::render('student/task/Show', [
-            'task'        => $task,
+            'task' => $task,
             'submissions' => $submissions,
         ]);
     }

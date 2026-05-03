@@ -11,16 +11,19 @@ use Inertia\Testing\AssertableInertia as Assert;
 test('teacher can view classroom list card', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
 
-    Classroom::factory()->count(3)->create([
-        'teacher_id' => $teacher->id,
-    ]);
+    Classroom::factory()
+        ->count(3)
+        ->create([
+            'teacher_id' => $teacher->id,
+        ]);
 
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.index'))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->component('teacher/classroom/Index')
-                 ->has('classrooms.data', 3)
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('teacher/classroom/Index')
+                ->has('classrooms.data', 3),
         );
 });
 
@@ -28,18 +31,26 @@ test('teacher only sees their own classrooms', function () {
     $teacher1 = User::factory()->create(['role' => 'teacher']);
     $teacher2 = User::factory()->create(['role' => 'teacher']);
 
-    Classroom::factory()->create(['name' => 'OWN_CLASS', 'teacher_id' => $teacher1->id]);
-    Classroom::factory()->create(['name' => 'OTHER_CLASS', 'teacher_id' => $teacher2->id]);
+    Classroom::factory()->create([
+        'name' => 'OWN_CLASS',
+        'teacher_id' => $teacher1->id,
+    ]);
+    Classroom::factory()->create([
+        'name' => 'OTHER_CLASS',
+        'teacher_id' => $teacher2->id,
+    ]);
 
     $this->actingAs($teacher1)
         ->get(route('teacher.classroom.index'))
-        ->assertInertia(fn (Assert $page) =>
-            $page->where('classrooms.data', function ($classrooms) {
+        ->assertInertia(
+            fn(Assert $page) => $page->where('classrooms.data', function (
+                $classrooms,
+            ) {
                 $names = collect($classrooms)->pluck('name');
 
-                return $names->contains('OWN_CLASS')
-                    && !$names->contains('OTHER_CLASS');
-            })
+                return $names->contains('OWN_CLASS') &&
+                    !$names->contains('OTHER_CLASS');
+            }),
         );
 });
 
@@ -48,11 +59,13 @@ test('teacher only sees their own classrooms', function () {
 test('teacher can create classroom with name and description', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.store'), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.store'),
+        [
             'name' => 'New Class',
             'description' => 'Description here',
-        ]);
+        ],
+    );
 
     $response->assertRedirect(route('teacher.classroom.index'));
 
@@ -70,10 +83,12 @@ test('teacher can create classroom with name and description', function () {
 test('teacher can create classroom with only name', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
 
-    $response = $this->actingAs($teacher)
-        ->post(route('teacher.classroom.store'), [
+    $response = $this->actingAs($teacher)->post(
+        route('teacher.classroom.store'),
+        [
             'name' => 'Only Name Class',
-        ]);
+        ],
+    );
 
     $response->assertRedirect(route('teacher.classroom.index'));
 
@@ -108,10 +123,9 @@ test('teacher cannot create classroom with invalid name format', function () {
 test('classroom code is generated automatically', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
 
-    $this->actingAs($teacher)
-        ->post(route('teacher.classroom.store'), [
-            'name' => 'Auto Code Class',
-        ]);
+    $this->actingAs($teacher)->post(route('teacher.classroom.store'), [
+        'name' => 'Auto Code Class',
+    ]);
 
     $this->assertDatabaseHas('classrooms', [
         'name' => 'Auto Code Class',
@@ -125,10 +139,9 @@ test('classroom code is unique globally', function () {
 
     Classroom::factory()->create(['code' => 'ABC123']);
 
-    $this->actingAs($teacher)
-        ->post(route('teacher.classroom.store'), [
-            'name' => 'New Class',
-        ]);
+    $this->actingAs($teacher)->post(route('teacher.classroom.store'), [
+        'name' => 'New Class',
+    ]);
 
     $codes = Classroom::pluck('code');
 
@@ -141,10 +154,9 @@ test('classroom code regenerates if collision occurs', function () {
     Classroom::factory()->create(['code' => 'FIXEDCODE']);
 
     // asumsi generator pertama menghasilkan FIXEDCODE lagi → harus regenerate
-    $this->actingAs($teacher)
-        ->post(route('teacher.classroom.store'), [
-            'name' => 'Collision Class',
-        ]);
+    $this->actingAs($teacher)->post(route('teacher.classroom.store'), [
+        'name' => 'Collision Class',
+    ]);
 
     $this->assertDatabaseCount('classrooms', 2);
 
@@ -153,21 +165,23 @@ test('classroom code regenerates if collision occurs', function () {
     expect($codes->unique()->count())->toBe(2);
 });
 
-test('teacher cannot assign classroom to another teacher on create', function () {
-    $teacher1 = User::factory()->create(['role' => 'teacher']);
-    $teacher2 = User::factory()->create(['role' => 'teacher']);
+test(
+    'teacher cannot assign classroom to another teacher on create',
+    function () {
+        $teacher1 = User::factory()->create(['role' => 'teacher']);
+        $teacher2 = User::factory()->create(['role' => 'teacher']);
 
-    $this->actingAs($teacher1)
-        ->post(route('teacher.classroom.store'), [
+        $this->actingAs($teacher1)->post(route('teacher.classroom.store'), [
             'name' => 'Hack Class',
             'teacher_id' => $teacher2->id,
         ]);
 
-    $this->assertDatabaseHas('classrooms', [
-        'name' => 'Hack Class',
-        'teacher_id' => $teacher1->id,
-    ]);
-});
+        $this->assertDatabaseHas('classrooms', [
+            'name' => 'Hack Class',
+            'teacher_id' => $teacher1->id,
+        ]);
+    },
+);
 
 test('non-teacher cannot create classroom', function () {
     $user = User::factory()->create(['role' => 'student']);
@@ -188,8 +202,8 @@ test('teacher can view classroom details', function () {
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.show', $classroom))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->where('classroom.id', $classroom->id)
+        ->assertInertia(
+            fn(Assert $page) => $page->where('classroom.id', $classroom->id),
         );
 });
 
@@ -208,11 +222,12 @@ test('teacher can view enrolled students', function () {
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.show', $classroom))
         ->assertSuccessful()
-        ->assertInertia(fn (Assert $page) =>
-            $page->has('classroom.students', 1, fn (Assert $page) =>
-                $page->where('id', $student->id)
-                    ->etc()
-            )
+        ->assertInertia(
+            fn(Assert $page) => $page->has(
+                'classroom.students',
+                1,
+                fn(Assert $page) => $page->where('id', $student->id)->etc(),
+            ),
         );
 });
 
@@ -237,11 +252,13 @@ test('teacher can update classroom name and description', function () {
         'teacher_id' => $teacher->id,
     ]);
 
-    $response = $this->actingAs($teacher)
-        ->put(route('teacher.classroom.update', $classroom), [
+    $response = $this->actingAs($teacher)->put(
+        route('teacher.classroom.update', $classroom),
+        [
             'name' => 'Updated Name',
             'description' => 'Updated Desc',
-        ]);
+        ],
+    );
 
     $response->assertRedirect(route('teacher.classroom.index'));
 
@@ -305,11 +322,13 @@ test('teacher cannot change classroom ownership', function () {
         'teacher_id' => $teacher1->id,
     ]);
 
-    $this->actingAs($teacher1)
-        ->put(route('teacher.classroom.update', $classroom), [
+    $this->actingAs($teacher1)->put(
+        route('teacher.classroom.update', $classroom),
+        [
             'name' => 'Updated',
             'teacher_id' => $teacher2->id,
-        ]);
+        ],
+    );
 
     $this->assertDatabaseHas('classrooms', [
         'id' => $classroom->id,
@@ -334,8 +353,9 @@ test('teacher can delete classroom', function () {
         'teacher_id' => $teacher->id,
     ]);
 
-    $response = $this->actingAs($teacher)
-        ->delete(route('teacher.classroom.destroy', $classroom));
+    $response = $this->actingAs($teacher)->delete(
+        route('teacher.classroom.destroy', $classroom),
+    );
 
     $response->assertRedirect(route('teacher.classroom.index'));
 
@@ -374,8 +394,9 @@ test('teacher cannot delete classroom with active tasks', function () {
         'is_published' => true,
     ]);
 
-    $this->actingAs($teacher)
-        ->delete(route('teacher.classroom.destroy', $classroom));
+    $this->actingAs($teacher)->delete(
+        route('teacher.classroom.destroy', $classroom),
+    );
 
     $this->assertDatabaseHas('classrooms', [
         'id' => $classroom->id,
@@ -402,6 +423,5 @@ test('non-teacher cannot access teacher classroom routes', function () {
 });
 
 test('guest cannot access teacher classroom routes', function () {
-    $this->get(route('teacher.classroom.index'))
-        ->assertRedirect('/login');
+    $this->get(route('teacher.classroom.index'))->assertRedirect('/login');
 });

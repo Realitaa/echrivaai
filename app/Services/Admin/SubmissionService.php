@@ -10,10 +10,7 @@ class SubmissionService
     public function getPaginatedSubmissions(Request $request)
     {
         $query = Submission::query()
-            ->with([
-                'user:id,name',
-                'task:id,title',
-            ])
+            ->with(['user:id,name', 'task:id,title'])
             ->latest();
 
         if ($request->filled('task_id')) {

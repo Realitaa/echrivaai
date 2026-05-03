@@ -4,8 +4,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Laravel\Ai\Migrations\AiMigration;
 
-return new class extends AiMigration
-{
+return new class extends AiMigration {
     /**
      * Run the migrations.
      */
@@ -20,7 +19,9 @@ return new class extends AiMigration
             $table->index(['user_id', 'updated_at']);
         });
 
-        Schema::create('agent_conversation_messages', function (Blueprint $table) {
+        Schema::create('agent_conversation_messages', function (
+            Blueprint $table,
+        ) {
             $table->string('id', 36)->primary();
             $table->string('conversation_id', 36)->index();
             $table->foreignId('user_id')->nullable();
@@ -34,7 +35,10 @@ return new class extends AiMigration
             $table->text('meta');
             $table->timestamps();
 
-            $table->index(['conversation_id', 'user_id', 'updated_at'], 'conversation_index');
+            $table->index(
+                ['conversation_id', 'user_id', 'updated_at'],
+                'conversation_index',
+            );
             $table->index(['user_id']);
         });
     }

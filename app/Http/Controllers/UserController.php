@@ -15,16 +15,25 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query()
-            ->select('id', 'name', 'email', 'role', 'is_approved', 'created_at');
+        $query = User::query()->select(
+            'id',
+            'name',
+            'email',
+            'role',
+            'is_approved',
+            'created_at',
+        );
 
         // Search (name / email)
         if ($request->filled('search')) {
             $search = $request->search;
 
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
+                $q->where('name', 'like', "%$search%")->orWhere(
+                    'email',
+                    'like',
+                    "%$search%",
+                );
             });
         }
 
@@ -34,14 +43,14 @@ class UserController extends Controller
         }
 
         // Filter approval
-        if ($request->has('is_approved') && $request->input('is_approved') !== null) {
+        if (
+            $request->has('is_approved') &&
+            $request->input('is_approved') !== null
+        ) {
             $query->where('is_approved', $request->boolean('is_approved'));
         }
 
-        $users = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $users = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('admin/Users', [
             'users' => $users,
@@ -71,7 +80,7 @@ class UserController extends Controller
             'message' => 'User created successfully.',
         ]);
 
-        return to_route("admin.user.index");
+        return to_route('admin.user.index');
     }
 
     /**
@@ -109,7 +118,7 @@ class UserController extends Controller
             'message' => 'User updated successfully.',
         ]);
 
-        return to_route("admin.user.index");
+        return to_route('admin.user.index');
     }
 
     /**
@@ -119,10 +128,10 @@ class UserController extends Controller
     {
         if ($user->id === auth()->id()) {
             Inertia::flash('toast', [
-                'type'=> 'error',
+                'type' => 'error',
                 'message' => 'You cannot delete yourself.',
             ]);
-            return to_route("admin.user.index");
+            return to_route('admin.user.index');
         }
 
         $user->delete();
@@ -132,7 +141,7 @@ class UserController extends Controller
             'message' => 'User deleted successfully.',
         ]);
 
-        return to_route("admin.user.index");
+        return to_route('admin.user.index');
     }
 
     /**
@@ -143,7 +152,7 @@ class UserController extends Controller
     public function approve(User $user)
     {
         $user->update([
-            'is_approved' => !$user->is_approved
+            'is_approved' => !$user->is_approved,
         ]);
 
         Inertia::flash('toast', [
@@ -151,6 +160,6 @@ class UserController extends Controller
             'message' => 'Teacher registration approved successfully.',
         ]);
 
-        return to_route("admin.user.index");
+        return to_route('admin.user.index');
     }
 }

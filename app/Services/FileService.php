@@ -10,7 +10,8 @@ class FileService
 {
     public function putTempFile($file)
     {
-        $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+        $fileName =
+            Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
         $file->storeAs('tmp', $fileName, 'public');
 
         return TemporaryFile::create([
@@ -24,14 +25,14 @@ class FileService
     {
         $file = TemporaryFile::where('id', $fileId)->first();
         if ($file) {
-            Storage::disk('public')->delete('tmp/'.$file->filename);
+            Storage::disk('public')->delete('tmp/' . $file->filename);
             $file->delete();
         }
     }
 
     public function deleteTempFileByName($fileName)
     {
-        Storage::disk('public')->delete('tmp/'.$fileName);
+        Storage::disk('public')->delete('tmp/' . $fileName);
         TemporaryFile::where('filename', $fileName)->delete();
     }
 }

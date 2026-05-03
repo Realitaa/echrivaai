@@ -13,26 +13,44 @@ class FeedbackSubmissionRequest extends FormRequest
         $task = $this->route('task');
         $submission = $this->route('submission');
 
-        return $classroom && $classroom->teacher_id === auth()->id() &&
-               $task && $task->classroom_id === $classroom->id &&
-               $submission && $submission->task_id === $task->id;
+        return $classroom &&
+            $classroom->teacher_id === auth()->id() &&
+            $task &&
+            $task->classroom_id === $classroom->id &&
+            $submission &&
+            $submission->task_id === $task->id;
     }
 
     public function rules(): array
     {
         $rules = [
             'rubrics' => ['required', 'array', 'min:1'],
-            'rubrics.*.task_rubric_id' => ['required', 'integer', 'exists:task_rubrics,id'],
+            'rubrics.*.task_rubric_id' => [
+                'required',
+                'integer',
+                'exists:task_rubrics,id',
+            ],
             'rubrics.*.feedback_teacher' => ['required', 'string'],
         ];
 
         if ($this->has('rubrics') && is_array($this->rubrics)) {
             foreach ($this->rubrics as $index => $rubric) {
                 if (isset($rubric['task_rubric_id'])) {
-                    $maxScore = TaskRubric::find($rubric['task_rubric_id'])?->max_score ?? 100;
-                    $rules["rubrics.{$index}.score_teacher"] = ['required', 'numeric', 'min:0', "max:{$maxScore}"];
+                    $maxScore =
+                        TaskRubric::find($rubric['task_rubric_id'])
+                            ?->max_score ?? 100;
+                    $rules["rubrics.{$index}.score_teacher"] = [
+                        'required',
+                        'numeric',
+                        'min:0',
+                        "max:{$maxScore}",
+                    ];
                 } else {
-                    $rules["rubrics.{$index}.score_teacher"] = ['required', 'numeric', 'min:0'];
+                    $rules["rubrics.{$index}.score_teacher"] = [
+                        'required',
+                        'numeric',
+                        'min:0',
+                    ];
                 }
             }
         }

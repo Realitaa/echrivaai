@@ -15,7 +15,7 @@ class ClassroomSeeder extends Seeder
      */
     public function run(): void
     {
-    $teacher = User::where('role', 'teacher')->first();
+        $teacher = User::where('role', 'teacher')->first();
 
         Classroom::create([
             'name' => 'French Writing A1',

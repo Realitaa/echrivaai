@@ -58,18 +58,18 @@ class ProcessAiFeedbackJob implements ShouldQueue
             DB::transaction(function () use ($submission, $response) {
                 // Save AI feedback
                 $submission->aiFeedbacks()->create([
-                    'result'     => $response['feedback'],
-                    'score'      => $response['score'],
+                    'result' => $response['feedback'],
+                    'score' => $response['score'],
                     'model_name' => $response->meta->model ?? 'unknown',
-                    'prompt'     => $submission->content,
+                    'prompt' => $submission->content,
                 ]);
 
                 // Save rubric scores
                 foreach ($response['rubric_scores'] as $rubricScore) {
                     $submission->rubricScores()->create([
                         'task_rubric_id' => $rubricScore['rubric_id'],
-                        'score_ai'       => $rubricScore['score'],
-                        'feedback_ai'    => $rubricScore['feedback'],
+                        'score_ai' => $rubricScore['score'],
+                        'feedback_ai' => $rubricScore['feedback'],
                     ]);
                 }
 
@@ -77,7 +77,9 @@ class ProcessAiFeedbackJob implements ShouldQueue
                 $submission->update(['status' => 'graded']);
             });
         } catch (\Throwable $e) {
-            Log::error("AI feedback generation failed for submission {$submission->id}: {$e->getMessage()}");
+            Log::error(
+                "AI feedback generation failed for submission {$submission->id}: {$e->getMessage()}",
+            );
 
             // Transition to failed so the student is not stuck in 'processing' forever
             $submission->update(['status' => 'failed']);
