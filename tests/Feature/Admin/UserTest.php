@@ -120,7 +120,55 @@ test('pagination works correctly', function () {
 });
 
 // === UserController.store ===
-test('admin can create user', function () {
+test('admin can create new admin', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $response = $this->actingAs($admin)->post(route('admin.user.store'), [
+        'name' => 'New User',
+        'email' => 'exampleemail@example.com',
+        'password' => 'password',
+        'role' => 'student',
+    ]);
+
+    $response->assertRedirect(route('admin.user.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'User created successfully.',
+    ]);
+
+    $this->assertDatabaseHas('users', [
+        'email' => 'exampleemail@example.com',
+        'role' => 'student',
+        'is_approved' => true,
+    ]);
+});
+
+test('admin can create new teacher', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $response = $this->actingAs($admin)->post(route('admin.user.store'), [
+        'name' => 'New User',
+        'email' => 'exampleemail@example.com',
+        'password' => 'password',
+        'role' => 'teacher',
+    ]);
+
+    $response->assertRedirect(route('admin.user.index'));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'User created successfully.',
+    ]);
+
+    $this->assertDatabaseHas('users', [
+        'email' => 'exampleemail@example.com',
+        'role' => 'teacher',
+        'is_approved' => true, // auto approve teacher created by admin
+    ]);
+});
+
+test('admin can create new student', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->actingAs($admin)->post(route('admin.user.store'), [

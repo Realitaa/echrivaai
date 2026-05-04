@@ -10,8 +10,32 @@ test('login screen can be rendered', function () {
     $response->assertOk();
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+test('users can authenticate using the login screen as student', function () {
+    $user = User::factory()->create(['role' => 'student']);
+
+    $response = $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('student.classroom.index', absolute: false));
+});
+
+test('approved teachers can authenticate using the login screen as teacher', function () {
+    $user = User::factory()->create(['role' => 'teacher', 'is_approved' => true]);
+
+    $response = $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('teacher.classroom.index', absolute: false));
+});
+
+test('approved admins can authenticate using the login screen as admin', function () {
+    $user = User::factory()->create(['role' => 'admin', 'is_approved' => true]);
 
     $response = $this->post(route('login.store'), [
         'email' => $user->email,

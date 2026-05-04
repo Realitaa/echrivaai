@@ -425,3 +425,13 @@ test('non-teacher cannot access teacher classroom routes', function () {
 test('guest cannot access teacher classroom routes', function () {
     $this->get(route('teacher.classroom.index'))->assertRedirect('/login');
 });
+
+test('non-approved teacher redirected to pending page', function () {
+    $teacher = User::factory()->create([
+        'role' => 'teacher',
+        'is_approved' => false,
+    ]);
+    $this->actingAs($teacher)
+        ->get(route('teacher.classroom.index'))
+        ->assertRedirect(route('register.pending'));
+});
