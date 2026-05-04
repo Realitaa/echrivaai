@@ -19,6 +19,14 @@ class RoleMiddleware
             abort(403);
         }
 
+        if ($request->user()->role === 'teacher' && !$request->user()->is_approved && $request->route()->getName() !== 'register.pending') {
+            return redirect()->route('register.pending');
+        }
+
+        if ($request->user()->role === 'teacher' && $request->user()->is_approved && $request->route()->getName() === 'register.pending') {
+            return redirect()->route('teacher.classroom.index');
+        }
+
         return $next($request);
     }
 }

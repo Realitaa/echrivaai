@@ -19,15 +19,24 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
+        if (isset($input['role']) && $input['role'] === 'admin') {
+            abort(403);
+        }
+
         Validator::make($input, [
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
+            'role' => ['required', 'string', 'in:student,teacher'],
         ])->validate();
+
+        $role = $input['role'] ?? 'student';
 
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
+            'role' => $role,
+            'is_approved' => $role === 'student',
         ]);
     }
 }
