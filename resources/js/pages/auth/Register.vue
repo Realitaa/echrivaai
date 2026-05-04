@@ -6,6 +6,8 @@ import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup } from '@/components/ui/radio-group';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -83,10 +85,31 @@ defineOptions({
                 <InputError :message="errors.password_confirmation" />
             </div>
 
+            <div class="grid gap-2">
+                <Label for="role">Role</Label>
+                <RadioGroup
+                    name="role"
+                    class="grid grid-cols-2 gap-4"
+                    :default-value="errors.role ?? 'student'"
+                    required
+                >
+                    <div class="flex items-center gap-2">
+                        <RadioGroupItem value="student" id="student" />
+                        <Label for="student">Student</Label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <RadioGroupItem value="teacher" id="teacher" />
+                        <Label for="teacher">Teacher</Label>
+                    </div>
+                </RadioGroup>
+                <InputError :message="errors.role" />
+            </div>
+
             <Button
                 type="submit"
-                class="mt-2 w-full bg-purple-600 text-white hover:bg-purple-700"
+                class="mt-2 w-full"
                 tabindex="5"
+                :variant="'ecrivaai'"
                 :disabled="processing"
                 data-test="register-user-button"
             >
