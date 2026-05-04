@@ -8,7 +8,7 @@ Route::inertia('/', 'Welcome', [
 ])->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard')->middleware('role:admin');
+    Route::inertia('admin/dashboard', 'admin/Dashboard')->name('dashboard')->middleware('role:admin');
     Route::inertia('register/pending', 'auth/RegisterPending')->name('register.pending')->middleware('role:teacher');
 
     require __DIR__ . '/settings.php';
