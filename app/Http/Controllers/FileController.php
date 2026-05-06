@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TemporaryFile;
 use App\Services\FileService;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {

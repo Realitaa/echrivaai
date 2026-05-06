@@ -7,6 +7,7 @@ use App\Models\Classroom;
 use App\Models\Enrollment;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Attributes\Controllers\Authorize;
 
 class ClassroomController extends Controller
 {
@@ -61,15 +62,9 @@ class ClassroomController extends Controller
         return redirect()->route('student.classroom.show', $classroom);
     }
 
+    #[Authorize('viewAsStudent', 'classroom')]
     public function show(Classroom $classroom)
     {
-        $isEnrolled = app(Enrollment::class)->isEnrolled(
-            auth()->id(),
-            $classroom->id,
-        );
-
-        abort_if(!$isEnrolled, 403);
-
         return Inertia::render('student/classroom/Show', [
             'classroom' => $classroom,
         ]);

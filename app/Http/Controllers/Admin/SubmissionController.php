@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Submission;
 use App\Services\Admin\SubmissionService;
 use Inertia\Inertia;
+use Illuminate\Routing\Attributes\Controllers\Authorize;
 
 class SubmissionController extends Controller
 {
@@ -14,11 +15,9 @@ class SubmissionController extends Controller
         protected SubmissionService $submissionService,
     ) {}
 
+    #[Authorize('viewAny', Submission::class)]
     public function index(Request $request)
     {
-        // Authorization (simple & consistent)
-        abort_unless(auth()->user()->role === 'admin', 403);
-
         $submissions = $this->submissionService->getPaginatedSubmissions(
             $request,
         );
@@ -28,10 +27,9 @@ class SubmissionController extends Controller
         ]);
     }
 
+    #[Authorize('view', 'submission')]
     public function show(Submission $submission)
     {
-        abort_unless(auth()->user()->role === 'admin', 403);
-
         // Load semua yang dibutuhkan sesuai model kamu
         $submission = $this->submissionService->loadSubmissionDetails(
             $submission,

@@ -6,37 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Classroom;
 use App\Models\Task;
 use Inertia\Inertia;
+use Illuminate\Routing\Attributes\Controllers\Authorize;
 
 class TaskController extends Controller
 {
+    #[Authorize('viewAsStudent', 'classroom')]
     public function index(Classroom $classroom)
     {
-        if (
-            !$classroom->enrollments()->where('user_id', auth()->id())->exists()
-        ) {
-            abort(403);
-        }
-
         return Inertia::render('student/task/Index', [
             'tasks' => $classroom->publishedTasks()->latest()->paginate(10),
         ]);
     }
 
+    #[Authorize('viewAsStudent', 'task')]
     public function show(Classroom $classroom, Task $task)
     {
-        if (
-            !$classroom->enrollments()->where('user_id', auth()->id())->exists()
-        ) {
-            abort(403);
-        }
-
-        // Only published tasks are visible to students
-        if (!$task->is_published) {
-            abort(403);
-        }
-
         // Ensure task belongs to this classroom
-        abort_if($task->classroom_id !== $classroom->id, 403);
+        abort_if($task->classroom_id !== $classroom->id, 404);
 
         // Get the authenticated student's submissions for this task
         $submissions = $task

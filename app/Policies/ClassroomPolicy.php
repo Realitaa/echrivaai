@@ -20,6 +20,11 @@ class ClassroomPolicy
         return $user->is($classroom->teacher);
     }
 
+    public function viewAsStudent(User $user, Classroom $classroom): bool
+    {
+        return $classroom->enrollments()->where('user_id', $user->id)->exists();
+    }
+
     public function update(User $user, Classroom $classroom): bool
     {
         return $user->is($classroom->teacher);

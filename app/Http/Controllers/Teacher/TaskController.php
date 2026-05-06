@@ -9,6 +9,8 @@ use App\Models\Classroom;
 use App\Models\Task;
 use App\Services\Teacher\TaskService;
 use Inertia\Inertia;
+use Illuminate\Routing\Attributes\Controllers\Authorize;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -17,10 +19,9 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
+    #[Authorize('view', 'classroom')]
     public function index(Classroom $classroom)
     {
-        $this->authorizeClassroomAccess($classroom);
-
         $tasks = $this->taskService->getPaginatedTasks($classroom);
 
         return Inertia::render('teacher/task/Index', [
@@ -31,10 +32,9 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    #[Authorize('update', 'classroom')]
     public function store(StoreTaskRequest $request, Classroom $classroom)
     {
-        $this->authorizeClassroomAccess($classroom);
-
         $task = $this->taskService->createTask(
             $classroom,
             $request->validated(),
@@ -58,9 +58,10 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
+    #[Authorize('view', 'task')]
     public function show(Classroom $classroom, Task $task)
     {
-        $this->authorizeTaskAccess($classroom, $task);
+        abort_if($task->classroom_id !== $classroom->id, 404);
 
         return Inertia::render('teacher/task/Show', [
             'task' => $task,
@@ -70,12 +71,13 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    #[Authorize('update', 'task')]
     public function update(
         UpdateTaskRequest $request,
         Classroom $classroom,
         Task $task,
     ) {
-        $this->authorizeTaskAccess($classroom, $task);
+        abort_if($task->classroom_id !== $classroom->id, 404);
 
         if ($task->is_published) {
             Inertia::flash('toast', [
@@ -99,9 +101,10 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    #[Authorize('delete', 'task')]
     public function destroy(Classroom $classroom, Task $task)
     {
-        $this->authorizeTaskAccess($classroom, $task);
+        abort_if($task->classroom_id !== $classroom->id, 404);
 
         if ($task->is_published) {
             Inertia::flash('toast', [
@@ -128,22 +131,5 @@ class TaskController extends Controller
         ]);
 
         return to_route('teacher.classroom.show', $classroom);
-    }
-
-    /**
-     * Ensure the authenticated teacher owns the classroom.
-     */
-    private function authorizeClassroomAccess(Classroom $classroom): void
-    {
-        abort_if($classroom->teacher_id !== auth()->id(), 403);
-    }
-
-    /**
-     * Ensure the task belongs to the classroom and the teacher owns it.
-     */
-    private function authorizeTaskAccess(Classroom $classroom, Task $task): void
-    {
-        $this->authorizeClassroomAccess($classroom);
-        abort_if($task->classroom_id !== $classroom->id, 404);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Task;
 use App\Models\Submission;
 use App\Http\Requests\Teacher\FeedbackSubmissionRequest;
 use Inertia\Inertia;
+use Illuminate\Routing\Attributes\Controllers\Authorize;
 
 class SubmissionController extends Controller
 {
@@ -16,9 +17,10 @@ class SubmissionController extends Controller
         protected SubmissionService $submissionService,
     ) {}
 
+    #[Authorize('view', 'task')]
     public function index(Classroom $classroom, Task $task)
     {
-        $this->authorizeAccess($classroom, $task);
+        abort_if($task->classroom_id !== $classroom->id, 404);
 
         $submissions = $this->submissionService->getPaginatedSubmissions($task);
 
@@ -27,24 +29,30 @@ class SubmissionController extends Controller
         ]);
     }
 
+    #[Authorize('view', 'submission')]
     public function show(
         Classroom $classroom,
         Task $task,
         Submission $submission,
     ) {
-        $this->authorizeAccess($classroom, $task, $submission);
+        abort_if($task->classroom_id !== $classroom->id, 404);
+        abort_if($submission->task_id !== $task->id, 404);
 
         return Inertia::render('teacher/submission/Show', [
             'submission' => $submission,
         ]);
     }
 
+    #[Authorize('update', 'submission')]
     public function feedback(
         FeedbackSubmissionRequest $request,
         Classroom $classroom,
         Task $task,
         Submission $submission,
     ) {
+        abort_if($task->classroom_id !== $classroom->id, 404);
+        abort_if($submission->task_id !== $task->id, 404);
+
         $this->submissionService->updateFeedback(
             $submission,
             $request->validated(),
@@ -60,17 +68,5 @@ class SubmissionController extends Controller
             $task,
             $submission,
         ]);
-    }
-
-    private function authorizeAccess(
-        Classroom $classroom,
-        Task $task,
-        Submission $submission = null,
-    ): void {
-        abort_if($classroom->teacher_id !== auth()->id(), 403);
-        abort_if($task->classroom_id !== $classroom->id, 403);
-        if ($submission) {
-            abort_if($submission->task_id !== $task->id, 403);
-        }
     }
 }
