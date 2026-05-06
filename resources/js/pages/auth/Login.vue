@@ -90,7 +90,7 @@ defineProps<{
 
             <Button
                 type="submit"
-                class="mt-4 w-full"
+                class="w-full"
                 :variant="'ecrivaai'"
                 :tabindex="4"
                 :disabled="processing"
