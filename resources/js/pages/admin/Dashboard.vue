@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { GraduationCap, Hourglass, ShieldUser, User } from '@lucide/vue';
 import dayjs from 'dayjs';
+import type { Component } from 'vue';
 import CardIcon from '@/components/CardIcon.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +16,7 @@ import {
 import { dashboard } from '@/routes';
 import { approve } from '@/routes/admin/user';
 
-defineProps<{
+const props = defineProps<{
     stats: {
         admin: number;
         teacher: number;
@@ -40,6 +41,33 @@ defineOptions({
         ],
     },
 });
+
+const statLists: Array<{
+    title: string;
+    count: number;
+    icon: Component;
+}> = [
+    {
+        title: 'Total Admin',
+        count: props.stats.admin,
+        icon: ShieldUser,
+    },
+    {
+        title: 'Total Guru',
+        count: props.stats.teacher,
+        icon: GraduationCap,
+    },
+    {
+        title: 'Total Siswa',
+        count: props.stats.student,
+        icon: User,
+    },
+    {
+        title: 'Guru Menunggu Persetujuan',
+        count: props.stats.unapproved_teacher,
+        icon: Hourglass,
+    },
+];
 </script>
 
 <template>
@@ -49,44 +77,14 @@ defineOptions({
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
     >
         <div class="grid auto-rows-min gap-4 md:grid-cols-4">
-            <CardIcon :icon="ShieldUser" cardClass="bg-blue-50">
+            <CardIcon v-for="(stat, index) in statLists" :key="index" :icon="stat.icon" cardClass="bg-blue-50">
                 <template #title>
                     <h3
                         class="flex items-center gap-2 text-xl font-semibold text-blue-900"
                     >
-                        Total Admin
+                        {{ stat.title }}
                     </h3>
-                    <p class="text-blue-900 font-bold text-4xl py-4 tabular-nums">{{ stats.admin }}</p>
-                </template>
-            </CardIcon>
-            <CardIcon :icon="GraduationCap" cardClass="bg-blue-50">
-                <template #title>
-                    <h3
-                        class="flex items-center gap-2 text-xl font-semibold text-blue-900"
-                    >
-                        Total Guru
-                    </h3>
-                    <p class="text-blue-900 font-bold text-4xl py-4 tabular-nums">{{ stats.teacher }}</p>
-                </template>
-            </CardIcon>
-            <CardIcon :icon="User" cardClass="bg-blue-50">
-                <template #title>
-                    <h3
-                        class="flex items-center gap-2 text-xl font-semibold text-blue-900"
-                    >
-                        Total Siswa
-                    </h3>
-                    <p class="text-blue-900 font-bold text-4xl py-4 tabular-nums">{{ stats.student }}</p>
-                </template>
-            </CardIcon>
-            <CardIcon :icon="Hourglass" cardClass="bg-blue-50">
-                <template #title>
-                    <h3
-                        class="flex items-center gap-2 text-xl font-semibold text-blue-900"
-                    >
-                        Guru Menunggu Persetujuan
-                    </h3>
-                    <p class="text-blue-900 font-bold text-4xl py-4 tabular-nums">{{ stats.unapproved_teacher }}</p>
+                    <p class="text-blue-900 font-bold text-4xl py-4 tabular-nums">{{ stat.count }}</p>
                 </template>
             </CardIcon>
         </div>
