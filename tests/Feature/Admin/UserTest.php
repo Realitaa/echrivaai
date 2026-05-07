@@ -368,7 +368,7 @@ test('admin can toggle user approval', function () {
         route('admin.user.approve', $user),
     );
 
-    $response->assertRedirect(route('admin.user.index'));
+    $response->assertRedirectBack();
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',

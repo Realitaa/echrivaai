@@ -1,15 +1,31 @@
 import { createInertiaApp, router } from '@inertiajs/vue3';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createApp, h } from 'vue';
+import type { DefineComponent } from 'vue';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { initializeTheme, updateTheme } from '@/composables/useAppearance';
 import type { Appearance } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
+import 'dayjs/locale/id';
+import 'dayjs/locale/en';
+
+dayjs.extend(relativeTime);
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
+    setup({ el, App, props, plugin }) {
+        dayjs.locale(props.initialPage.props.locale as string);
+        createApp({ render: () => h(App, props) })
+            .use(plugin)
+            .mount(el);
+    },
     layout: (name) => {
         switch (true) {
             case name === 'Welcome':
@@ -31,6 +47,10 @@ createInertiaApp({
 initializeTheme();
 
 router.on('navigate', (event) => {
+    if (event.detail.page.props.locale) {
+        dayjs.locale(event.detail.page.props.locale as string);
+    }
+
     const isAuth = event.detail.page.component.startsWith('auth/');
     const isWelcome = event.detail.page.component === 'Welcome';
 

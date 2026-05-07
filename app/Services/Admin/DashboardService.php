@@ -12,11 +12,11 @@ class DashboardService
             ->selectRaw(
                 "
                 SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as admin,
-                SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as teacher,
+                SUM(CASE WHEN role = ? AND is_approved = ? THEN 1 ELSE 0 END) as teacher,
                 SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as student,
                 SUM(CASE WHEN role = ? AND is_approved = ? THEN 1 ELSE 0 END) as unapproved_teacher
             ",
-                ['admin', 'teacher', 'student', 'teacher', false],
+                ['admin', 'teacher', true, 'student', 'teacher', false],
             )
             ->first();
 
@@ -30,7 +30,7 @@ class DashboardService
 
     public function getNotApprovedTeacher()
     {
-        return User::select('name', 'email', 'created_at')
+        return User::select('id', 'name', 'email', 'created_at')
             ->where('role', 'teacher')
             ->where('is_approved', false)
             ->get();

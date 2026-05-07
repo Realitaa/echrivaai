@@ -160,6 +160,6 @@ class UserController extends Controller
             'message' => 'Teacher registration approved successfully.',
         ]);
 
-        return to_route('admin.user.index');
+        return back();
     }
 }
