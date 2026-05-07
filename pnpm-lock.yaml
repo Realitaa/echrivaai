@@ -14,6 +14,9 @@ importers:
       '@inertiajs/vue3':
         specifier: ^3.0.0
         version: 3.0.3(vue@3.5.32(typescript@5.9.3))
+      '@lucide/vue':
+        specifier: ^1.14.0
+        version: 1.14.0(vue@3.5.32(typescript@5.9.3))
       '@vueuse/core':
         specifier: ^12.8.2
         version: 12.8.2(typescript@5.9.3)
@@ -26,9 +29,6 @@ importers:
       laravel-vite-plugin:
         specifier: ^3.0.0
         version: 3.0.1(vite@8.0.8(@types/node@22.19.17)(jiti@2.6.1))
-      lucide-vue-next:
-        specifier: ^0.468.0
-        version: 0.468.0(vue@3.5.32(typescript@5.9.3))
       reka-ui:
         specifier: ^2.6.1
         version: 2.9.6(vue@3.5.32(typescript@5.9.3))
@@ -267,6 +267,11 @@ packages:
 
   '@laravel/vite-plugin-wayfinder@0.1.7':
     resolution: {integrity: sha512-yZYIr1iwuCQ7LFI+GsJk9vacw1HWMp3ZlDlW0pdfz3zXyKeu4US7oH79KmQQ031L0cYaSyaUMo/Ha1D4BosKqw==}
+
+  '@lucide/vue@1.14.0':
+    resolution: {integrity: sha512-0s2fsXJGXYqcuyigsRtoTPqbeGGFOiLTYMDFfYvWO4rQNOongaJe1XDiExOLiybbI9+uQPBr5aGoiCdQNlSfQg==}
+    peerDependencies:
+      vue: '>=3.0.1'
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
@@ -1588,11 +1593,6 @@ packages:
   lodash@4.18.1:
     resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
-  lucide-vue-next@0.468.0:
-    resolution: {integrity: sha512-quV/6T8YB1XK0VOEnebg3Byd8Rsan5/m95cvjnuHV4vcS3qEnLAybkrSh0hk3ppavx+V7R1PjNW+mGDvcBdz4A==}
-    peerDependencies:
-      vue: '>=3.0.1'
-
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
@@ -2375,6 +2375,10 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@laravel/vite-plugin-wayfinder@0.1.7': {}
+
+  '@lucide/vue@1.14.0(vue@3.5.32(typescript@5.9.3))':
+    dependencies:
+      vue: 3.5.32(typescript@5.9.3)
 
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
@@ -3738,10 +3742,6 @@ snapshots:
   lodash.merge@4.6.2: {}
 
   lodash@4.18.1: {}
-
-  lucide-vue-next@0.468.0(vue@3.5.32(typescript@5.9.3)):
-    dependencies:
-      vue: 3.5.32(typescript@5.9.3)
 
   magic-string@0.30.21:
     dependencies:

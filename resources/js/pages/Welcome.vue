@@ -10,7 +10,7 @@ import {
     BarChart3,
     UploadCloud,
     Sparkles,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import CardIcon from '@/components/CardIcon.vue';
 import { Badge } from '@/components/ui/badge';

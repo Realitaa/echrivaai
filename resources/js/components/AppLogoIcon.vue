@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Brain } from 'lucide-vue-next';
+import { Brain } from '@lucide/vue';
 </script>
 
 <template>

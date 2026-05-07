@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Brain } from 'lucide-vue-next';
+import { Brain } from '@lucide/vue';
 import {
     Card,
     CardContent,
