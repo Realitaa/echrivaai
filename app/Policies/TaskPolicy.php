@@ -15,8 +15,11 @@ class TaskPolicy
 
     public function viewAsStudent(User $user, Task $task): bool
     {
-        return $task->is_published && 
-               $task->classroom->enrollments()->where('user_id', $user->id)->exists();
+        return $task->is_published &&
+            $task->classroom
+                ->enrollments()
+                ->where('user_id', $user->id)
+                ->exists();
     }
 
     public function update(User $user, Task $task): bool

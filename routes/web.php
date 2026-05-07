@@ -9,8 +9,12 @@ Route::inertia('/', 'Welcome', [
 ])->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('role:admin');
-    Route::inertia('register/pending', 'auth/RegisterPending')->name('register.pending')->middleware('role:teacher');
+    Route::get('admin/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('role:admin');
+    Route::inertia('register/pending', 'auth/RegisterPending')
+        ->name('register.pending')
+        ->middleware('role:teacher');
 
     require __DIR__ . '/settings.php';
     require __DIR__ . '/users.php';

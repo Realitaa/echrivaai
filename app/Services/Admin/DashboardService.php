@@ -9,12 +9,15 @@ class DashboardService
     public function getStat()
     {
         $stats = User::toBase()
-            ->selectRaw("
+            ->selectRaw(
+                "
                 SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as admin,
                 SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as teacher,
                 SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as student,
                 SUM(CASE WHEN role = ? AND is_approved = ? THEN 1 ELSE 0 END) as unapproved_teacher
-            ", ['admin', 'teacher', 'student', 'teacher', false])
+            ",
+                ['admin', 'teacher', 'student', 'teacher', false],
+            )
             ->first();
 
         return [

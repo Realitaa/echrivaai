@@ -20,12 +20,20 @@ class RoleMiddleware
         }
 
         // unapproved teacher accessing teacher route -> redirect to pending registration page
-        if ($request->user()->role === 'teacher' && !$request->user()->is_approved && $request->route()->getName() !== 'register.pending') {
+        if (
+            $request->user()->role === 'teacher' &&
+            !$request->user()->is_approved &&
+            $request->route()->getName() !== 'register.pending'
+        ) {
             return redirect()->route('register.pending');
         }
 
         // approved teacher accessing pending registration route -> redirect to teacher classroom page
-        if ($request->user()->role === 'teacher' && $request->user()->is_approved && $request->route()->getName() === 'register.pending') {
+        if (
+            $request->user()->role === 'teacher' &&
+            $request->user()->is_approved &&
+            $request->route()->getName() === 'register.pending'
+        ) {
             return redirect()->route('teacher.classroom.index');
         }
 

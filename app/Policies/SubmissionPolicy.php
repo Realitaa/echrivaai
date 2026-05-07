@@ -23,8 +23,11 @@ class SubmissionPolicy
 
     public function viewAsStudent(User $user, Submission $submission): bool
     {
-        return $user->is($submission->user) && 
-               $submission->task->classroom->enrollments()->where('user_id', $user->id)->exists();
+        return $user->is($submission->user) &&
+            $submission->task->classroom
+                ->enrollments()
+                ->where('user_id', $user->id)
+                ->exists();
     }
 
     public function update(User $user, Submission $submission): bool

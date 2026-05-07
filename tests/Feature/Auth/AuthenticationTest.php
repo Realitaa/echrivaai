@@ -19,32 +19,48 @@ test('users can authenticate using the login screen as student', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('student.classroom.index', absolute: false));
+    $response->assertRedirect(
+        route('student.classroom.index', absolute: false),
+    );
 });
 
-test('approved teachers can authenticate using the login screen as teacher', function () {
-    $user = User::factory()->create(['role' => 'teacher', 'is_approved' => true]);
+test(
+    'approved teachers can authenticate using the login screen as teacher',
+    function () {
+        $user = User::factory()->create([
+            'role' => 'teacher',
+            'is_approved' => true,
+        ]);
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('teacher.classroom.index', absolute: false));
-});
+        $this->assertAuthenticated();
+        $response->assertRedirect(
+            route('teacher.classroom.index', absolute: false),
+        );
+    },
+);
 
-test('approved admins can authenticate using the login screen as admin', function () {
-    $user = User::factory()->create(['role' => 'admin', 'is_approved' => true]);
+test(
+    'approved admins can authenticate using the login screen as admin',
+    function () {
+        $user = User::factory()->create([
+            'role' => 'admin',
+            'is_approved' => true,
+        ]);
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
-});
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard', absolute: false));
+    },
+);
 
 test(
     'users with two factor enabled are redirected to two factor challenge',

@@ -23,7 +23,9 @@ test('new users can register as student', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('student.classroom.index', absolute: false));
+    $response->assertRedirect(
+        route('student.classroom.index', absolute: false),
+    );
 });
 
 test('new users register as teacher will wait for admin approval', function () {
@@ -54,15 +56,22 @@ test('new users register as teacher cannot approve themselves', function () {
     $response->assertRedirect(route('register.pending', absolute: false));
 });
 
-test('approved teacher directed to classroom page when accessing pending registration page', function () {
-    $user = User::factory()->create([
-        'role' => 'teacher',
-        'is_approved' => true,
-    ]);
+test(
+    'approved teacher directed to classroom page when accessing pending registration page',
+    function () {
+        $user = User::factory()->create([
+            'role' => 'teacher',
+            'is_approved' => true,
+        ]);
 
-    $response = $this->actingAs($user)->get(route('register.pending', absolute: false));
-    $response->assertRedirect(route('teacher.classroom.index', absolute: false));
-});
+        $response = $this->actingAs($user)->get(
+            route('register.pending', absolute: false),
+        );
+        $response->assertRedirect(
+            route('teacher.classroom.index', absolute: false),
+        );
+    },
+);
 
 test('new users register as admin will get rejected', function () {
     $this->post(route('register.store'), [

@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { Brain } from 'lucide-vue-next';
 </script>
