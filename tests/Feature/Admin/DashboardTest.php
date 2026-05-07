@@ -28,7 +28,7 @@ test('admin can view dashboard with stats', function () {
                 'stats',
                 fn(Assert $page) => $page
                     ->where('admin', 2)
-                    ->where('teacher', 4)
+                    ->where('teacher', 3)
                     ->where('student', 2)
                     ->where('unapproved_teacher', 1),
             )
