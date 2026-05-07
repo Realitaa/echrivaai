@@ -29,7 +29,9 @@ const emit = defineEmits(['selected']);
 
 const comboboxOpen = ref(false);
 
-const value = ref<number | undefined>(props.defaultValue ? Number(props.defaultValue) : undefined);
+const value = ref<number | undefined>(
+    props.defaultValue ? Number(props.defaultValue) : undefined,
+);
 
 const selectedValue = computed(() =>
     props.items.find((item) => item.id === value.value),

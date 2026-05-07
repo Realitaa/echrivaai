@@ -93,29 +93,42 @@ const props = defineProps<{
 
 // Filters
 const search = ref(props.filters.search ?? '');
-const teacherId = ref<number | undefined>(props.filters.teacher_id ? Number(props.filters.teacher_id) : undefined);
-const classroomId = ref<number | undefined>(props.filters.classroom_id ? Number(props.filters.classroom_id) : undefined);
-const isPublished = ref(props.filters.is_published !== undefined && props.filters.is_published !== null ? String(props.filters.is_published) : 'all');
+const teacherId = ref<number | undefined>(
+    props.filters.teacher_id ? Number(props.filters.teacher_id) : undefined,
+);
+const classroomId = ref<number | undefined>(
+    props.filters.classroom_id ? Number(props.filters.classroom_id) : undefined,
+);
+const isPublished = ref(
+    props.filters.is_published !== undefined &&
+        props.filters.is_published !== null
+        ? String(props.filters.is_published)
+        : 'all',
+);
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
-watch([search, teacherId, classroomId, isPublished], ([newSearch, newTeacherId, newClassroomId, newIsPublished]) => {
-    if (timeout) {
-        clearTimeout(timeout);
-    }
-    timeout = setTimeout(() => {
-        router.get(
-            index().url,
-            {
-                search: newSearch || undefined,
-                teacher_id: newTeacherId || undefined,
-                classroom_id: newClassroomId || undefined,
-                is_published: newIsPublished === 'all' ? undefined : newIsPublished,
-            },
-            { preserveState: true, replace: true }
-        );
-    }, 300);
-});
+watch(
+    [search, teacherId, classroomId, isPublished],
+    ([newSearch, newTeacherId, newClassroomId, newIsPublished]) => {
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(() => {
+            router.get(
+                index().url,
+                {
+                    search: newSearch || undefined,
+                    teacher_id: newTeacherId || undefined,
+                    classroom_id: newClassroomId || undefined,
+                    is_published:
+                        newIsPublished === 'all' ? undefined : newIsPublished,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+    },
+);
 
 // Delete Task Modal
 const deleteDialogOpen = ref(false);
@@ -138,16 +151,28 @@ const deleteTask = () => {
     <Head title="Manajemen Tugas" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div
+            class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        >
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">Manajemen Tugas</h1>
-                <p class="text-sm text-muted-foreground">Kelola tugas yang tersedia di platform.</p>
+                <h1 class="text-2xl font-bold tracking-tight">
+                    Manajemen Tugas
+                </h1>
+                <p class="text-sm text-muted-foreground">
+                    Kelola tugas yang tersedia di platform.
+                </p>
             </div>
         </div>
 
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:flex-wrap">
-            <Input v-model="search" placeholder="Cari judul tugas..." class="md:max-w-[250px]" />
-            
+        <div
+            class="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-center"
+        >
+            <Input
+                v-model="search"
+                placeholder="Cari judul tugas..."
+                class="md:max-w-[250px]"
+            />
+
             <LookupCombobox
                 :items="teachers"
                 label="Semua Guru"
@@ -180,7 +205,7 @@ const deleteTask = () => {
             </Select>
         </div>
 
-        <div class="rounded-md border bg-card overflow-x-auto">
+        <div class="overflow-x-auto rounded-md border bg-card">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -194,15 +219,25 @@ const deleteTask = () => {
                 </TableHeader>
                 <TableBody>
                     <TableRow v-for="task in tasks.data" :key="task.id">
-                        <TableCell class="font-medium">{{ task.title }}</TableCell>
+                        <TableCell class="font-medium">{{
+                            task.title
+                        }}</TableCell>
                         <TableCell>{{ task.classroom?.name }}</TableCell>
-                        <TableCell>{{ task.classroom?.teacher?.name }}</TableCell>
+                        <TableCell>{{
+                            task.classroom?.teacher?.name
+                        }}</TableCell>
                         <TableCell>
-                            <Badge :variant="task.is_published ? 'default' : 'secondary'">
+                            <Badge
+                                :variant="
+                                    task.is_published ? 'default' : 'secondary'
+                                "
+                            >
                                 {{ task.is_published ? 'Published' : 'Draft' }}
                             </Badge>
                         </TableCell>
-                        <TableCell>{{ dayjs(task.created_at).format('DD MMM YYYY') }}</TableCell>
+                        <TableCell>{{
+                            dayjs(task.created_at).format('DD MMM YYYY')
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
@@ -213,7 +248,10 @@ const deleteTask = () => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                                    <DropdownMenuItem class="text-destructive" @click="confirmDelete(task.id)">
+                                    <DropdownMenuItem
+                                        class="text-destructive"
+                                        @click="confirmDelete(task.id)"
+                                    >
                                         <Trash2 class="mr-2 h-4 w-4" /> Hapus
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -221,7 +259,10 @@ const deleteTask = () => {
                         </TableCell>
                     </TableRow>
                     <TableRow v-if="tasks.data.length === 0">
-                        <TableCell colspan="6" class="h-24 text-center text-muted-foreground">
+                        <TableCell
+                            colspan="6"
+                            class="h-24 text-center text-muted-foreground"
+                        >
                             Tidak ada tugas ditemukan.
                         </TableCell>
                     </TableRow>
@@ -229,7 +270,10 @@ const deleteTask = () => {
             </Table>
         </div>
 
-        <div class="flex items-center justify-end space-x-2" v-if="tasks.links && tasks.links.length > 3">
+        <div
+            class="flex items-center justify-end space-x-2"
+            v-if="tasks.links && tasks.links.length > 3"
+        >
             <template v-for="(link, index) in tasks.links" :key="index">
                 <Button
                     v-if="link.url"
@@ -241,7 +285,11 @@ const deleteTask = () => {
                 >
                     <span v-html="link.label"></span>
                 </Button>
-                <span v-else class="px-2 text-muted-foreground" v-html="link.label"></span>
+                <span
+                    v-else
+                    class="px-2 text-muted-foreground"
+                    v-html="link.label"
+                ></span>
             </template>
         </div>
     </div>
@@ -252,13 +300,19 @@ const deleteTask = () => {
             <AlertDialogHeader>
                 <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan. Ini akan menghapus tugas ini secara permanen.
-                    Catatan: Tugas yang memiliki kiriman (submission) tidak dapat dihapus.
+                    Tindakan ini tidak dapat dibatalkan. Ini akan menghapus
+                    tugas ini secara permanen. Catatan: Tugas yang memiliki
+                    kiriman (submission) tidak dapat dihapus.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel @click="deleteDialogOpen = false">Batal</AlertDialogCancel>
-                <AlertDialogAction @click="deleteTask" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                <AlertDialogCancel @click="deleteDialogOpen = false"
+                    >Batal</AlertDialogCancel
+                >
+                <AlertDialogAction
+                    @click="deleteTask"
+                    class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
                     Hapus
                 </AlertDialogAction>
             </AlertDialogFooter>

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ClipboardCheck, ClipboardList, GraduationCap, LayoutGrid, Users } from '@lucide/vue';
+import {
+    ClipboardCheck,
+    ClipboardList,
+    GraduationCap,
+    LayoutGrid,
+    Users,
+} from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -45,7 +51,7 @@ const mainNavItems: NavItem[] = [
         title: 'Penugasan',
         href: submission.index(),
         icon: ClipboardCheck,
-    }
+    },
 ];
 </script>
 

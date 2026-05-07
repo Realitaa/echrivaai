@@ -17,8 +17,13 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $tasks = $this->taskService->getPaginatedTasks($request);
-        $classrooms = Classroom::select('id', 'name')->orderBy('name', 'asc')->get();
-        $teachers = User::select('id', 'name')->where('role', 'teacher')->orderBy('name', 'asc')->get();
+        $classrooms = Classroom::select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+        $teachers = User::select('id', 'name')
+            ->where('role', 'teacher')
+            ->orderBy('name', 'asc')
+            ->get();
 
         return Inertia::render('admin/Task', [
             'tasks' => $tasks,

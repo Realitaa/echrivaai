@@ -40,11 +40,15 @@ const props = defineProps<{
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div class="flex flex-col gap-1">
-            <h1 class="text-2xl font-bold tracking-tight">Manajemen Penugasan</h1>
-            <p class="text-sm text-muted-foreground">Kelola daftar penugasan dan kiriman siswa.</p>
+            <h1 class="text-2xl font-bold tracking-tight">
+                Manajemen Penugasan
+            </h1>
+            <p class="text-sm text-muted-foreground">
+                Kelola daftar penugasan dan kiriman siswa.
+            </p>
         </div>
 
-        <div class="rounded-md border bg-card overflow-x-auto">
+        <div class="overflow-x-auto rounded-md border bg-card">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -58,13 +62,21 @@ const props = defineProps<{
                 </TableHeader>
                 <TableBody>
                     <TableRow v-for="sub in submissions.data" :key="sub.id">
-                        <TableCell class="font-medium">{{ sub.task?.title }}</TableCell>
+                        <TableCell class="font-medium">{{
+                            sub.task?.title
+                        }}</TableCell>
                         <TableCell>{{ sub.user?.name }}</TableCell>
                         <TableCell>
-                            <Badge variant="outline">{{ sub.status ?? 'Menunggu' }}</Badge>
+                            <Badge variant="outline">{{
+                                sub.status ?? 'Menunggu'
+                            }}</Badge>
                         </TableCell>
-                        <TableCell>{{ sub.score !== null ? sub.score : '-' }}</TableCell>
-                        <TableCell>{{ dayjs(sub.created_at).format('DD MMM YYYY HH:mm') }}</TableCell>
+                        <TableCell>{{
+                            sub.score !== null ? sub.score : '-'
+                        }}</TableCell>
+                        <TableCell>{{
+                            dayjs(sub.created_at).format('DD MMM YYYY HH:mm')
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <Button variant="outline" size="sm" as-child>
                                 <Link :href="show(sub.id).url">
@@ -74,7 +86,10 @@ const props = defineProps<{
                         </TableCell>
                     </TableRow>
                     <TableRow v-if="submissions.data.length === 0">
-                        <TableCell colspan="6" class="h-24 text-center text-muted-foreground">
+                        <TableCell
+                            colspan="6"
+                            class="h-24 text-center text-muted-foreground"
+                        >
                             Tidak ada penugasan ditemukan.
                         </TableCell>
                     </TableRow>
@@ -82,7 +97,10 @@ const props = defineProps<{
             </Table>
         </div>
 
-        <div class="flex items-center justify-end space-x-2" v-if="submissions.links && submissions.links.length > 3">
+        <div
+            class="flex items-center justify-end space-x-2"
+            v-if="submissions.links && submissions.links.length > 3"
+        >
             <template v-for="(link, idx) in submissions.links" :key="idx">
                 <Button
                     v-if="link.url"
@@ -94,7 +112,11 @@ const props = defineProps<{
                 >
                     <span v-html="link.label"></span>
                 </Button>
-                <span v-else class="px-2 text-muted-foreground" v-html="link.label"></span>
+                <span
+                    v-else
+                    class="px-2 text-muted-foreground"
+                    v-html="link.label"
+                ></span>
             </template>
         </div>
     </div>

@@ -40,12 +40,16 @@ defineOptions({
                 </Link>
             </Button>
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Detail Penugasan</h1>
-                <p class="text-sm text-muted-foreground">Detail kiriman tugas dari siswa.</p>
+                <h1 class="text-2xl font-bold tracking-tight">
+                    Detail Penugasan
+                </h1>
+                <p class="text-sm text-muted-foreground">
+                    Detail kiriman tugas dari siswa.
+                </p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
             <!-- Info Panel -->
             <Card class="md:col-span-1">
                 <CardHeader>
@@ -59,24 +63,42 @@ defineOptions({
                     <div>
                         <p class="text-sm text-muted-foreground">Siswa</p>
                         <p class="font-medium">{{ submission.user?.name }}</p>
-                        <p class="text-sm text-muted-foreground">{{ submission.user?.email }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ submission.user?.email }}
+                        </p>
                     </div>
                     <div>
                         <p class="text-sm text-muted-foreground">Status</p>
-                        <Badge class="mt-1" variant="secondary">{{ submission.status ?? 'Menunggu' }}</Badge>
+                        <Badge class="mt-1" variant="secondary">{{
+                            submission.status ?? 'Menunggu'
+                        }}</Badge>
                     </div>
                     <div>
                         <p class="text-sm text-muted-foreground">Nilai</p>
-                        <p class="font-bold text-xl">{{ submission.score !== null ? submission.score : '-' }}</p>
+                        <p class="text-xl font-bold">
+                            {{
+                                submission.score !== null
+                                    ? submission.score
+                                    : '-'
+                            }}
+                        </p>
                     </div>
                     <div>
-                        <p class="text-sm text-muted-foreground">Dikirim Pada</p>
-                        <p class="font-medium">{{ dayjs(submission.created_at).format('DD MMM YYYY, HH:mm') }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            Dikirim Pada
+                        </p>
+                        <p class="font-medium">
+                            {{
+                                dayjs(submission.created_at).format(
+                                    'DD MMM YYYY, HH:mm',
+                                )
+                            }}
+                        </p>
                     </div>
                 </CardContent>
             </Card>
 
-            <div class="md:col-span-2 space-y-4">
+            <div class="space-y-4 md:col-span-2">
                 <!-- Files Panel -->
                 <Card>
                     <CardHeader>
@@ -85,17 +107,33 @@ defineOptions({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div v-if="!submission.files || submission.files.length === 0" class="text-muted-foreground text-sm py-4">
+                        <div
+                            v-if="
+                                !submission.files ||
+                                submission.files.length === 0
+                            "
+                            class="py-4 text-sm text-muted-foreground"
+                        >
                             Tidak ada file yang dikirimkan.
                         </div>
                         <ul v-else class="space-y-2">
-                            <li v-for="file in submission.files" :key="file.id" class="flex items-center justify-between border p-3 rounded-md">
+                            <li
+                                v-for="file in submission.files"
+                                :key="file.id"
+                                class="flex items-center justify-between rounded-md border p-3"
+                            >
                                 <div class="flex items-center gap-3">
                                     <FileText class="h-5 w-5 text-blue-500" />
-                                    <span class="text-sm font-medium">{{ file.name ?? 'Berkas' }}</span>
+                                    <span class="text-sm font-medium">{{
+                                        file.name ?? 'Berkas'
+                                    }}</span>
                                 </div>
                                 <Button size="sm" variant="secondary" as-child>
-                                    <a :href="file.path ?? file.url" target="_blank">Unduh</a>
+                                    <a
+                                        :href="file.path ?? file.url"
+                                        target="_blank"
+                                        >Unduh</a
+                                    >
                                 </Button>
                             </li>
                         </ul>
@@ -110,17 +148,43 @@ defineOptions({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div v-if="!submission.ai_feedbacks || submission.ai_feedbacks.length === 0" class="text-muted-foreground text-sm py-4">
+                        <div
+                            v-if="
+                                !submission.ai_feedbacks ||
+                                submission.ai_feedbacks.length === 0
+                            "
+                            class="py-4 text-sm text-muted-foreground"
+                        >
                             Belum ada feedback dari AI.
                         </div>
                         <div v-else class="space-y-4">
-                            <div v-for="feedback in submission.ai_feedbacks" :key="feedback.id" class="border p-4 rounded-md bg-muted/50">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-semibold">AI Evaluator</span>
-                                    <span class="text-xs text-muted-foreground">{{ dayjs(feedback.created_at).format('DD MMM YYYY, HH:mm') }}</span>
+                            <div
+                                v-for="feedback in submission.ai_feedbacks"
+                                :key="feedback.id"
+                                class="rounded-md border bg-muted/50 p-4"
+                            >
+                                <div
+                                    class="mb-2 flex items-center justify-between"
+                                >
+                                    <span class="text-sm font-semibold"
+                                        >AI Evaluator</span
+                                    >
+                                    <span
+                                        class="text-xs text-muted-foreground"
+                                        >{{
+                                            dayjs(feedback.created_at).format(
+                                                'DD MMM YYYY, HH:mm',
+                                            )
+                                        }}</span
+                                    >
                                 </div>
-                                <div class="text-sm whitespace-pre-wrap">{{ feedback.feedback }}</div>
-                                <div class="mt-2 text-xs font-semibold text-right text-primary" v-if="feedback.score">
+                                <div class="text-sm whitespace-pre-wrap">
+                                    {{ feedback.feedback }}
+                                </div>
+                                <div
+                                    class="mt-2 text-right text-xs font-semibold text-primary"
+                                    v-if="feedback.score"
+                                >
                                     Skor AI: {{ feedback.score }}
                                 </div>
                             </div>
