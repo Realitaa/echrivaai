@@ -3,7 +3,7 @@ import { Head, Link, router, useHttp } from '@inertiajs/vue3';
 import { MoreHorizontal, Trash2, Users } from '@lucide/vue';
 import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
-import TeacherNameCombobox from '@/components/admin/classroom/TeacherNameCombobox.vue';
+import LookupCombobox from '@/components/admin/LookupCombobox.vue';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -158,8 +158,11 @@ const deleteClassroom = () => {
                 placeholder="Cari nama atau kode kelas..."
                 class="md:max-w-[300px]"
             />
-            <TeacherNameCombobox
-                :teachers="teachers"
+            <LookupCombobox
+                :items="teachers"
+                :label="'Pilih Guru...'"
+                empty-text="Tidak ada guru"
+                placeholder="Cari guru..."
                 @selected="(id) => (teacherId = id)"
             />
         </div>

@@ -16,23 +16,26 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import type { Teacher } from '@/types';
 
 const props = defineProps<{
-    teachers: Teacher[];
+    items: any[];
+    label: string;
+    placeholder?: string;
+    emptyText?: string;
+    defaultValue?: number | string;
 }>();
 
 const emit = defineEmits(['selected']);
 
 const comboboxOpen = ref(false);
 
-const value = ref<number | undefined>(undefined);
+const value = ref<number | undefined>(props.defaultValue ? Number(props.defaultValue) : undefined);
 
-const selectedTeacher = computed(() =>
-    props.teachers.find((teacher) => teacher.id === value.value),
+const selectedValue = computed(() =>
+    props.items.find((item) => item.id === value.value),
 );
 
-function selectTeacher(selectedValue: string) {
+function selectValue(selectedValue: string) {
     const id = Number(selectedValue);
     value.value = id === value.value ? undefined : id;
 
@@ -50,32 +53,32 @@ function selectTeacher(selectedValue: string) {
                 :aria-expanded="comboboxOpen"
                 class="w-[200px] justify-between"
             >
-                {{ selectedTeacher?.name || 'Pilih Guru...' }}
+                {{ selectedValue?.name || label }}
                 <ChevronsUpDownIcon class="opacity-50" />
             </Button>
         </PopoverTrigger>
         <PopoverContent class="w-[200px] p-0">
             <Command>
-                <CommandInput class="h-9" placeholder="Cari guru..." />
+                <CommandInput class="h-9" :placeholder="placeholder" />
                 <CommandList>
-                    <CommandEmpty>Tidak ada guru.</CommandEmpty>
+                    <CommandEmpty>{{ emptyText }}</CommandEmpty>
                     <CommandGroup>
                         <CommandItem
-                            v-for="teacher in teachers"
-                            :key="teacher.id"
-                            :value="teacher.id"
+                            v-for="item in items"
+                            :key="item.id"
+                            :value="item.id"
                             @select="
                                 (ev) => {
-                                    selectTeacher(ev.detail.value as string);
+                                    selectValue(ev.detail.value as string);
                                 }
                             "
                         >
-                            {{ teacher.name }}
+                            {{ item.name }}
                             <CheckIcon
                                 :class="
                                     cn(
                                         'ml-auto',
-                                        value === teacher.id
+                                        value === item.id
                                             ? 'opacity-100'
                                             : 'opacity-0',
                                     )
