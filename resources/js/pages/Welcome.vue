@@ -11,6 +11,7 @@ import {
     UploadCloud,
     Sparkles,
 } from 'lucide-vue-next';
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,12 +41,7 @@ withDefaults(
         <header
             class="container mx-auto flex items-center justify-between px-6 py-4"
         >
-            <div class="flex items-center gap-2">
-                <Brain class="h-8 w-8 text-purple-600" />
-                <span class="text-xl font-bold tracking-tight text-slate-900"
-                    >EchrivaAI</span
-                >
-            </div>
+            <AppLogoIcon />
             <nav
                 class="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex"
             >
