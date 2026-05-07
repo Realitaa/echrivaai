@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'is_approved' => true,
-            ]
+            ],
         );
 
         // Teacher
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'teacher',
                 'is_approved' => true,
-            ]
+            ],
         );
 
         // Students
@@ -45,7 +45,7 @@ class UserSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'role' => 'student',
                     'is_approved' => true,
-                ]
+                ],
             );
         }
     }

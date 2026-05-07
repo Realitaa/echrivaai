@@ -29,7 +29,7 @@ class SubmissionSeeder extends Seeder
                     'content' => 'Je suis étudiant...',
                     'status' => 'graded',
                     'is_latest' => false,
-                ]
+                ],
             );
 
             // version 2 (latest)
@@ -43,7 +43,7 @@ class SubmissionSeeder extends Seeder
                     'content' => 'Je suis un étudiant motivé...',
                     'status' => 'submitted',
                     'is_latest' => true,
-                ]
+                ],
             );
         }
     }

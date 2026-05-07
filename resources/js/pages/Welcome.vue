@@ -242,19 +242,25 @@ withDefaults(
                                 feedback.
                             </p>
                             <ul class="space-y-3">
-                                <li class="flex items-center gap-3 text-slate-600">
+                                <li
+                                    class="flex items-center gap-3 text-slate-600"
+                                >
                                     <span
                                         class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
                                     ></span>
                                     Burnout from endless paperwork
                                 </li>
-                                <li class="flex items-center gap-3 text-slate-600">
+                                <li
+                                    class="flex items-center gap-3 text-slate-600"
+                                >
                                     <span
                                         class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
                                     ></span>
                                     Delayed student learning cycle
                                 </li>
-                                <li class="flex items-center gap-3 text-slate-600">
+                                <li
+                                    class="flex items-center gap-3 text-slate-600"
+                                >
                                     <span
                                         class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
                                     ></span>
@@ -278,27 +284,32 @@ withDefaults(
                         <template #default>
                             <p class="mb-6 text-purple-800/80">
                                 Automate the initial review process. Let AI
-                                handle the mechanics and structured feedback,
-                                so teachers can focus on higher-level
-                                mentoring.
+                                handle the mechanics and structured feedback, so
+                                teachers can focus on higher-level mentoring.
                             </p>
                             <ul class="space-y-3">
                                 <li
                                     class="flex items-center gap-3 text-purple-800/80"
                                 >
-                                    <CheckCircle2 class="h-5 w-5 text-purple-600" />
+                                    <CheckCircle2
+                                        class="h-5 w-5 text-purple-600"
+                                    />
                                     Instant, structured AI analysis
                                 </li>
                                 <li
                                     class="flex items-center gap-3 text-purple-800/80"
                                 >
-                                    <CheckCircle2 class="h-5 w-5 text-purple-600" />
+                                    <CheckCircle2
+                                        class="h-5 w-5 text-purple-600"
+                                    />
                                     Objective and consistent scoring
                                 </li>
                                 <li
                                     class="flex items-center gap-3 text-purple-800/80"
                                 >
-                                    <CheckCircle2 class="h-5 w-5 text-purple-600" />
+                                    <CheckCircle2
+                                        class="h-5 w-5 text-purple-600"
+                                    />
                                     More time for student interaction
                                 </li>
                             </ul>

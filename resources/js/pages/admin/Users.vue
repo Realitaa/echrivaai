@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { MoreHorizontal, Pencil, Trash2, CheckCircle, XCircle } from '@lucide/vue';
+import {
+    MoreHorizontal,
+    Pencil,
+    Trash2,
+    CheckCircle,
+    XCircle,
+} from '@lucide/vue';
 import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
 import DeleteUserDialog from '@/components/admin/users/DeleteUserDialog.vue';
@@ -62,17 +68,18 @@ const props = defineProps<{
 const search = ref(props.filters.search ?? '');
 const role = ref(props.filters.role ?? 'all');
 const isApproved = ref(
-    props.filters.is_approved !== undefined && props.filters.is_approved !== null
+    props.filters.is_approved !== undefined &&
+        props.filters.is_approved !== null
         ? String(props.filters.is_approved)
-        : 'all'
+        : 'all',
 );
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
 watch([search, role, isApproved], ([newSearch, newRole, newIsApproved]) => {
     if (timeout) {
-clearTimeout(timeout);
-}
+        clearTimeout(timeout);
+    }
 
     timeout = setTimeout(() => {
         router.get(
@@ -80,9 +87,10 @@ clearTimeout(timeout);
             {
                 search: newSearch,
                 role: newRole === 'all' ? undefined : newRole,
-                is_approved: newIsApproved === 'all' ? undefined : newIsApproved,
+                is_approved:
+                    newIsApproved === 'all' ? undefined : newIsApproved,
             },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     }, 300);
 });
@@ -127,16 +135,24 @@ const toggleApprove = (user: User) => {
     <Head title="Manajemen Pengguna" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div
+            class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        >
             <div class="flex flex-col gap-1">
                 <h1 class="text-2xl font-bold tracking-tight">Pengguna</h1>
-                <p class="text-sm text-muted-foreground">Kelola pengguna yang terdaftar di platform.</p>
+                <p class="text-sm text-muted-foreground">
+                    Kelola pengguna yang terdaftar di platform.
+                </p>
             </div>
             <Button @click="openCreateDialog">Tambah Pengguna</Button>
         </div>
 
         <div class="flex flex-col gap-4 md:flex-row md:items-center">
-            <Input v-model="search" placeholder="Cari nama atau email..." class="md:max-w-[300px]" />
+            <Input
+                v-model="search"
+                placeholder="Cari nama atau email..."
+                class="md:max-w-[300px]"
+            />
 
             <Select v-model="role">
                 <SelectTrigger class="w-full md:w-[180px]">
@@ -180,17 +196,29 @@ const toggleApprove = (user: User) => {
                 </TableHeader>
                 <TableBody>
                     <TableRow v-for="user in users.data" :key="user.id">
-                        <TableCell class="font-medium">{{ user.name }}</TableCell>
+                        <TableCell class="font-medium">{{
+                            user.name
+                        }}</TableCell>
                         <TableCell>{{ user.email }}</TableCell>
                         <TableCell>
                             <span class="capitalize">{{ user.role }}</span>
                         </TableCell>
                         <TableCell>
-                            <Badge :variant="user.is_approved ? 'default' : 'destructive'">
-                                {{ user.is_approved ? 'Disetujui' : 'Belum Disetujui' }}
+                            <Badge
+                                :variant="
+                                    user.is_approved ? 'default' : 'destructive'
+                                "
+                            >
+                                {{
+                                    user.is_approved
+                                        ? 'Disetujui'
+                                        : 'Belum Disetujui'
+                                }}
                             </Badge>
                         </TableCell>
-                        <TableCell>{{ dayjs(user.created_at).format('DD MMM YYYY') }}</TableCell>
+                        <TableCell>{{
+                            dayjs(user.created_at).format('DD MMM YYYY')
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
@@ -201,19 +229,33 @@ const toggleApprove = (user: User) => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                                    <DropdownMenuItem @click="openEditDialog(user)">
+                                    <DropdownMenuItem
+                                        @click="openEditDialog(user)"
+                                    >
                                         <Pencil class="mr-2 h-4 w-4" /> Edit
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem @click="toggleApprove(user)" v-if="user.role === 'teacher'">
+                                    <DropdownMenuItem
+                                        @click="toggleApprove(user)"
+                                        v-if="user.role === 'teacher'"
+                                    >
                                         <template v-if="user.is_approved">
-                                            <XCircle class="mr-2 h-4 w-4 text-destructive" /> Cabut Approval
+                                            <XCircle
+                                                class="mr-2 h-4 w-4 text-destructive"
+                                            />
+                                            Cabut Approval
                                         </template>
                                         <template v-else>
-                                            <CheckCircle class="mr-2 h-4 w-4 text-green-500" /> Setujui
+                                            <CheckCircle
+                                                class="mr-2 h-4 w-4 text-green-500"
+                                            />
+                                            Setujui
                                         </template>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem class="text-destructive" @click="confirmDelete(user.id)">
+                                    <DropdownMenuItem
+                                        class="text-destructive"
+                                        @click="confirmDelete(user.id)"
+                                    >
                                         <Trash2 class="mr-2 h-4 w-4" /> Hapus
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -221,7 +263,10 @@ const toggleApprove = (user: User) => {
                         </TableCell>
                     </TableRow>
                     <TableRow v-if="users.data.length === 0">
-                        <TableCell colspan="6" class="text-center text-muted-foreground h-24">
+                        <TableCell
+                            colspan="6"
+                            class="h-24 text-center text-muted-foreground"
+                        >
                             Tidak ada pengguna ditemukan.
                         </TableCell>
                     </TableRow>
@@ -229,7 +274,10 @@ const toggleApprove = (user: User) => {
             </Table>
         </div>
 
-        <div class="flex items-center justify-end space-x-2" v-if="users.links && users.links.length > 3">
+        <div
+            class="flex items-center justify-end space-x-2"
+            v-if="users.links && users.links.length > 3"
+        >
             <template v-for="(link, index) in users.links" :key="index">
                 <Button
                     v-if="link.url"
@@ -241,13 +289,21 @@ const toggleApprove = (user: User) => {
                 >
                     <span v-html="link.label"></span>
                 </Button>
-                <span v-else class="text-muted-foreground px-2" v-html="link.label"></span>
+                <span
+                    v-else
+                    class="px-2 text-muted-foreground"
+                    v-html="link.label"
+                ></span>
             </template>
         </div>
     </div>
 
     <!-- Form Dialog -->
-    <FormUserDialog v-model:open="dialogOpen" :action="editingUser ? 'edit' : 'create'" :user="editingUser ?? undefined" />
+    <FormUserDialog
+        v-model:open="dialogOpen"
+        :action="editingUser ? 'edit' : 'create'"
+        :user="editingUser ?? undefined"
+    />
 
     <!-- Delete Alert Dialog -->
     <DeleteUserDialog v-model:open="deleteDialogOpen" @delete="deleteUser" />

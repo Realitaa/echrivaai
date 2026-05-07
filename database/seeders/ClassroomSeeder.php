@@ -23,7 +23,7 @@ class ClassroomSeeder extends Seeder
                 'description' => 'Basic French Writing Class',
                 'teacher_id' => $teacher->id,
                 'code' => Str::upper(Str::random(6)),
-            ]
+            ],
         );
     }
 }

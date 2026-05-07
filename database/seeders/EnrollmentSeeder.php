@@ -27,7 +27,7 @@ class EnrollmentSeeder extends Seeder
                 [
                     'role' => 'student',
                     'joined_at' => now(),
-                ]
+                ],
             );
         }
     }

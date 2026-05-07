@@ -84,7 +84,7 @@ watch([search, teacherId], ([newSearch, newTeacherId]) => {
                 search: newSearch,
                 teacher_id: newTeacherId || undefined,
             },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     }, 300);
 });
@@ -92,7 +92,9 @@ watch([search, teacherId], ([newSearch, newTeacherId]) => {
 // Enrollments Modal
 const enrollmentsDialogOpen = ref(false);
 const currentClassroom = ref<Classroom | null>(null);
-const enrollmentsData = ref<{ user: { id: number; name: string; email: string } }[]>([]);
+const enrollmentsData = ref<
+    { user: { id: number; name: string; email: string } }[]
+>([]);
 const loadingEnrollments = ref(false);
 
 const openEnrollments = async (classroom: Classroom) => {
@@ -103,11 +105,11 @@ const openEnrollments = async (classroom: Classroom) => {
     try {
         const http = useHttp({
             query: '',
-        })
+        });
         await http.get(enrollments(classroom.id).url, {
             onSuccess: (response: any) => {
                 enrollmentsData.value = response.data;
-            }
+            },
         });
     } catch (error) {
         console.error(error);
@@ -137,16 +139,29 @@ const deleteClassroom = () => {
     <Head title="Manajemen Kelas" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div
+            class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        >
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">Manajemen Kelas</h1>
-                <p class="text-sm text-muted-foreground">Kelola kelas yang tersedia di platform.</p>
+                <h1 class="text-2xl font-bold tracking-tight">
+                    Manajemen Kelas
+                </h1>
+                <p class="text-sm text-muted-foreground">
+                    Kelola kelas yang tersedia di platform.
+                </p>
             </div>
         </div>
 
         <div class="flex flex-col gap-4 md:flex-row md:items-center">
-            <Input v-model="search" placeholder="Cari nama atau kode kelas..." class="md:max-w-[300px]" />
-            <TeacherNameCombobox :teachers="teachers" @selected="(id) => teacherId = id" />
+            <Input
+                v-model="search"
+                placeholder="Cari nama atau kode kelas..."
+                class="md:max-w-[300px]"
+            />
+            <TeacherNameCombobox
+                :teachers="teachers"
+                @selected="(id) => (teacherId = id)"
+            />
         </div>
 
         <div class="rounded-md border bg-card">
@@ -163,11 +178,17 @@ const deleteClassroom = () => {
                 <TableBody>
                     <TableRow v-for="cls in classroom.data" :key="cls.id">
                         <TableCell>
-                            <Badge variant="outline" class="font-mono">{{ cls.code }}</Badge>
+                            <Badge variant="outline" class="font-mono">{{
+                                cls.code
+                            }}</Badge>
                         </TableCell>
-                        <TableCell class="font-medium">{{ cls.name }}</TableCell>
+                        <TableCell class="font-medium">{{
+                            cls.name
+                        }}</TableCell>
                         <TableCell>{{ cls.teacher.name }}</TableCell>
-                        <TableCell>{{ dayjs(cls.created_at).format('DD MMM YYYY') }}</TableCell>
+                        <TableCell>{{
+                            dayjs(cls.created_at).format('DD MMM YYYY')
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
@@ -178,11 +199,17 @@ const deleteClassroom = () => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                                    <DropdownMenuItem @click="openEnrollments(cls)">
-                                        <Users class="mr-2 h-4 w-4" /> Lihat Siswa
+                                    <DropdownMenuItem
+                                        @click="openEnrollments(cls)"
+                                    >
+                                        <Users class="mr-2 h-4 w-4" /> Lihat
+                                        Siswa
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem class="text-destructive" @click="confirmDelete(cls.id)">
+                                    <DropdownMenuItem
+                                        class="text-destructive"
+                                        @click="confirmDelete(cls.id)"
+                                    >
                                         <Trash2 class="mr-2 h-4 w-4" /> Hapus
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -190,7 +217,10 @@ const deleteClassroom = () => {
                         </TableCell>
                     </TableRow>
                     <TableRow v-if="classroom.data.length === 0">
-                        <TableCell colspan="5" class="text-center text-muted-foreground h-24">
+                        <TableCell
+                            colspan="5"
+                            class="h-24 text-center text-muted-foreground"
+                        >
                             Tidak ada kelas ditemukan.
                         </TableCell>
                     </TableRow>
@@ -198,7 +228,10 @@ const deleteClassroom = () => {
             </Table>
         </div>
 
-        <div class="flex items-center justify-end space-x-2" v-if="classroom.links && classroom.links.length > 3">
+        <div
+            class="flex items-center justify-end space-x-2"
+            v-if="classroom.links && classroom.links.length > 3"
+        >
             <template v-for="(link, index) in classroom.links" :key="index">
                 <Button
                     v-if="link.url"
@@ -210,7 +243,11 @@ const deleteClassroom = () => {
                 >
                     <span v-html="link.label"></span>
                 </Button>
-                <span v-else class="text-muted-foreground px-2" v-html="link.label"></span>
+                <span
+                    v-else
+                    class="px-2 text-muted-foreground"
+                    v-html="link.label"
+                ></span>
             </template>
         </div>
     </div>
@@ -219,23 +256,39 @@ const deleteClassroom = () => {
     <Dialog v-model:open="enrollmentsDialogOpen">
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Data Siswa - {{ currentClassroom?.name }}</DialogTitle>
+                <DialogTitle
+                    >Data Siswa - {{ currentClassroom?.name }}</DialogTitle
+                >
                 <DialogDescription>
                     Daftar siswa yang tergabung di kelas ini.
                 </DialogDescription>
             </DialogHeader>
-            <div v-if="loadingEnrollments" class="py-6 text-center text-muted-foreground">
+            <div
+                v-if="loadingEnrollments"
+                class="py-6 text-center text-muted-foreground"
+            >
                 Memuat data...
             </div>
             <div v-else>
-                <div v-if="enrollmentsData.length === 0" class="py-6 text-center text-muted-foreground">
+                <div
+                    v-if="enrollmentsData.length === 0"
+                    class="py-6 text-center text-muted-foreground"
+                >
                     Tidak ada siswa di kelas ini.
                 </div>
-                <div v-else class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                    <div v-for="enrollment in enrollmentsData" :key="enrollment.user.id" class="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
+                <div v-else class="max-h-[60vh] space-y-4 overflow-y-auto pr-2">
+                    <div
+                        v-for="enrollment in enrollmentsData"
+                        :key="enrollment.user.id"
+                        class="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0"
+                    >
                         <div class="flex flex-col">
-                            <span class="font-medium text-sm">{{ enrollment.user.name }}</span>
-                            <span class="text-xs text-muted-foreground">{{ enrollment.user.email }}</span>
+                            <span class="text-sm font-medium">{{
+                                enrollment.user.name
+                            }}</span>
+                            <span class="text-xs text-muted-foreground">{{
+                                enrollment.user.email
+                            }}</span>
                         </div>
                     </div>
                 </div>
@@ -249,13 +302,19 @@ const deleteClassroom = () => {
             <AlertDialogHeader>
                 <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan. Ini akan menghapus kelas ini secara permanen.
-                    Catatan: Kelas dengan tugas aktif tidak dapat dihapus.
+                    Tindakan ini tidak dapat dibatalkan. Ini akan menghapus
+                    kelas ini secara permanen. Catatan: Kelas dengan tugas aktif
+                    tidak dapat dihapus.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel @click="deleteDialogOpen = false">Batal</AlertDialogCancel>
-                <AlertDialogAction @click="deleteClassroom" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                <AlertDialogCancel @click="deleteDialogOpen = false"
+                    >Batal</AlertDialogCancel
+                >
+                <AlertDialogAction
+                    @click="deleteClassroom"
+                    class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
                     Hapus
                 </AlertDialogAction>
             </AlertDialogFooter>
