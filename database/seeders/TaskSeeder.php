@@ -18,14 +18,16 @@ class TaskSeeder extends Seeder
         $class = Classroom::first();
         $teacher = User::where('role', 'teacher')->first();
 
-        Task::create([
-            'classroom_id' => $class->id,
-            'title' => 'Write About Yourself',
-            'description' => 'Write a short essay in French about yourself.',
-            'deadline' => now()->addDays(7),
-            'minimal_score' => 85,
-            'created_by' => $teacher->id,
-            'is_published' => true,
-        ]);
+        Task::updateOrCreate(
+            ['title' => 'Write About Yourself'],
+            [
+                'classroom_id' => $class->id,
+                'description' => 'Write a short essay in French about yourself.',
+                'deadline' => now()->addDays(7),
+                'minimal_score' => 85,
+                'created_by' => $teacher->id,
+                'is_published' => true,
+            ]
+        );
     }
 }

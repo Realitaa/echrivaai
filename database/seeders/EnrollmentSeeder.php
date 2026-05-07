@@ -19,12 +19,16 @@ class EnrollmentSeeder extends Seeder
         $students = User::where('role', 'student')->get();
 
         foreach ($students as $student) {
-            Enrollment::create([
-                'user_id' => $student->id,
-                'classroom_id' => $class->id,
-                'role' => 'student',
-                'joined_at' => now(),
-            ]);
+            Enrollment::updateOrCreate(
+                [
+                    'user_id' => $student->id,
+                    'classroom_id' => $class->id,
+                ],
+                [
+                    'role' => 'student',
+                    'joined_at' => now(),
+                ]
+            );
         }
     }
 }

@@ -15,32 +15,38 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Admin
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'is_approved' => true,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'is_approved' => true,
+            ]
+        );
 
         // Teacher
-        User::create([
-            'name' => 'Teacher User',
-            'email' => 'teacher@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'teacher',
-            'is_approved' => true,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'teacher@example.com'],
+            [
+                'name' => 'Teacher User',
+                'password' => Hash::make('password'),
+                'role' => 'teacher',
+                'is_approved' => true,
+            ]
+        );
 
         // Students
         for ($i = 1; $i <= 5; $i++) {
-            User::create([
-                'name' => "Student $i",
-                'email' => "student$i@example.com",
-                'password' => Hash::make('password'),
-                'role' => 'student',
-                'is_approved' => true,
-            ]);
+            User::updateOrCreate(
+                ['email' => "student$i@example.com"],
+                [
+                    'name' => "Student $i",
+                    'password' => Hash::make('password'),
+                    'role' => 'student',
+                    'is_approved' => true,
+                ]
+            );
         }
     }
 }

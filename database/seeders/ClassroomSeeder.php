@@ -17,11 +17,13 @@ class ClassroomSeeder extends Seeder
     {
         $teacher = User::where('role', 'teacher')->first();
 
-        Classroom::create([
-            'name' => 'French Writing A1',
-            'description' => 'Basic French Writing Class',
-            'teacher_id' => $teacher->id,
-            'code' => Str::upper(Str::random(6)),
-        ]);
+        Classroom::updateOrCreate(
+            ['name' => 'French Writing A1'],
+            [
+                'description' => 'Basic French Writing Class',
+                'teacher_id' => $teacher->id,
+                'code' => Str::upper(Str::random(6)),
+            ]
+        );
     }
 }
