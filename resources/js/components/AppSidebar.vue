@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ClipboardList, GraduationCap, LayoutGrid, Users } from '@lucide/vue';
+import { ClipboardCheck, ClipboardList, GraduationCap, LayoutGrid, Users } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import classroom from '@/routes/admin/classroom';
+import submission from '@/routes/admin/submission';
 import task from '@/routes/admin/task';
 import users from '@/routes/admin/user';
 import type { NavItem } from '@/types';
@@ -40,6 +41,11 @@ const mainNavItems: NavItem[] = [
         href: task.index(),
         icon: ClipboardList,
     },
+    {
+        title: 'Penugasan',
+        href: submission.index(),
+        icon: ClipboardCheck,
+    }
 ];
 </script>
 
