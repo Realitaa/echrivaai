@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { GraduationCap, LayoutGrid, Users } from '@lucide/vue';
+import { ClipboardList, GraduationCap, LayoutGrid, Users } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import classroom from '@/routes/admin/classroom';
+import task from '@/routes/admin/task';
 import users from '@/routes/admin/user';
 import type { NavItem } from '@/types';
 
@@ -33,6 +34,11 @@ const mainNavItems: NavItem[] = [
         title: 'Kelas',
         href: classroom.index(),
         icon: GraduationCap,
+    },
+    {
+        title: 'Tugas',
+        href: task.index(),
+        icon: ClipboardList,
     },
 ];
 </script>

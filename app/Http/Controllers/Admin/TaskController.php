@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Classroom;
 use App\Models\Task;
+use App\Models\User;
 use App\Services\Admin\TaskService;
 use Inertia\Inertia;
 
@@ -15,9 +17,13 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $tasks = $this->taskService->getPaginatedTasks($request);
+        $classrooms = Classroom::select('id', 'name')->orderBy('name', 'asc')->get();
+        $teachers = User::select('id', 'name')->where('role', 'teacher')->orderBy('name', 'asc')->get();
 
         return Inertia::render('admin/Task', [
             'tasks' => $tasks,
+            'classrooms' => $classrooms,
+            'teachers' => $teachers,
             'filters' => $request->only([
                 'search',
                 'teacher_id',
