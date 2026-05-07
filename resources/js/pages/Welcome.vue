@@ -12,6 +12,7 @@ import {
     Sparkles,
 } from 'lucide-vue-next';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import CardIcon from '@/components/CardIcon.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -225,83 +226,84 @@ withDefaults(
                     Grading shouldn't be the hardest part of teaching
                 </h2>
                 <div class="grid items-center gap-12 md:grid-cols-2">
-                    <div
-                        class="relative overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-8 text-left"
+                    <CardIcon :icon="Clock">
+                        <template #title>
+                            <h3
+                                class="mb-4 flex items-center gap-2 text-xl font-semibold text-red-500"
+                            >
+                                The Problem
+                            </h3>
+                        </template>
+                        <template #default>
+                            <p class="mb-6 text-slate-600">
+                                Manual grading is slow, exhausting, and often
+                                inconsistent. Teachers spend weekends reading
+                                essays, while students wait days or weeks for
+                                feedback.
+                            </p>
+                            <ul class="space-y-3">
+                                <li class="flex items-center gap-3 text-slate-600">
+                                    <span
+                                        class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
+                                    ></span>
+                                    Burnout from endless paperwork
+                                </li>
+                                <li class="flex items-center gap-3 text-slate-600">
+                                    <span
+                                        class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
+                                    ></span>
+                                    Delayed student learning cycle
+                                </li>
+                                <li class="flex items-center gap-3 text-slate-600">
+                                    <span
+                                        class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
+                                    ></span>
+                                    Subjective scoring variations
+                                </li>
+                            </ul>
+                        </template>
+                    </CardIcon>
+                    <CardIcon
+                        :icon="Sparkles"
+                        cardClass="bg-purple-50"
+                        :iconClass="'text-purple-600'"
                     >
-                        <div class="absolute top-0 right-0 p-4 opacity-10">
-                            <Clock class="h-24 w-24" />
-                        </div>
-                        <h3
-                            class="mb-4 flex items-center gap-2 text-xl font-semibold text-red-500"
-                        >
-                            The Problem
-                        </h3>
-                        <p class="mb-6 text-slate-600">
-                            Manual grading is slow, exhausting, and often
-                            inconsistent. Teachers spend weekends reading
-                            essays, while students wait days or weeks for
-                            feedback.
-                        </p>
-                        <ul class="space-y-3">
-                            <li class="flex items-center gap-3 text-slate-600">
-                                <span
-                                    class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
-                                ></span>
-                                Burnout from endless paperwork
-                            </li>
-                            <li class="flex items-center gap-3 text-slate-600">
-                                <span
-                                    class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
-                                ></span>
-                                Delayed student learning cycle
-                            </li>
-                            <li class="flex items-center gap-3 text-slate-600">
-                                <span
-                                    class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"
-                                ></span>
-                                Subjective scoring variations
-                            </li>
-                        </ul>
-                    </div>
-                    <div
-                        class="relative overflow-hidden rounded-2xl border border-purple-100 bg-purple-50 p-8 text-left shadow-lg shadow-purple-100/50"
-                    >
-                        <div
-                            class="absolute top-0 right-0 p-4 text-purple-600 opacity-10"
-                        >
-                            <Sparkles class="h-24 w-24" />
-                        </div>
-                        <h3
-                            class="mb-4 flex items-center gap-2 text-xl font-semibold text-purple-900"
-                        >
-                            The EchrivaAI Solution
-                        </h3>
-                        <p class="mb-6 text-purple-800/80">
-                            Automate the initial review process. Let AI handle
-                            the mechanics and structured feedback, so teachers
-                            can focus on higher-level mentoring.
-                        </p>
-                        <ul class="space-y-3">
-                            <li
-                                class="flex items-center gap-3 text-purple-800/80"
+                        <template #title>
+                            <h3
+                                class="mb-4 flex items-center gap-2 text-xl font-semibold text-purple-900"
                             >
-                                <CheckCircle2 class="h-5 w-5 text-purple-600" />
-                                Instant, structured AI analysis
-                            </li>
-                            <li
-                                class="flex items-center gap-3 text-purple-800/80"
-                            >
-                                <CheckCircle2 class="h-5 w-5 text-purple-600" />
-                                Objective and consistent scoring
-                            </li>
-                            <li
-                                class="flex items-center gap-3 text-purple-800/80"
-                            >
-                                <CheckCircle2 class="h-5 w-5 text-purple-600" />
-                                More time for student interaction
-                            </li>
-                        </ul>
-                    </div>
+                                The EchrivaAI Solution
+                            </h3>
+                        </template>
+                        <template #default>
+                            <p class="mb-6 text-purple-800/80">
+                                Automate the initial review process. Let AI
+                                handle the mechanics and structured feedback,
+                                so teachers can focus on higher-level
+                                mentoring.
+                            </p>
+                            <ul class="space-y-3">
+                                <li
+                                    class="flex items-center gap-3 text-purple-800/80"
+                                >
+                                    <CheckCircle2 class="h-5 w-5 text-purple-600" />
+                                    Instant, structured AI analysis
+                                </li>
+                                <li
+                                    class="flex items-center gap-3 text-purple-800/80"
+                                >
+                                    <CheckCircle2 class="h-5 w-5 text-purple-600" />
+                                    Objective and consistent scoring
+                                </li>
+                                <li
+                                    class="flex items-center gap-3 text-purple-800/80"
+                                >
+                                    <CheckCircle2 class="h-5 w-5 text-purple-600" />
+                                    More time for student interaction
+                                </li>
+                            </ul>
+                        </template>
+                    </CardIcon>
                 </div>
             </div>
         </section>

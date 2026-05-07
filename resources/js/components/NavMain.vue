@@ -29,7 +29,7 @@ const { isCurrentUrl } = useCurrentUrl();
                     size="lg"
                 >
                     <Link :href="item.href">
-                        <component :is="item.icon" class="size-5! ml-1" />
+                        <component :is="item.icon" class="ml-1 size-5!" />
                         <span class="text-md">{{ item.title }}</span>
                     </Link>
                 </SidebarMenuButton>
