@@ -31,4 +31,9 @@ class TaskPolicy
     {
         return $user->is($task->classroom->teacher);
     }
+
+    public function managePublishing(User $user, Task $task): bool
+    {
+        return $user->is($task->classroom->teacher);
+    }
 }

@@ -14,7 +14,7 @@ class TaskController extends Controller
     public function index(Classroom $classroom)
     {
         return Inertia::render('student/task/Index', [
-            'tasks' => $classroom->publishedTasks()->latest()->paginate(10),
+            'tasks' => $classroom->publishedTasks()->with('files')->latest()->paginate(10),
         ]);
     }
 
@@ -32,7 +32,7 @@ class TaskController extends Controller
             ->get();
 
         return Inertia::render('student/task/Show', [
-            'task' => $task,
+            'task' => $task->load('files'),
             'submissions' => $submissions,
         ]);
     }

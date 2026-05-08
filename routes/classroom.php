@@ -80,6 +80,14 @@ Route::group(
                     TeacherTaskController::class,
                     'destroy',
                 ])->name('destroy');
+                Route::patch('/{task}/publish', [
+                    TeacherTaskController::class,
+                    'publish',
+                ])->name('publish');
+                Route::patch('/{task}/unpublish', [
+                    TeacherTaskController::class,
+                    'unpublish',
+                ])->name('unpublish');
 
                 Route::group(
                     ['prefix' => '{task}/submissions', 'as' => 'submission.'],

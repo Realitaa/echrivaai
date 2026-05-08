@@ -13,7 +13,7 @@ class TaskService
 {
     public function getPaginatedTasks(Classroom $classroom)
     {
-        return $classroom->tasks()->latest()->paginate(10);
+        return $classroom->tasks()->with('files')->latest()->paginate(10);
     }
 
     public function createTask(Classroom $classroom, array $data)
@@ -98,5 +98,25 @@ class TaskService
                 $tempFile->delete();
             }
         }
+    }
+
+    public function publishTask(Task $task): void
+    {
+        $task->update([
+            'is_published' => true,
+        ]);
+    }
+
+    public function unpublishTask(Task $task): bool
+    {
+        if ($task->hasSubmission()) {
+            return false;
+        }
+
+        $task->update([
+            'is_published' => false,
+        ]);
+
+        return true;
     }
 }

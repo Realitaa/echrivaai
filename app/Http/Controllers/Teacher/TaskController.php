@@ -73,7 +73,7 @@ class TaskController extends Controller
         abort_if($task->classroom_id !== $classroom->id, 404);
 
         return Inertia::render('teacher/task/Show', [
-            'task' => $task,
+            'task' => $task->load('files'),
         ]);
     }
 
@@ -137,6 +137,61 @@ class TaskController extends Controller
         Inertia::flash('toast', [
             'type' => 'success',
             'message' => 'Task deleted successfully!',
+        ]);
+
+        return to_route('teacher.classroom.show', $classroom);
+    }
+
+    #[Authorize('managePublishing', 'task')]
+    public function publish(Classroom $classroom, Task $task)
+    {
+        abort_if($task->classroom_id !== $classroom->id, 404);
+
+        if ($task->is_published) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Task is already published!',
+            ]);
+
+            return to_route('teacher.classroom.show', $classroom);
+        }
+
+        $this->taskService->publishTask($task);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Task published successfully!',
+        ]);
+
+        return to_route('teacher.classroom.show', $classroom);
+    }
+
+    #[Authorize('managePublishing', 'task')]
+    public function unpublish(Classroom $classroom, Task $task)
+    {
+        abort_if($task->classroom_id !== $classroom->id, 404);
+
+        if (!$task->is_published) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Task is not published!',
+            ]);
+
+            return to_route('teacher.classroom.show', $classroom);
+        }
+
+        if (!$this->taskService->unpublishTask($task)) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Cannot unpublish task that has submissions!',
+            ]);
+
+            return to_route('teacher.classroom.show', $classroom);
+        }
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Task unpublished successfully!',
         ]);
 
         return to_route('teacher.classroom.show', $classroom);
