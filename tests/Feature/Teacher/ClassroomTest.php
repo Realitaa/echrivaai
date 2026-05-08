@@ -394,9 +394,16 @@ test('teacher cannot delete classroom with active tasks', function () {
         'is_published' => true,
     ]);
 
-    $this->actingAs($teacher)->delete(
+    $response = $this->actingAs($teacher)->delete(
         route('teacher.classroom.destroy', $classroom),
     );
+
+    $response->assertRedirectBack();
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'error',
+        'message' => 'Classroom cannot be deleted because it has active tasks.',
+    ]);
 
     $this->assertDatabaseHas('classrooms', [
         'id' => $classroom->id,

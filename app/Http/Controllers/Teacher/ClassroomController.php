@@ -72,13 +72,12 @@ class ClassroomController extends Controller
     public function destroy(Classroom $classroom)
     {
         if (!$this->classroomService->deleteClassroom($classroom)) {
-            return redirect()
-                ->route('teacher.classroom.index')
-                ->with('toast', [
-                    'type' => 'error',
-                    'message' =>
-                        'Classroom cannot be deleted because it has active tasks.',
-                ]);
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Classroom cannot be deleted because it has active tasks.',
+            ]);
+            
+            return back();
         }
 
         Cache::forget("sidebar_user_v1_{$classroom->teacher_id}");

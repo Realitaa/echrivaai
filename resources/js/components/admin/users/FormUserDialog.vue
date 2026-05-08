@@ -51,6 +51,7 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                 @success="dialogOpen = false"
                 class="space-y-4"
                 #default="{ errors, processing }"
+                autocomplete="off"
             >
                 <div class="space-y-2">
                     <Label for="name">Nama</Label>
@@ -124,6 +125,7 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                         type="button"
                         variant="outline"
                         @click="dialogOpen = false"
+                        :disabled="processing"
                         >Batal</Button
                     >
                     <Button type="submit" :disabled="processing">

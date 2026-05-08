@@ -6,6 +6,7 @@ import {
     Trash2,
     CheckCircle,
     XCircle,
+    Plus,
 } from '@lucide/vue';
 import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
@@ -144,7 +145,9 @@ const toggleApprove = (user: User) => {
                     Kelola pengguna yang terdaftar di platform.
                 </p>
             </div>
-            <Button @click="openCreateDialog">Tambah Pengguna</Button>
+            <Button @click="openCreateDialog">
+                <Plus class="h-4 w-4" /> Tambah Pengguna
+            </Button>
         </div>
 
         <div class="flex flex-col gap-4 md:flex-row md:items-center">
