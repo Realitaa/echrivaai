@@ -5,6 +5,7 @@ use App\Models\Classroom;
 use App\Models\Task;
 use App\Models\TaskRubric;
 use App\Models\Submission;
+use App\Models\File;
 use App\Models\TemporaryFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -584,7 +585,6 @@ test('teacher can view edit task form', function () {
         ->assertSuccessful()
         ->assertInertia(fn(Assert $page) => $page->component('teacher/task/Form'))
         ->assertInertia(function (Assert $page) use ($task, $classroom) {
-            $page->dump();
             $page->has('task', function (Assert $page) use ($task, $classroom) {
                 $page->where('id', $task->id)
                     ->where('classroom_id', $classroom->id)
@@ -751,6 +751,72 @@ test('teacher can remove a rubric during task update', function () {
     $this->assertDatabaseMissing('task_rubrics', [
         'title' => 'Vocabulary',
     ]);
+});
+
+test('teacher can remove attachment during task update', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => false,
+    ]);
+
+    Storage::fake('public');
+
+    // Create two files attached to the task
+    $f1 = File::factory()->create([
+        'fileable_id' => $task->id,
+        'fileable_type' => Task::class,
+        'original_name' => 'keep.jpg',
+        'path' => 'tasks/keep.jpg',
+        'uploaded_by' => $teacher->id,
+    ]);
+    $f2 = File::factory()->create([
+        'fileable_id' => $task->id,
+        'fileable_type' => Task::class,
+        'original_name' => 'remove.jpg',
+        'path' => 'tasks/remove.jpg',
+        'uploaded_by' => $teacher->id,
+    ]);
+
+    // Put files in fake storage
+    Storage::disk('public')->put($f1->path, 'keep me');
+    Storage::disk('public')->put($f2->path, 'remove me');
+
+    $this->assertDatabaseCount('files', 2);
+    Storage::disk('public')->assertExists($f1->path);
+    Storage::disk('public')->assertExists($f2->path);
+
+    // Update task, keeping only $f1
+    $response = $this->actingAs($teacher)->put(
+        route('teacher.classroom.task.update', [$classroom, $task]),
+        [
+            'title' => 'Updated Task',
+            'deadline' => Carbon::now()->addDays(10)->toDateTimeString(),
+            'is_published' => false,
+            'rubrics' => [
+                [
+                    'title' => 'Grammar',
+                    'description' => 'Grammar description',
+                    'max_score' => 25,
+                    'order' => 1,
+                ],
+            ],
+            'attachments' => [$f1->id],
+        ],
+    );
+
+    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+
+    // Assert database
+    $this->assertDatabaseCount('files', 1);
+    $this->assertDatabaseHas('files', ['id' => $f1->id]);
+    $this->assertDatabaseMissing('files', ['id' => $f2->id]);
+
+    // Assert physical storage
+    Storage::disk('public')->assertExists($f1->path);
+    Storage::disk('public')->assertMissing($f2->path);
 });
 
 test('teacher cannot update publised task', function () {

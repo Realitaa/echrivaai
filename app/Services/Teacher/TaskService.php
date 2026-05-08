@@ -50,6 +50,11 @@ class TaskService
                 $task->rubrics()->createMany($data['rubrics']);
             }
 
+            if (isset($data['attachments'])) {
+                $task->files()->whereNotIn('id', $data['attachments'])->get()->each->delete();
+                $this->attachFiles($task, $data['attachments']);
+            }
+
             return $task;
         });
     }

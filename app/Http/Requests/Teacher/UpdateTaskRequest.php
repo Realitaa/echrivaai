@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Teacher;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 
 class UpdateTaskRequest extends FormRequest
 {
@@ -29,6 +30,24 @@ class UpdateTaskRequest extends FormRequest
             'rubrics.*.description' => ['required', 'string'],
             'rubrics.*.max_score' => ['required', 'integer', 'min:1'],
             'rubrics.*.order' => ['required', 'integer', 'distinct'],
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $existsInTemp = DB::table('temporary_files')
+                        ->where('id', $value)
+                        ->where('uploaded_by', auth()->id())
+                        ->exists();
+                    $existsInFiles = DB::table('files')
+                        ->where('id', $value)
+                        ->where('uploaded_by', auth()->id())
+                        ->exists();
+
+                    if (!$existsInTemp && !$existsInFiles) {
+                        $fail('The selected attachment is invalid.');
+                    }
+                },
+            ],
         ];
     }
 }
