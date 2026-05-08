@@ -64,19 +64,6 @@ class TaskController extends Controller
         return to_route('teacher.classroom.task.index', $classroom);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    #[Authorize('view', 'task')]
-    public function show(Classroom $classroom, Task $task)
-    {
-        abort_if($task->classroom_id !== $classroom->id, 404);
-
-        return Inertia::render('teacher/task/Show', [
-            'task' => $task->load('files'),
-        ]);
-    }
-
     #[Authorize('update', 'task')]
     public function edit(Classroom $classroom, Task $task)
     {

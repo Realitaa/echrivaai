@@ -973,45 +973,6 @@ test('teacher cannot update other teacher tasks', function () {
         ->assertForbidden();
 });
 
-// === Teacher/TaskController.show ===
-
-test('teacher can view task details', function () {
-    $teacher = User::factory()->create(['role' => 'teacher']);
-    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create([
-        'classroom_id' => $classroom->id,
-        'created_by' => $teacher->id,
-    ]);
-
-    $this->actingAs($teacher)
-        ->get(route('teacher.classroom.task.show', [$classroom, $task]))
-        ->assertSuccessful()
-        ->assertInertia(
-            fn(Assert $page) => $page
-                ->component('teacher/task/Show')
-                ->where('task.id', $task->id),
-        );
-});
-
-test(
-    'teacher cannot view task details from other classroom teacher',
-    function () {
-        $teacher1 = User::factory()->create(['role' => 'teacher']);
-        $teacher2 = User::factory()->create(['role' => 'teacher']);
-        $classroom2 = Classroom::factory()->create([
-            'teacher_id' => $teacher2->id,
-        ]);
-        $task2 = Task::factory()->create([
-            'classroom_id' => $classroom2->id,
-            'created_by' => $teacher2->id,
-        ]);
-
-        $this->actingAs($teacher1)
-            ->get(route('teacher.classroom.task.show', [$classroom2, $task2]))
-            ->assertForbidden();
-    },
-);
-
 // === Teacher/TaskController.destroy ===
 
 test('teacher can delete unpublished task', function () {
