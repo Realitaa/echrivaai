@@ -22,8 +22,10 @@ class TaskController extends Controller
     public function index(Classroom $classroom)
     {
         $tasks = $this->taskService->getPaginatedTasks($classroom);
+        $classroom->loadCount(['tasks', 'enrollments']);
 
         return Inertia::render('teacher/task/Index', [
+            'classroom' => $classroom,
             'tasks' => $tasks,
         ]);
     }
@@ -34,8 +36,9 @@ class TaskController extends Controller
     #[Authorize('view', 'classroom')]
     public function create(Classroom $classroom)
     {
-        // Policy need $classroom as content, but frontend dont
-        return Inertia::render('teacher/task/Form');
+        return Inertia::render('teacher/task/Form', [
+            'classroom' => $classroom,
+        ]);
     }
 
     /**
