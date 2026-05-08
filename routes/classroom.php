@@ -72,6 +72,10 @@ Route::group(
                     TeacherTaskController::class,
                     'show',
                 ])->name('show');
+                Route::get('/{task}/edit', [
+                    TeacherTaskController::class,
+                    'edit',
+                ])->name('edit');
                 Route::put('/{task}', [
                     TeacherTaskController::class,
                     'update',

@@ -35,7 +35,7 @@ class TaskController extends Controller
     public function create(Classroom $classroom)
     {
         // Policy need $classroom as content, but frontend dont
-        return Inertia::render('teacher/task/Create');
+        return Inertia::render('teacher/task/Form');
     }
 
     /**
@@ -74,6 +74,25 @@ class TaskController extends Controller
 
         return Inertia::render('teacher/task/Show', [
             'task' => $task->load('files'),
+        ]);
+    }
+
+    #[Authorize('update', 'task')]
+    public function edit(Classroom $classroom, Task $task)
+    {
+        abort_if($task->classroom_id !== $classroom->id, 404);
+
+        if ($task->is_published) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'You cannot edit a published task!',
+            ]);
+
+            return to_route('teacher.classroom.show', $classroom);
+        }
+
+        return Inertia::render('teacher/task/Form', [
+            'task' => $task->load('files', 'rubrics'),
         ]);
     }
 

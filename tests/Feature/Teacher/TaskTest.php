@@ -53,7 +53,7 @@ test('teacher can view create task form', function () {
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.task.create', $classroom))
         ->assertSuccessful()
-        ->assertInertia(fn(Assert $page) => $page->component('teacher/task/Create'));
+        ->assertInertia(fn(Assert $page) => $page->component('teacher/task/Form'));
 });
 
 test('teacher cannot view create task form from other classroom teacher', function () {
@@ -548,6 +548,88 @@ test('teacher cannot create task in other teacher classroom', function () {
         ])
         ->assertForbidden();
 });
+
+// === Teacher/TaskController.edit ===
+
+test('teacher can view edit task form', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => false,
+    ]);
+
+    TaskRubric::factory(5)->create([
+        'task_id' => $task->id,
+    ]);
+
+    $task->files()->createMany([
+        [
+            'original_name' => 'file1.txt',
+            'filename' => 'file1.txt',
+            'path' => 'tasks/file1.txt',
+            'uploaded_by' => $teacher->id,
+        ],
+        [
+            'original_name' => 'file2.txt',
+            'filename' => 'file2.txt',
+            'path' => 'tasks/file2.txt',
+            'uploaded_by' => $teacher->id,
+        ],
+    ]);
+
+    $this->actingAs($teacher)
+        ->get(route('teacher.classroom.task.edit', [$classroom, $task]))
+        ->assertSuccessful()
+        ->assertInertia(fn(Assert $page) => $page->component('teacher/task/Form'))
+        ->assertInertia(function (Assert $page) use ($task, $classroom) {
+            $page->dump();
+            $page->has('task', function (Assert $page) use ($task, $classroom) {
+                $page->where('id', $task->id)
+                    ->where('classroom_id', $classroom->id)
+                    ->has('classroom')
+                    ->has('files', 2)
+                    ->etc();
+            })
+            ->has('task.rubrics', 5);
+        });
+});
+
+test('teacher cannot view edit task form for other classroom teacher', function () {
+    $teacher1 = User::factory()->create(['role' => 'teacher']);
+    $teacher2 = User::factory()->create(['role' => 'teacher']);
+    $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
+    $task2 = Task::factory()->create([
+        'classroom_id' => $classroom2->id,
+        'created_by' => $teacher2->id,
+    ]);
+
+    $this->actingAs($teacher1)
+        ->get(route('teacher.classroom.task.edit', [$classroom2, $task2]))
+        ->assertForbidden();
+});
+
+test('teacher cannot view edit task form if task is published', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+    $task = Task::factory()->create([
+        'classroom_id' => $classroom->id,
+        'created_by' => $teacher->id,
+        'is_published' => true,
+    ]);
+
+    $response = $this->actingAs($teacher)->get(
+        route('teacher.classroom.task.edit', [$classroom, $task]),
+    );
+
+    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertInertiaFlash('toast', [
+        'type' => 'error',
+        'message' => 'You cannot edit a published task!',
+    ]);
+});
+
 
 // === Teacher/TaskController.update ===
 
