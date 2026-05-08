@@ -45,6 +45,28 @@ test('teacher cannot view task list from other classroom teacher', function () {
         ->assertForbidden();
 });
 
+// === Teacher/TaskController.create ===
+test('teacher can view create task form', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
+
+    $this->actingAs($teacher)
+        ->get(route('teacher.classroom.task.create', $classroom))
+        ->assertSuccessful()
+        ->assertInertia(fn(Assert $page) => $page->component('teacher/task/Create'));
+});
+
+test('teacher cannot view create task form from other classroom teacher', function () {
+    $teacher1 = User::factory()->create(['role' => 'teacher']);
+    $teacher2 = User::factory()->create(['role' => 'teacher']);
+
+    $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
+
+    $this->actingAs($teacher1)
+        ->get(route('teacher.classroom.task.create', $classroom2))
+        ->assertForbidden();
+});
+
 // === Teacher/TaskController.store ===
 
 test('teacher can create task with complete attributes', function () {

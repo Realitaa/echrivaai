@@ -10,7 +10,6 @@ use App\Models\Task;
 use App\Services\Teacher\TaskService;
 use Inertia\Inertia;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
-use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -27,6 +26,16 @@ class TaskController extends Controller
         return Inertia::render('teacher/task/Index', [
             'tasks' => $tasks,
         ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    #[Authorize('view', 'classroom')]
+    public function create(Classroom $classroom)
+    {
+        // Policy need $classroom as content, but frontend dont
+        return Inertia::render('teacher/task/Create');
     }
 
     /**
