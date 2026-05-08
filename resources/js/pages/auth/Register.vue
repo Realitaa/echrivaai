@@ -109,7 +109,6 @@ defineOptions({
                 type="submit"
                 class="w-full"
                 tabindex="5"
-                :variant="'ecrivaai'"
                 :disabled="processing"
                 data-test="register-user-button"
             >

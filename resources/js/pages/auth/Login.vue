@@ -91,7 +91,6 @@ defineProps<{
             <Button
                 type="submit"
                 class="w-full"
-                :variant="'ecrivaai'"
                 :tabindex="4"
                 :disabled="processing"
                 data-test="login-button"
