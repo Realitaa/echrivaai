@@ -7,8 +7,9 @@ use App\Http\Requests\Teacher\StoreClassroomRequest;
 use App\Http\Requests\Teacher\UpdateClassroomRequest;
 use App\Models\Classroom;
 use App\Services\Teacher\ClassroomService;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
+use Inertia\Inertia;
 
 class ClassroomController extends Controller
 {
@@ -26,6 +27,8 @@ class ClassroomController extends Controller
     public function store(StoreClassroomRequest $request)
     {
         $this->classroomService->createClassroom($request->validated());
+
+        Cache::forget("sidebar_user_v1_{$request->user()->id}");
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -55,6 +58,8 @@ class ClassroomController extends Controller
             $request->validated(),
         );
 
+        Cache::forget("sidebar_user_v1_{$classroom->teacher_id}");
+
         Inertia::flash('toast', [
             'type' => 'success',
             'message' => 'Classroom updated successfully!',
@@ -75,6 +80,8 @@ class ClassroomController extends Controller
                         'Classroom cannot be deleted because it has active tasks.',
                 ]);
         }
+
+        Cache::forget("sidebar_user_v1_{$classroom->teacher_id}");
 
         Inertia::flash('toast', [
             'type' => 'success',

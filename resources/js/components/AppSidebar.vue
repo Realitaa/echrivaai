@@ -1,12 +1,5 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import {
-    ClipboardCheck,
-    ClipboardList,
-    GraduationCap,
-    LayoutGrid,
-    Users,
-} from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -19,40 +12,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
-import classroom from '@/routes/admin/classroom';
-import submission from '@/routes/admin/submission';
-import task from '@/routes/admin/task';
-import users from '@/routes/admin/user';
-import type { NavItem } from '@/types';
+import { useNavItems } from '@/composables/useNavItems';
+import { home } from '@/routes';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Pengguna',
-        href: users.index(),
-        icon: Users,
-    },
-    {
-        title: 'Kelas',
-        href: classroom.index(),
-        icon: GraduationCap,
-    },
-    {
-        title: 'Tugas',
-        href: task.index(),
-        icon: ClipboardList,
-    },
-    {
-        title: 'Penugasan',
-        href: submission.index(),
-        icon: ClipboardCheck,
-    },
-];
+const mainNavItems = useNavItems();
 </script>
 
 <template>
@@ -61,7 +24,7 @@ const mainNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link :href="home()">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

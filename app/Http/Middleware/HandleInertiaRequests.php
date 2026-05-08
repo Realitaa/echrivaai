@@ -2,11 +2,20 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\SidebarService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Inertia\Inertia;
 
 class HandleInertiaRequests extends Middleware
 {
+    protected $sidebarService;
+
+    public function __construct(SidebarService $sidebarService)
+    {
+        $this->sidebarService = $sidebarService;
+    }
+    
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -44,6 +53,11 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' =>
                 !$request->hasCookie('sidebar_state') ||
                 $request->cookie('sidebar_state') === 'true',
+            'sidebar' => [
+                'list' => $request->user() 
+                    ? $this->sidebarService->getCachedSidebar($request->user()) 
+                    : [],
+            ],
             'locale' => app()->getLocale(),
         ];
     }
