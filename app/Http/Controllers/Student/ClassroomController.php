@@ -8,9 +8,12 @@ use App\Models\Enrollment;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
+use App\Services\Teacher\ClassroomService as TeacherClassroomService;
 
 class ClassroomController extends Controller
 {
+    public function __construct(protected TeacherClassroomService $teacherClassroomService) {}
+    
     public function index()
     {
         $classrooms = Classroom::whereHas('enrollments', function ($query) {
@@ -65,6 +68,8 @@ class ClassroomController extends Controller
     #[Authorize('viewAsStudent', 'classroom')]
     public function show(Classroom $classroom)
     {
+        $classroom = $this->teacherClassroomService->loadClassroomDetails($classroom);
+        
         return Inertia::render('student/classroom/Show', [
             'classroom' => $classroom,
         ]);

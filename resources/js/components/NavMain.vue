@@ -21,7 +21,8 @@ import {
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { useInitials } from '@/composables/useInitials';
-import index from '@/routes/teacher/classroom/task';
+import { index as indexStudent } from '@/routes/student/classroom/task';
+import { index as indexTeacher } from '@/routes/teacher/classroom/task';
 import type { NavItem } from '@/types';
 
 defineProps<{
@@ -49,6 +50,8 @@ function toggleClassroom() {
         openClassroom.value = true;
     }
 }
+
+const sidebarClassroomUrl = computed(() => userRole === 'teacher' ? indexTeacher : indexStudent);
 </script>
 
 <template>
@@ -88,7 +91,7 @@ function toggleClassroom() {
                             </SidebarMenuSubItem>
                             <SidebarMenuSubItem v-else v-for="classroom in classLists" :key="classroom.title">
                                 <SidebarMenuSubButton as-child :is-active="isCurrentOrParentUrl(classroom.url)" size="md" class="py-6">
-                                    <Link :href="index.index(classroom.id)">
+                                    <Link :href="sidebarClassroomUrl(classroom.id)">
                                         <Avatar class="size-6! overflow-hidden">
                                             <AvatarFallback class="rounded-md text-black dark:text-white">
                                                 {{ getInitials(classroom.title).charAt(0) }}
