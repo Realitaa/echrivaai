@@ -623,7 +623,7 @@ test('teacher cannot view edit task form if task is published', function () {
         route('teacher.classroom.task.edit', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'You cannot edit a published task!',
@@ -681,7 +681,7 @@ test('teacher can update task attributes while still a draft', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task updated successfully!',
@@ -744,7 +744,12 @@ test('teacher can remove a rubric during task update', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'Task updated successfully!',
+    ]);
 
     // Pastikan di database rubriknya tinggal 1 (proses sinkronisasi berhasil membuang Vocabulary)
     $this->assertDatabaseCount('task_rubrics', 1);
@@ -807,7 +812,12 @@ test('teacher can remove attachment during task update', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+
+    $response->assertInertiaFlash('toast', [
+        'type' => 'success',
+        'message' => 'Task updated successfully!',
+    ]);
 
     // Assert database
     $this->assertDatabaseCount('files', 1);
@@ -865,7 +875,7 @@ test('teacher cannot update publised task', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'You cannot update a published task!',
@@ -988,7 +998,7 @@ test('teacher can delete unpublished task', function () {
         route('teacher.classroom.task.destroy', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task deleted successfully!',
@@ -1010,7 +1020,7 @@ test('teacher cannot delete published task', function () {
         route('teacher.classroom.task.destroy', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'You cannot delete a published task!',
@@ -1049,7 +1059,7 @@ test('teacher cannot delete task that already has submissions', function () {
         route('teacher.classroom.task.destroy', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'Task cannot be deleted because it has submissions!',
@@ -1073,7 +1083,7 @@ test('teacher can publish a created task', function () {
         route('teacher.classroom.task.publish', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task published successfully!',
@@ -1098,7 +1108,7 @@ test('teacher can unpublish a published task if the task has no submissions', fu
         route('teacher.classroom.task.unpublish', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task unpublished successfully!',
@@ -1128,7 +1138,7 @@ test('teacher cannot unpublish a published task if the task has submissions', fu
         route('teacher.classroom.task.unpublish', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.show', $classroom));
+    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'Cannot unpublish task that has submissions!',

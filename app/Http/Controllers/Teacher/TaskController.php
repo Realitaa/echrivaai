@@ -78,10 +78,11 @@ class TaskController extends Controller
                 'message' => 'You cannot edit a published task!',
             ]);
 
-            return to_route('teacher.classroom.show', $classroom);
+            return to_route('teacher.classroom.task.index', $classroom);
         }
 
         return Inertia::render('teacher/task/Form', [
+            'classroom' => $classroom,
             'task' => $task->load('files', 'rubrics'),
         ]);
     }
@@ -103,7 +104,7 @@ class TaskController extends Controller
                 'message' => 'You cannot update a published task!',
             ]);
 
-            return to_route('teacher.classroom.show', $classroom);
+            return to_route('teacher.classroom.task.index', $classroom);
         }
 
         $this->taskService->updateTask($task, $request->validated());
@@ -113,7 +114,7 @@ class TaskController extends Controller
             'message' => 'Task updated successfully!',
         ]);
 
-        return to_route('teacher.classroom.show', $classroom);
+        return to_route('teacher.classroom.task.index', $classroom);
     }
 
     /**
@@ -130,7 +131,7 @@ class TaskController extends Controller
                 'message' => 'You cannot delete a published task!',
             ]);
 
-            return to_route('teacher.classroom.show', $classroom);
+            return to_route('teacher.classroom.task.index', $classroom);
         }
 
         if (!$this->taskService->deleteTask($task)) {
@@ -140,7 +141,7 @@ class TaskController extends Controller
                     'Task cannot be deleted because it has submissions!',
             ]);
 
-            return to_route('teacher.classroom.show', $classroom);
+            return to_route('teacher.classroom.task.index', $classroom);
         }
 
         Inertia::flash('toast', [
@@ -148,7 +149,7 @@ class TaskController extends Controller
             'message' => 'Task deleted successfully!',
         ]);
 
-        return to_route('teacher.classroom.show', $classroom);
+        return to_route('teacher.classroom.task.index', $classroom);
     }
 
     #[Authorize('managePublishing', 'task')]
@@ -162,7 +163,7 @@ class TaskController extends Controller
                 'message' => 'Task is already published!',
             ]);
 
-            return to_route('teacher.classroom.show', $classroom);
+            return to_route('teacher.classroom.task.index', $classroom);
         }
 
         $this->taskService->publishTask($task);
@@ -172,7 +173,7 @@ class TaskController extends Controller
             'message' => 'Task published successfully!',
         ]);
 
-        return to_route('teacher.classroom.show', $classroom);
+        return to_route('teacher.classroom.task.index', $classroom);
     }
 
     #[Authorize('managePublishing', 'task')]
@@ -186,7 +187,7 @@ class TaskController extends Controller
                 'message' => 'Task is not published!',
             ]);
 
-            return to_route('teacher.classroom.show', $classroom);
+            return to_route('teacher.classroom.task.index', $classroom);
         }
 
         if (!$this->taskService->unpublishTask($task)) {
@@ -195,7 +196,7 @@ class TaskController extends Controller
                 'message' => 'Cannot unpublish task that has submissions!',
             ]);
 
-            return to_route('teacher.classroom.show', $classroom);
+            return to_route('teacher.classroom.task.index', $classroom);
         }
 
         Inertia::flash('toast', [
@@ -203,6 +204,6 @@ class TaskController extends Controller
             'message' => 'Task unpublished successfully!',
         ]);
 
-        return to_route('teacher.classroom.show', $classroom);
+        return to_route('teacher.classroom.task.index', $classroom);
     }
 }
