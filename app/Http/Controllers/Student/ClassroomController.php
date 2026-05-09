@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
 use App\Services\Teacher\ClassroomService as TeacherClassroomService;
+use Illuminate\Support\Facades\Cache;
 
 class ClassroomController extends Controller
 {
@@ -16,9 +17,9 @@ class ClassroomController extends Controller
     
     public function index()
     {
-        $classrooms = Classroom::whereHas('enrollments', function ($query) {
-            $query->where('user_id', auth()->id());
-        })->paginate(10);
+        $classrooms = Classroom::whereHas('enrollments', fn($query) => $query->where('user_id', auth()->id()))
+            ->with('teacher', fn($query) => $query->select('id', 'name'))
+            ->paginate(10);
 
         return Inertia::render('student/classroom/Index', [
             'classrooms' => $classrooms,
@@ -56,6 +57,8 @@ class ClassroomController extends Controller
             'user_id' => auth()->id(),
             'classroom_id' => $classroom->id,
         ]);
+
+        Cache::forget("sidebar_user_v1_{$request->user()->id}");
 
         Inertia::flash('toast', [
             'type' => 'success',

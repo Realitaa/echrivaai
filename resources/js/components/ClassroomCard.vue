@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { Edit, Eye, Trash2, Copy } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
+import { computed } from 'vue';
 import { toast } from 'vue-sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { index as studentTaskIndex } from '@/routes/student/classroom/task';
 import { show } from '@/routes/teacher/classroom';
-import index from '@/routes/teacher/classroom/task';
+import { index as teacherTaskIndex } from '@/routes/teacher/classroom/task';
 import type { Classroom } from '@/types';
 
 defineProps<{
@@ -18,12 +20,18 @@ defineEmits<{
     (e: 'delete', id: number): void;
 }>();
 
+const page = usePage();
+const userRole = page.props.auth.user.role;
 const { copy } = useClipboard()
 
 function copyClassroomCode(code: string) {
     copy(code);
     toast.success(`Kode kelas ${code} berhasil disalin!`);
 }
+
+const taskIndex = computed(() => {
+    return userRole === 'teacher' ? teacherTaskIndex : studentTaskIndex;
+});
 </script>
 
 <template>
@@ -51,7 +59,7 @@ function copyClassroomCode(code: string) {
         <!-- Content Area -->
         <div class="flex flex-1 flex-col p-6 pt-2">
             <div class="mb-4">
-                <Link :href="index.index(classroom.id)">
+                <Link :href="taskIndex(classroom.id)">
                     <h3 class="line-clamp-1 text-xl font-bold tracking-tight group-hover:text-primary transition-colors hover:underline">
                         {{ classroom.name }}
                     </h3>
@@ -71,6 +79,7 @@ function copyClassroomCode(code: string) {
                         <Copy class="h-4 w-4" />
                     </Button>
                 </p>
+                <p class="text-sm" v-if="userRole === 'student'">Guru: {{ classroom.teacher.name }}</p>
             </div>
 
             <p class="line-clamp-2 min-h-10 text-sm text-muted-foreground">
@@ -78,7 +87,7 @@ function copyClassroomCode(code: string) {
             </p>
             
             <!-- Actions Area (Footer) -->
-            <div class="mt-6 flex items-center justify-between border-t pt-4">
+            <div v-if="userRole === 'teacher'" class="mt-6 flex items-center justify-between border-t pt-4">
                 <div class="flex gap-1">
                     <Button 
                         variant="ghost" 
