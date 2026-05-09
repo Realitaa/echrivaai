@@ -8,6 +8,10 @@ interface Classroom {
     teacher_id: number;
     created_at: string;
     teacher: Teacher;
+    
+    enrollments_count?: number;
+    students?: any[];
+    tasks_count?: number;
 }
 
 export type { Classroom };

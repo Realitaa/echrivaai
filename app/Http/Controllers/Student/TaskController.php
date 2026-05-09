@@ -13,7 +13,9 @@ class TaskController extends Controller
     #[Authorize('viewAsStudent', 'classroom')]
     public function index(Classroom $classroom)
     {
+        $classroom->loadCount(['tasks', 'enrollments']);
         return Inertia::render('student/task/Index', [
+            'classroom' => $classroom,
             'tasks' => $classroom->publishedTasks()->with('files')->latest()->paginate(10),
         ]);
     }

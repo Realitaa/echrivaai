@@ -29,35 +29,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { show as showClassroom } from '@/routes/teacher/classroom';
+import { show as showStudentClassroom } from '@/routes/student/classroom';
+import { show as showStudentTask } from '@/routes/student/classroom/task';
+import { show as showTeacherClassroom } from '@/routes/teacher/classroom';
 import {
     create as createTask,
     edit as editTask,
     destroy as destroyTask,
 } from '@/routes/teacher/classroom/task';
-import submission from '@/routes/teacher/classroom/task/submission';
+import teacherSubmission from '@/routes/teacher/classroom/task/submission';
+import type { Task, Classroom } from '@/types';
 
 dayjs.extend(relativeTime);
-
-interface Task {
-    id: number;
-    title: string;
-    description: string | null;
-    deadline: string;
-    is_published: boolean;
-    created_at: string;
-    classroom_id: number;
-    files?: any[];
-}
-
-interface Classroom {
-    id: number;
-    name: string;
-    code: string;
-    description: string | null;
-    tasks_count?: number;
-    enrollments_count?: number;
-}
 
 const props = defineProps<{
     classroom: Classroom;
@@ -104,6 +87,18 @@ const submitDelete = () => {
         );
     }
 };
+
+const showClassroom = computed(() => {
+    return userRole.value === 'teacher' ? showTeacherClassroom : showStudentClassroom;
+});
+
+const getTaskUrl = (taskId: number) => {
+    if (userRole.value === 'teacher') {
+        return teacherSubmission.index({ classroom: props.classroom.id, task: taskId }).url;
+    }
+    
+    return showStudentTask({ classroom: props.classroom.id, task: taskId }).url;
+};
 </script>
 
 <template>
@@ -132,7 +127,7 @@ const submitDelete = () => {
                         >
                             <!-- Icon -->
                             <Link
-                                :href="submission.index({ classroom: classroom.id, task: task.id }).url"
+                                :href="getTaskUrl(task.id)"
                                 class="flex shrink-0 items-center justify-center rounded-full bg-primary/10 p-3 text-primary transition-colors group-hover:bg-primary/20"
                             >
                                 <ClipboardList class="h-5 w-5" />
@@ -140,7 +135,7 @@ const submitDelete = () => {
 
                             <!-- Content -->
                             <Link
-                                :href="submission.index({ classroom: classroom.id, task: task.id }).url"
+                                :href="getTaskUrl(task.id)"
                                 class="min-w-0 flex-1"
                             >
                                 <div class="flex items-center gap-2">
