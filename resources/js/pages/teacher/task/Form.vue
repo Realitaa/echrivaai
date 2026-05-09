@@ -10,19 +10,18 @@ import {
     FileText,
     Loader2,
 } from '@lucide/vue';
-import { ref, computed, nextTick } from 'vue';
-import axios from 'axios';
-
+import { ref, computed } from 'vue';
+import DateTimePicker from '@/components/DateTimePicker.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { upload as fileUpload, remove as fileRemove } from '@/routes/file';
 import { index as taskIndex, store, update } from '@/routes/teacher/classroom/task';
+import axios from 'axios';
 
 interface FileItem {
     id: number;
@@ -74,6 +73,7 @@ const uploadError = ref('');
 
 const handleFileUpload = async (event: Event) => {
     const input = event.target as HTMLInputElement;
+
     if (!input.files?.length) return;
 
     isUploading.value = true;
@@ -107,6 +107,7 @@ const handleFileUpload = async (event: Event) => {
 
 const removeFile = async (index: number) => {
     const file = uploadedFiles.value[index];
+
     if (file.isTemp) {
         try {
             await axios.delete(fileRemove(file.id).url);
@@ -114,6 +115,7 @@ const removeFile = async (index: number) => {
             // ignore error on remove
         }
     }
+    
     uploadedFiles.value.splice(index, 1);
 };
 
@@ -171,9 +173,7 @@ const onDragEnd = () => {
 const form = useForm({
     title: props.task?.title ?? '',
     description: props.task?.description ?? '',
-    deadline: props.task?.deadline
-        ? new Date(props.task.deadline).toISOString().slice(0, 16)
-        : '',
+    deadline: props.task?.deadline ?? '',
     is_published: props.task?.is_published ?? false,
     rubrics: [] as Rubric[],
     attachments: [] as number[],
@@ -261,11 +261,10 @@ const totalScore = computed(() =>
                                 <Label for="deadline" :class="{ 'text-destructive': form.errors.deadline }">
                                     Tenggat Waktu
                                 </Label>
-                                <Input
+                                <DateTimePicker
                                     id="deadline"
                                     v-model="form.deadline"
-                                    type="datetime-local"
-                                    :class="{ 'border-destructive': form.errors.deadline }"
+                                    :error="!!form.errors.deadline"
                                 />
                                 <span v-if="form.errors.deadline" class="text-xs text-destructive">
                                     {{ form.errors.deadline }}
