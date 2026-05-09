@@ -4,8 +4,6 @@ import {
     ClipboardList,
     EllipsisVertical,
     Plus,
-    Eye,
-    BookOpen,
     Edit,
     Trash2,
     Globe,
@@ -21,7 +19,7 @@ import PublishTaskDialog from '@/components/teacher/task/PublishTaskDialog.vue';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent} from '@/components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -113,7 +111,10 @@ const submitDelete = () => {
         <!-- Task List (left, 3/4) -->
         <div class="flex-1 lg:basis-3/4">
             <div class="mb-4 flex items-center justify-between">
-                <h2 class="text-lg font-semibold">Daftar Tugas</h2>
+                <div class="space-y-2">
+                    <h2 class="text-lg font-semibold">Daftar Tugas</h2>
+                    <p class="text-sm text-muted-foreground">Daftar tugas di kelas {{ classroom.name }}</p>
+                </div>
                 <Button v-if="userRole === 'teacher'" size="sm" as-child>
                     <Link :href="createTask(classroom.id).url">
                         <Plus class="h-4 w-4" /> Tugas Baru
@@ -122,7 +123,7 @@ const submitDelete = () => {
             </div>
 
             <ScrollArea class="h-[calc(100vh-16rem)]">
-                <div class="space-y-3 pr-4">
+                <div class="space-y-3">
                     <template v-if="tasks.data.length > 0">
                         <div
                             v-for="task in tasks.data"
@@ -235,7 +236,7 @@ const submitDelete = () => {
         <div class="lg:basis-1/4">
             <Card class="overflow-hidden sticky top-4">
                 <!-- Classroom Image -->
-                <div class="relative h-32 w-full overflow-hidden">
+                <div class="relative h-32 -mt-6 w-full overflow-hidden">
                     <img
                         src="/assets/images/bg_library.jpg"
                         alt="Classroom cover"
@@ -245,7 +246,7 @@ const submitDelete = () => {
                 </div>
 
                 <!-- Avatar -->
-                <div class="flex justify-center -mt-10 relative z-10">
+                <div class="flex justify-center -mt-14 relative z-10">
                     <Avatar class="h-16 w-16 border-4 border-card shadow-sm">
                         <AvatarFallback class="bg-slate-500 text-xl font-bold text-white">
                             {{ classroom.name.charAt(0).toUpperCase() }}
@@ -253,7 +254,7 @@ const submitDelete = () => {
                     </Avatar>
                 </div>
 
-                <CardContent class="pt-3 text-center space-y-3">
+                <CardContent class="text-center space-y-3">
                     <div>
                         <h3 class="text-lg font-bold tracking-tight">{{ classroom.name }}</h3>
                         <Badge variant="outline" class="mt-1 font-mono text-xs">{{ classroom.code }}</Badge>

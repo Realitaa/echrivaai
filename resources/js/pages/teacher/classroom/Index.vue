@@ -6,7 +6,7 @@ import ClassroomCard from '@/components/ClassroomCard.vue';
 import DeleteClassroomDialog from '@/components/teacher/classroom/DeleteClassroomDialog.vue';
 import FormClassroomDialog from '@/components/teacher/classroom/FormClassroomDialog.vue';
 import { Button } from '@/components/ui/button';
-import { index, destroy } from '@/routes/teacher/classroom';
+import { destroy } from '@/routes/teacher/classroom';
 import type { Classroom } from '@/types';
 
 defineOptions({
@@ -14,7 +14,7 @@ defineOptions({
         breadcrumbs: [
             {
                 title: 'Kelasku',
-                href: index().url,
+                href: '#',
             },
         ],
     },

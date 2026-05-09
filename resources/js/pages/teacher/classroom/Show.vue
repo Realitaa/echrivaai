@@ -21,18 +21,12 @@ defineProps<{
 }>();
 
 defineOptions({
-    layout: {
+    layout: (props: any) => ({
         breadcrumbs: [
-            {
-                title: 'Kelasku',
-                href: index().url,
-            },
-            {
-                title: 'Detail Kelas',
-                href: '#',
-            },
+            { title: 'Kelasku', href: index().url },
+            { title: props.classroom.name, href: '#' },
         ],
-    },
+    }),
 });
 </script>
 

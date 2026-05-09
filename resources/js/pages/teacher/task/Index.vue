@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-
 import ClassroomTaskList from '@/components/ClassroomTaskList.vue';
-import { index } from '@/routes/teacher/classroom/task';
+import { index, show } from '@/routes/teacher/classroom';
 
-const props = defineProps<{
+defineProps<{
     classroom: any;
     tasks: {
         data: any[];
@@ -13,23 +12,27 @@ const props = defineProps<{
 }>();
 
 defineOptions({
-    layout: {
+    layout: (props: any) => ({
         breadcrumbs: [
             {
                 title: 'Kelasku',
-                href: '/teacher/classrooms',
+                href: index().url,
             },
             {
-                title: 'Tugas',
-                href: '#',
+                title: props.classroom.name,
+                href: show(props.classroom.id).url,
             },
+            {
+                title: 'Daftar Tugas',
+                href: "#"
+            }
         ],
-    },
+    }),
 });
 </script>
 
 <template>
-    <Head :title="`Tugas: ${classroom.name}`" />
+    <Head :title="`Tugas di Kelas ${classroom.name}`" />
 
     <div class="flex h-full flex-1 flex-col p-4 lg:p-8">
         <ClassroomTaskList

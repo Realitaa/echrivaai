@@ -6,6 +6,7 @@ import { toast } from 'vue-sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { show } from '@/routes/teacher/classroom';
+import index from '@/routes/teacher/classroom/task';
 import type { Classroom } from '@/types';
 
 defineProps<{
@@ -50,9 +51,11 @@ function copyClassroomCode(code: string) {
         <!-- Content Area -->
         <div class="flex flex-1 flex-col p-6 pt-2">
             <div class="mb-4">
-                <h3 class="line-clamp-1 text-xl font-bold tracking-tight group-hover:text-primary transition-colors">
-                    {{ classroom.name }}
-                </h3>
+                <Link :href="index.index(classroom.id)">
+                    <h3 class="line-clamp-1 text-xl font-bold tracking-tight group-hover:text-primary transition-colors hover:underline">
+                        {{ classroom.name }}
+                    </h3>
+                </Link>
                 <p 
                   @click="copyClassroomCode(classroom.code)"
                   title="Salin kode kelas"
