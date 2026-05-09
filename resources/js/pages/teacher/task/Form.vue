@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, useHttp } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Plus,
@@ -18,45 +18,37 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea';
 import { upload as fileUpload, remove as fileRemove } from '@/routes/file';
+import { index, show } from '@/routes/teacher/classroom';
 import { index as taskIndex, store, update } from '@/routes/teacher/classroom/task';
-import axios from 'axios';
-
-interface FileItem {
-    id: number;
-    original_name: string;
-    filename: string;
-    isTemp?: boolean;
-}
-
-interface Rubric {
-    title: string;
-    description: string;
-    max_score: number;
-    order: number;
-}
+import type { Classroom, Task, TaskRubric, FileItem, FileResponse } from '@/types';
 
 const props = defineProps<{
-    classroom: any;
-    task?: any;
+    classroom: Classroom;
+    task?: Task;
 }>();
 
 const isEdit = computed(() => !!props.task);
 
 defineOptions({
-    layout: {
+    layout: (props: any) => ({
         breadcrumbs: [
             {
                 title: 'Kelasku',
-                href: '/teacher/classrooms',
+                href: index().url,
             },
             {
-                title: 'Tugas',
-                href: '#',
+                title: props.classroom.name,
+                href: show(props.classroom.id).url,
             },
+            {
+                title: 'Buat Tugas',
+                href: "#"
+            }
         ],
-    },
+    }),
 });
 
 // File management
@@ -68,31 +60,31 @@ const uploadedFiles = ref<FileItem[]>(
         isTemp: false,
     })) ?? [],
 );
-const isUploading = ref(false);
+const uploadHttp = useHttp({
+    file: null as File | null,
+});
 const uploadError = ref('');
 
 const handleFileUpload = async (event: Event) => {
     const input = event.target as HTMLInputElement;
 
-    if (!input.files?.length) return;
+    if (!input.files?.length) {
+        return;
+    }
 
-    isUploading.value = true;
     uploadError.value = '';
 
     for (const file of Array.from(input.files)) {
-        const formData = new FormData();
-        formData.append('file', file);
+        uploadHttp.file = file;
 
         try {
-            const response = await axios.post(fileUpload().url, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response: FileResponse = await uploadHttp.post(fileUpload().url);
 
-            if (response.data.success) {
+            if (response.success) {
                 uploadedFiles.value.push({
-                    id: response.data.file.id,
-                    original_name: response.data.file.original_name,
-                    filename: response.data.file.filename,
+                    id: response.file.id,
+                    original_name: response.file.original_name,
+                    filename: response.file.filename,
                     isTemp: true,
                 });
             }
@@ -101,7 +93,6 @@ const handleFileUpload = async (event: Event) => {
         }
     }
 
-    isUploading.value = false;
     input.value = '';
 };
 
@@ -110,7 +101,10 @@ const removeFile = async (index: number) => {
 
     if (file.isTemp) {
         try {
-            await axios.delete(fileRemove(file.id).url);
+            const http = useHttp({
+                query: ''
+            });
+            await http.delete(fileRemove(file.id).url);
         } catch {
             // ignore error on remove
         }
@@ -119,8 +113,8 @@ const removeFile = async (index: number) => {
     uploadedFiles.value.splice(index, 1);
 };
 
-// Rubric management
-const rubrics = ref<Rubric[]>(
+// TaskRubric management
+const rubrics = ref<TaskRubric[]>(
     props.task?.rubrics?.map((r: any) => ({
         title: r.title,
         description: r.description,
@@ -157,7 +151,9 @@ const onDragOver = (event: DragEvent) => {
 };
 
 const onDrop = (targetIndex: number) => {
-    if (dragIndex.value === null || dragIndex.value === targetIndex) return;
+    if (dragIndex.value === null || dragIndex.value === targetIndex) {
+        return;
+    }
 
     const [moved] = rubrics.value.splice(dragIndex.value, 1);
     rubrics.value.splice(targetIndex, 0, moved);
@@ -175,7 +171,7 @@ const form = useForm({
     description: props.task?.description ?? '',
     deadline: props.task?.deadline ?? '',
     is_published: props.task?.is_published ?? false,
-    rubrics: [] as Rubric[],
+    rubrics: [] as TaskRubric[],
     attachments: [] as number[],
 });
 
@@ -186,8 +182,8 @@ const submitForm = () => {
     if (isEdit.value) {
         form.put(
             update({
-                classroom: props.task.classroom_id,
-                task: props.task.id,
+                classroom: props?.task?.classroom_id,
+                task: props?.task?.id,
             }).url,
         );
     } else {
@@ -265,6 +261,7 @@ const totalScore = computed(() =>
                                     id="deadline"
                                     v-model="form.deadline"
                                     :error="!!form.errors.deadline"
+                                    disablePast
                                 />
                                 <span v-if="form.errors.deadline" class="text-xs text-destructive">
                                     {{ form.errors.deadline }}
@@ -297,15 +294,16 @@ const totalScore = computed(() =>
                                         variant="outline"
                                         size="sm"
                                         @click="($refs.fileInput as HTMLInputElement).click()"
-                                        :disabled="isUploading"
+                                        :disabled="uploadHttp.processing"
                                     >
-                                        <template v-if="isUploading">
+                                        <template v-if="uploadHttp.processing">
                                             <Loader2 class="h-4 w-4 animate-spin" /> Mengunggah...
                                         </template>
                                         <template v-else>
                                             <Upload class="h-4 w-4" /> Unggah File
                                         </template>
                                     </Button>
+                                    <Progress v-if="uploadHttp.progress" :model-value="uploadHttp.progress.percentage" class="w-full" />
                                     <input
                                         ref="fileInput"
                                         type="file"
@@ -355,7 +353,7 @@ const totalScore = computed(() =>
                         <CardHeader>
                             <div class="flex items-center justify-between">
                                 <CardTitle>Rubrik Penilaian</CardTitle>
-                                <Badge variant="secondary" class="text-sm font-semibold">
+                                <Badge class="text-sm font-semibold">
                                     Total: {{ totalScore }}
                                 </Badge>
                             </div>
@@ -424,7 +422,7 @@ const totalScore = computed(() =>
                                 </div>
                             </div>
 
-                            <!-- Rubric validation errors -->
+                            <!-- TaskRubric validation errors -->
                             <template v-for="(value, key) in form.errors">
                                 <span
                                     v-if="String(key).startsWith('rubrics')"

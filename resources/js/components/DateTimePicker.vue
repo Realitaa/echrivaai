@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {
     CalendarDate,
+    getLocalTimeZone,
+    today
 } from '@internationalized/date';
 import { CalendarIcon, Clock } from '@lucide/vue';
 import dayjs from 'dayjs';
@@ -17,10 +19,12 @@ interface Props {
     modelValue?: string | null;
     error?: boolean;
     placeholder?: string;
+    disablePast?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     placeholder: 'Pilih tanggal & waktu',
+    disablePast: false,
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -44,6 +48,24 @@ watch(
     },
     { immediate: true },
 );
+
+// If disablePast is true, watch time, set it to next hour if time is past the current time
+watch(time, (val) => {
+    if (props.disablePast && date.value) {
+        const [hours, minutes] = val.split(':').map(Number);
+        const d = dayjs()
+            .year((date.value as any).year)
+            .month((date.value as any).month - 1)
+            .date((date.value as any).day)
+            .hour(hours || 0)
+            .minute(minutes || 0)
+            .second(0);
+        
+        if (d.isBefore(dayjs())) {
+            time.value = dayjs().add(1, 'hour').format('HH:mm');
+        }
+    }
+});
 
 // Sync to modelValue
 const updateValue = () => {
@@ -76,6 +98,14 @@ const formattedValue = computed(() => {
 
     return dayjs(props.modelValue).format('DD MMMM YYYY, HH:mm');
 });
+
+const isDateDisabled = (date: any) => {
+    if (props.disablePast) {
+        return date.compare(today(getLocalTimeZone())) < 0
+    }
+
+    return false
+}
 </script>
 
 <template>
@@ -96,7 +126,7 @@ const formattedValue = computed(() => {
             </Button>
         </PopoverTrigger>
         <PopoverContent class="w-auto p-0" align="start">
-            <Calendar v-model="date" initial-focus />
+            <Calendar v-model="date" initial-focus :is-date-disabled="isDateDisabled" />
             <div class="border-t p-4">
                 <div class="flex items-center gap-3">
                     <Clock class="h-4 w-4 text-muted-foreground" />
