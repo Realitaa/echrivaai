@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import ClassroomDetail from '@/components/ClassroomDetail.vue';
 import { index } from '@/routes/teacher/classroom';
 
 defineProps<{

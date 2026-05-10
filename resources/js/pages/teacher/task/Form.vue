@@ -60,10 +60,13 @@ const uploadedFiles = ref<FileItem[]>(
         isTemp: false,
     })) ?? [],
 );
-const uploadHttp = useHttp({
-    file: null as File | null,
-});
+
+const removeHttp = useHttp<Record<string, never>>({});
 const uploadError = ref('');
+
+const uploadHttp = useHttp<{ file: File | null }, FileResponse>({
+    file: null,
+});
 
 const handleFileUpload = async (event: Event) => {
     const input = event.target as HTMLInputElement;
@@ -78,7 +81,7 @@ const handleFileUpload = async (event: Event) => {
         uploadHttp.file = file;
 
         try {
-            const response: FileResponse = await uploadHttp.post(fileUpload().url);
+            const response = await uploadHttp.post(fileUpload().url);
 
             if (response.success) {
                 uploadedFiles.value.push({
@@ -88,8 +91,9 @@ const handleFileUpload = async (event: Event) => {
                     isTemp: true,
                 });
             }
-        } catch (error: any) {
-            uploadError.value = error.response?.data?.message ?? 'Gagal mengunggah file.';
+        } catch (error: unknown) {
+            const err = error as { response?: { data?: { message?: string } } };
+            uploadError.value = err.response?.data?.message ?? 'Gagal mengunggah file.';
         }
     }
 
@@ -101,15 +105,12 @@ const removeFile = async (index: number) => {
 
     if (file.isTemp) {
         try {
-            const http = useHttp({
-                query: ''
-            });
-            await http.delete(fileRemove(file.id).url);
+            await removeHttp.delete(fileRemove(file.id).url);
         } catch {
             // ignore error on remove
         }
     }
-    
+
     uploadedFiles.value.splice(index, 1);
 };
 
@@ -170,7 +171,7 @@ const form = useForm({
     title: props.task?.title ?? '',
     description: props.task?.description ?? '',
     deadline: props.task?.deadline ?? '',
-    is_published: props.task?.is_published ?? false,
+    is_published: !!(props.task?.is_published ?? false),
     rubrics: [] as TaskRubric[],
     attachments: [] as number[],
 });
@@ -182,8 +183,8 @@ const submitForm = () => {
     if (isEdit.value) {
         form.put(
             update({
-                classroom: props?.task?.classroom_id,
-                task: props?.task?.id,
+                classroom: props.task!.classroom_id,
+                task: props.task!.id,
             }).url,
         );
     } else {
@@ -202,7 +203,7 @@ const totalScore = computed(() =>
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div class="flex items-center gap-4">
             <Button variant="outline" size="icon" as-child>
-                <Link :href="taskIndex(isEdit ? task.classroom_id : classroom.id).url">
+                <Link :href="taskIndex(isEdit ? task!.classroom_id : classroom.id).url">
                     <ArrowLeft class="h-4 w-4" />
                 </Link>
             </Button>
@@ -271,8 +272,7 @@ const totalScore = computed(() =>
                             <div class="flex items-center space-x-2">
                                 <Checkbox
                                     id="is_published"
-                                    :checked="form.is_published"
-                                    @update:checked="(v: boolean) => (form.is_published = v)"
+                                    v-model="form.is_published"
                                 />
                                 <Label for="is_published" class="cursor-pointer">
                                     Langsung Publikasikan
@@ -444,7 +444,7 @@ const totalScore = computed(() =>
             <!-- Submit -->
             <div class="mt-6 flex items-center justify-end gap-3">
                 <Button type="button" variant="outline" as-child :disabled="form.processing">
-                    <Link :href="taskIndex(isEdit ? task.classroom_id : classroom.id).url">
+                    <Link :href="taskIndex(isEdit ? task!.classroom_id : classroom.id).url">
                         Batal
                     </Link>
                 </Button>

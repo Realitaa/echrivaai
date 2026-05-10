@@ -11,7 +11,7 @@ export type Task = {
 }
 
 export type TaskRubric = {
-    id: number;
+    id?: number;
     title: string;
     description: string;
     max_score: number;

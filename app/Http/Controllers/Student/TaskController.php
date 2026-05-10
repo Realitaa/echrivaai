@@ -34,7 +34,7 @@ class TaskController extends Controller
             ->get();
 
         return Inertia::render('student/task/Show', [
-            'task' => $task->load('files'),
+            'task' => $task->load(['files', 'creator', 'rubrics']),
             'submissions' => $submissions,
         ]);
     }
