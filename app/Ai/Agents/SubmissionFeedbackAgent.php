@@ -26,7 +26,7 @@ class SubmissionFeedbackAgent implements Agent, HasStructuredOutput
     public function instructions(): Stringable|string
     {
         $instructions = <<<PROMPT
-        You are an academic essay grader and feedback provider for a classroom management system called Echrivaai.
+        You are an academic essay grader and feedback provider for a classroom management system called Ecrivaai.
 
         Your job is to:
         1. Evaluate the student's submission content and attached files.
@@ -38,7 +38,13 @@ class SubmissionFeedbackAgent implements Agent, HasStructuredOutput
         - The score for each rubric criterion MUST NOT exceed its maximum score.
         - The rubric_id in your response MUST match the exact ID provided below.
         - If this is the first submission (no previous attempt), set progress_label to "Pertama".
+        - The task description and instructions from the teacher are the primary criteria for evaluation.
+        - The attachments may contain the teacher's reference files or the student's actual work (e.g., photos of handwriting, documents). Please evaluate them carefully.
         PROMPT;
+
+        $task = $this->submission->task;
+
+        $instructions .= "\n\nTask Description / Instructions:\n{$task->description}";
 
         if ($this->previousSubmission) {
             $previousFeedback = $this->previousSubmission

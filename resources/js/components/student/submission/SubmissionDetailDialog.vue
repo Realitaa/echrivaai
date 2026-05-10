@@ -149,7 +149,7 @@ const progressColor = computed(() => {
 
 <template>
     <Dialog v-model:open="dialogOpen">
-        <DialogContent class="sm:max-w-2xl max-h-[85vh]">
+        <DialogContent class="sm:max-w-2xl lg:min-w-7xl max-h-[85vh]">
             <DialogHeader>
                 <DialogTitle>
                     Detail Pengumpulan

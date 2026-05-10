@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessAiFeedbackJob implements ShouldQueue
 {
@@ -52,16 +53,50 @@ class ProcessAiFeedbackJob implements ShouldQueue
             previousSubmission: $previousSubmission,
         );
 
-        try {
-            $response = $agent->prompt($submission->content);
+        $promptContent = $submission->content ?: '(Tidak ada teks yang disertakan, silakan periksa dokumen lampiran.)';
+        $attachments = [];
 
-            DB::transaction(function () use ($submission, $response) {
+        $processFile = function ($file) use (&$promptContent, &$attachments) {
+            $path = Storage::disk('public')->path($file->path);
+
+            // Handle images
+            if (str_starts_with($file->mime_type, 'image/')) {
+                $attachments[] = new \Laravel\Ai\Files\LocalImage($path, $file->mime_type);
+                return;
+            }
+
+            // Handle DOCX (Gemini doesn't support DOCX in inlineData, so we extract text)
+            if ($file->mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                $text = $this->extractTextFromDocx($path);
+                $promptContent .= "\n\n[Isi dari dokumen {$file->original_name}]:\n{$text}";
+                return;
+            }
+
+            // Handle other documents (like PDF) via Base64Document to ensure correct MIME type
+            $attachments[] = new \Laravel\Ai\Files\Base64Document(
+                base64_encode(file_get_contents($path)),
+                $file->mime_type
+            );
+        };
+
+        foreach ($task->files as $file) {
+            $processFile($file);
+        }
+
+        foreach ($submission->files as $file) {
+            $processFile($file);
+        }
+
+        try {
+            $response = $agent->prompt($promptContent, $attachments);
+
+            DB::transaction(function () use ($submission, $response, $promptContent) {
                 // Save AI feedback
                 $submission->aiFeedbacks()->create([
                     'result' => $response['feedback'],
                     'score' => $response['score'],
                     'model_name' => $response->meta->model ?? 'unknown',
-                    'prompt' => $submission->content,
+                    'prompt' => $promptContent,
                 ]);
 
                 // Save rubric scores
@@ -84,5 +119,25 @@ class ProcessAiFeedbackJob implements ShouldQueue
             // Transition to failed so the student is not stuck in 'processing' forever
             $submission->update(['status' => 'failed']);
         }
+    }
+
+    /**
+     * Extract plain text from a DOCX file.
+     */
+    private function extractTextFromDocx(string $path): string
+    {
+        $content = '';
+        $zip = new \ZipArchive;
+
+        if ($zip->open($path) === true) {
+            if (($index = $zip->locateName('word/document.xml')) !== false) {
+                $data = $zip->getFromIndex($index);
+                // Basic XML tag stripping for text extraction
+                $content = strip_tags($data);
+            }
+            $zip->close();
+        }
+
+        return trim($content);
     }
 }

@@ -213,7 +213,8 @@ const statusConfig = (status: string) => {
                     :key="rubric.id"
                     class="rounded-lg border bg-muted/30 p-3 text-center"
                 >
-                    <p class="text-xs font-medium truncate">{{ rubric.title }}</p>
+                    <p class="text-sm font-bold truncate">{{ rubric.title }}</p>
+                    <p class="text-xs">{{ rubric.description }}</p>
                     <p class="text-lg font-bold text-primary mt-1">{{ rubric.max_score }}</p>
                 </div>
             </div>
