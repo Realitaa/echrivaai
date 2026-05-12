@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { download } from '@/routes/file';
 import { show as showSubmission } from '@/routes/student/classroom/task/submission';
 import type { SubmissionDetail, TaskRubric } from '@/types';
 
@@ -196,7 +197,7 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                         <a
                             v-for="file in submissionData.files"
                             :key="file.id"
-                            :href="`/storage/${file.path}`"
+                            :href="download({ file: file.id }).url"
                             target="_blank"
                             class="flex items-center gap-3 rounded-md border p-3 hover:bg-muted/50 transition-colors"
                         >

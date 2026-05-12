@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -114,4 +115,60 @@ test('guest trying to upload file should failed', function () {
 
     $uploadedFilename = $response->json('file.filename');
     Storage::disk('public')->assertMissing("tmp/$uploadedFilename");
+});
+
+test('user can download file', function () {
+    $user = User::factory()->create();
+    $fileOriginalName = 'document.pdf';
+    $filePath = 'files/document.pdf';
+
+    // Put file directly to storage
+    Storage::disk('public')->put($filePath, 'file content');
+
+    // Store file data in database
+    $file = File::create([
+        'path' => $filePath,
+        'filename' => 'document.pdf',
+        'original_name' => $fileOriginalName,
+        'mime_type' => 'application/pdf',
+        'size' => 1000,
+        'uploaded_by' => $user->id,
+        'fileable_id' => 1, // Dummy
+        'fileable_type' => 'App\Models\Task', // Dummy
+    ]);
+
+    $response = $this->actingAs($user)->get(route('file.download', $file->id));
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Disposition', 'attachment; filename=document.pdf');
+});
+
+test('not found file in database handed gracefully', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get(route('file.download', 999))->assertJson([
+        'success' => false,
+        'message' => 'File tidak ditemukan.',
+    ]);
+});
+
+test('not found file physically handed gracefully', function () {
+    $user = User::factory()->create();
+    $file = File::factory()->create([
+        'fileable_id' => 1, // Dummy
+        'fileable_type' => 'App\Models\Task', // Dummy
+        'uploaded_by' => $user->id,
+    ]);
+    Storage::disk('public')->delete($file->path);
+
+    $this->actingAs($user)->get(route('file.download', $file->id))->assertJson([
+        'success' => false,
+        'message' => 'File tidak ditemukan.',
+    ]);
+});
+
+test('guest cannot download file', function () {
+    $response = $this->get(route('file.download', 1));
+
+    $response->assertRedirect(route('login'));
 });

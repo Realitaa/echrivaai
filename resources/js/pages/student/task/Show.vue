@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { download } from '@/routes/file';
 import { index as classroomIndex } from '@/routes/student/classroom';
 import { index as taskIndex } from '@/routes/student/classroom/task';
 import type { SubmissionItem, TaskDetail } from '@/types';
@@ -198,7 +199,7 @@ const statusConfig = (status: string) => {
                         <a
                             v-for="file in task.files"
                             :key="file.id"
-                            :href="`/storage/${file.path}`"
+                            :href="download({ file: file.id }).url"
                             target="_blank"
                             class="flex items-center gap-2 rounded-md border px-3 py-2 hover:bg-muted/50 transition-colors text-sm"
                         >
@@ -257,9 +258,9 @@ const statusConfig = (status: string) => {
                             class="border-2 transition-all cursor-pointer group shrink-0"
                             :class="[
                                 canSubmit
-                                    ? 'border-dashed border-primary/40 hover:border-primary hover:shadow-md'
+                                    ? 'border-dashed border-primary/30 hover:border-primary hover:shadow-md'
                                     : 'border-dashed border-muted-foreground/20 opacity-60 cursor-not-allowed',
-                                currentView === 'submit' ? 'border-primary ring-1 ring-primary' : ''
+                                currentView === 'submit' ? 'border-primary' : ''
                             ]"
                             @click="showSubmitForm"
                         >

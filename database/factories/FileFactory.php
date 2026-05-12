@@ -23,6 +23,7 @@ class FileFactory extends Factory
         return [
             'path' => 'uploads/' . fake()->uuid() . '.pdf',
             'filename' => fake()->word() . '.pdf',
+            'original_name' => fake()->word() . '.pdf',
             'mime_type' => 'application/pdf',
             'size' => fake()->numberBetween(10000, 500000),
             'fileable_id' => null,

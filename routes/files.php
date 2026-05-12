@@ -8,4 +8,7 @@ Route::group(['prefix' => '/files', 'as' => 'file.'], function () {
     Route::delete('/remove/{file}', [FileController::class, 'remove'])->name(
         'remove',
     );
+    Route::get('/download/{file}', [FileController::class, 'download'])->name(
+        'download',
+    );
 });

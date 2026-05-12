@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TemporaryFile;
+use App\Models\File;
 use App\Services\FileService;
+use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
@@ -44,5 +46,19 @@ class FileController extends Controller
         return response()->json([
             'success' => true,
         ]);
+    }
+
+    public function download($fileId)
+    {
+        $file = File::find($fileId);
+
+        if (!$file || !Storage::disk('public')->exists($file->path)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File tidak ditemukan.',
+            ], 404);
+        }
+
+        return Storage::disk('public')->download($file->path, $file->original_name);
     }
 }
