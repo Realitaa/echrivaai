@@ -40,6 +40,7 @@ const props = defineProps<{
     taskId: number;
     submissionId: number | null;
     rubrics: TaskRubric[];
+    status?: string;
 }>();
 
 const submissionData = ref<SubmissionDetail | null>(null);
@@ -48,33 +49,47 @@ const isLoading = ref(false);
 
 const fetchHttp = useHttp<Record<string, never>>({});
 
+const fetchSubmission = async () => {
+    if (!props.submissionId) {
+        return;
+    }
+
+    isLoading.value = true;
+    submissionData.value = null;
+    progressData.value = null;
+
+    try {
+        const response = await fetchHttp.get(
+            showSubmission({
+                classroom: props.classroomId,
+                task: props.taskId,
+                submission: props.submissionId as number,
+            }).url,
+        ) as unknown as { submission: SubmissionDetail; progress: Progress | null };
+
+        submissionData.value = response.submission;
+        progressData.value = response.progress;
+    } catch {
+        // handle error silently
+    } finally {
+        isLoading.value = false;
+    }
+};
+
 watch(
     () => props.submissionId,
-    async (id) => {
-        if (id) {
-            isLoading.value = true;
-            submissionData.value = null;
-            progressData.value = null;
-
-            try {
-                const response = await fetchHttp.get(
-                    showSubmission({
-                        classroom: props.classroomId,
-                        task: props.taskId,
-                        submission: id as number,
-                    }).url,
-                ) as unknown as { submission: SubmissionDetail; progress: Progress | null };
-
-                submissionData.value = response.submission;
-                progressData.value = response.progress;
-            } catch {
-                // handle error silently
-            } finally {
-                isLoading.value = false;
-            }
-        }
-    },
+    () => fetchSubmission(),
     { immediate: true }
+);
+
+watch(
+    () => props.status,
+    (newStatus, oldStatus) => {
+        // If status changed from processing to something else, re-fetch the full detail
+        if (oldStatus === 'processing' && (newStatus === 'graded' || newStatus === 'failed')) {
+            fetchSubmission();
+        }
+    }
 );
 
 const statusConfig = computed(() => {
@@ -173,12 +188,12 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                 </div>
 
                 <!-- Progress Comparison -->
-                <template v-if="progressData">
-                        <div class="flex items-center gap-3">
-                            <component :is="progressIcon" class="h-5 w-5" :class="progressColor" />
-                            <p class="text-sm font-medium" :class="progressColor">
-                                {{ progressData.label }}, Skor sebelumnya: {{ progressData.previous_score }} <ArrowRight class="h-4 w-5 inline" :class="progressColor" /> Skor saat ini: {{ progressData.current_score }}
-                            </p>
+                <template v-if="submissionData.status == 'graded'">
+                    <div class="flex items-center gap-3">
+                        <component :is="progressIcon" class="h-5 w-5" :class="progressColor" />
+                        <p class="text-sm font-medium" :class="progressColor">
+                            {{ progressData?.label }}, Skor sebelumnya: {{ progressData?.previous_score }} <ArrowRight class="h-4 w-5 inline" :class="progressColor" /> Skor saat ini: {{ progressData?.current_score }}
+                        </p>
                     </div>
                 </template>
 

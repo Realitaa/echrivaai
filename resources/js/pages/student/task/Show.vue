@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     Calendar,
@@ -17,14 +17,14 @@ import {
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ref, computed } from 'vue';
-import { watch, onMounted } from 'vue';
+import { watch, onMounted, onUnmounted } from 'vue';
 import SubmissionDetail from '@/components/student/submission/SubmissionDetail.vue';
 import SubmissionForm from '@/components/student/submission/SubmissionForm.vue';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -90,6 +90,44 @@ const totalMaxScore = computed(() => {
 const currentView = ref<'none' | 'submit' | 'detail'>('none');
 const selectedSubmissionId = ref<number | null>(null);
 
+// Polling logic
+let pollingInterval: ReturnType<typeof setInterval> | null = null;
+
+const startPolling = () => {
+    if (pollingInterval) {
+        return;
+    }
+
+    pollingInterval = setInterval(() => {
+        router.reload({
+            only: ['submissions'],
+            onSuccess: () => {
+                if (!hasProcessingSubmission.value) {
+                    stopPolling();
+                }
+            },
+        });
+    }, 5000); // Poll every 5 seconds
+};
+
+const stopPolling = () => {
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+    }
+};
+
+watch(hasProcessingSubmission, (newValue) => {
+    if (newValue) {
+        startPolling();
+    } else {
+        stopPolling();
+    }
+}, { immediate: true });
+
+onUnmounted(() => {
+    stopPolling();
+});
 
 onMounted(() => {
     if (props.submissions.length > 0) {
@@ -347,7 +385,7 @@ const statusConfig = (status: string) => {
                                         {{ dayjs(submission.submitted_at).format('DD MMM YYYY, HH:mm') }}
                                         · {{ dayjs(submission.submitted_at).fromNow() }}
                                     </p>
-                                    <p class="text-sm text-muted-foreground mt-0.5">Skor: <span class="font-medium text-primary">{{ submission.final_score }}</span></p>
+                                    <p class="text-sm text-muted-foreground mt-0.5">Skor: <span class="font-medium text-primary">{{ submission.final_score ?? '-' }}</span></p>
                                 </div>
 
                                 <!-- Arrow -->
@@ -372,6 +410,7 @@ const statusConfig = (status: string) => {
                         :task-id="task.id"
                         :submission-id="selectedSubmissionId"
                         :rubrics="task.rubrics"
+                        :status="submissions.find(s => s.id === selectedSubmissionId)?.status"
                     />
 
                     <div v-else class="h-full flex items-center justify-center text-muted-foreground">
