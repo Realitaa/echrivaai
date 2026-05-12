@@ -6,3 +6,4 @@ export * from './teacher';
 export * from './task';
 export * from './file';
 export * from './submission';
+export * from './ai';

@@ -110,7 +110,8 @@ class SubmissionService
      */
     public function getSubmissionDetail(Submission $submission): array
     {
-        $submission->load(['aiFeedbacks', 'rubricScores.rubric', 'files']);
+        $submission->load(['aiFeedbacks', 'rubricScores.rubric', 'files'])
+            ->loadSum('rubricScores as final_score', 'score_ai');
 
         $progress = null;
 

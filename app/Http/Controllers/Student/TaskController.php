@@ -31,6 +31,7 @@ class TaskController extends Controller
             ->submissions()
             ->where('user_id', auth()->id())
             ->orderBy('version', 'desc')
+            ->withSum('rubricScores as final_score', 'score_ai')
             ->get();
 
         return Inertia::render('student/task/Show', [
