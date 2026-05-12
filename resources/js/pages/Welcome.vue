@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
     Brain,
     Clock,
@@ -11,6 +11,7 @@ import {
     UploadCloud,
     Sparkles,
 } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import CardIcon from '@/components/CardIcon.vue';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,8 @@ import {
     CardDescription,
 } from '@/components/ui/card';
 import { dashboard, login, register } from '@/routes';
+import studentClassroom from '@/routes/student/classroom/index';
+import teacherClassroom from '@/routes/teacher/classroom/index';
 
 withDefaults(
     defineProps<{
@@ -31,6 +34,20 @@ withDefaults(
         canRegister: true,
     },
 );
+
+const page = usePage();
+const userRole = computed(() => page.props.auth.user?.role);
+const loggedInNavBtn = computed(() => {
+    if (userRole.value === 'teacher') {
+        return teacherClassroom.index();
+    }
+
+    if (userRole.value === 'student') {
+        return studentClassroom.index();
+    }
+
+    return dashboard();
+});
 </script>
 
 <template>
@@ -69,7 +86,10 @@ withDefaults(
                         variant="default"
                         class="bg-purple-600 hover:bg-purple-700"
                     >
-                        <Link :href="dashboard()">Dashboard</Link>
+                        <Link
+                            :href="loggedInNavBtn"
+                            >{{ userRole === 'admin' ? 'Dashboard' : 'Classroom' }}</Link
+                        >
                     </Button>
                 </template>
                 <template v-else>
