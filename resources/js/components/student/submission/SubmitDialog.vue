@@ -140,6 +140,7 @@ const resetAndClose = () => {
                         v-model="form.content"
                         placeholder="Tulis esai atau jawaban tugas Anda di sini..."
                         rows="6"
+                        class="max-h-96 overflow-y-auto"
                         :class="{ 'border-destructive': form.errors.content }"
                     />
                     <span v-if="form.errors.content" class="text-xs text-destructive">

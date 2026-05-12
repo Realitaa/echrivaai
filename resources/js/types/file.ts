@@ -3,6 +3,7 @@ export type FileItem = {
     original_name: string;
     filename: string;
     isTemp?: boolean;
+    path: string;
 }
 
 /**

@@ -7,7 +7,6 @@ import {
     FileText,
     Plus,
     User,
-    ClipboardList,
     CheckCircle,
     Loader2,
     AlertCircle,
@@ -18,56 +17,23 @@ import {
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ref, computed } from 'vue';
-
 import SubmissionDetailDialog from '@/components/student/submission/SubmissionDetailDialog.vue';
 import SubmitDialog from '@/components/student/submission/SubmitDialog.vue';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { index as classroomIndex, show as classroomShow } from '@/routes/student/classroom';
+import { index as classroomIndex } from '@/routes/student/classroom';
 import { index as taskIndex } from '@/routes/student/classroom/task';
+import type { SubmissionItem, TaskDetail } from '@/types';
 
 dayjs.extend(relativeTime);
-
-interface TaskFile {
-    id: number;
-    original_name: string;
-    path: string;
-}
-
-interface TaskRubric {
-    id: number;
-    title: string;
-    description: string;
-    max_score: number;
-    order: number;
-}
-
-interface TaskDetail {
-    id: number;
-    title: string;
-    description: string | null;
-    deadline: string;
-    is_published: boolean;
-    created_at: string;
-    classroom_id: number;
-    files: TaskFile[];
-    rubrics: TaskRubric[];
-    creator: {
-        id: number;
-        name: string;
-    };
-}
-
-interface SubmissionItem {
-    id: number;
-    version: number;
-    status: string;
-    content: string;
-    submitted_at: string;
-    is_latest: boolean;
-}
 
 const props = defineProps<{
     task: TaskDetail;
@@ -181,52 +147,69 @@ const statusConfig = (status: string) => {
             </Badge>
         </div>
 
-        <!-- Task Description -->
-        <div v-if="task.description" class="space-y-2">
-            <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ task.description }}</p>
-        </div>
+        <div class="flex flex-col lg:flex-row justify-between gap-4 w-full">
+            <div class="w-full lg:w-2/3">
+                <!-- Task Description -->
+                <div v-if="task.description" class="space-y-2">
+                    <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ task.description }}</p>
+                </div>
 
-        <!-- Task Attachments -->
-        <div v-if="task.files?.length" class="space-y-2">
-            <h3 class="text-sm font-semibold">Lampiran Tugas</h3>
-            <div class="flex flex-wrap gap-2">
-                <a
-                    v-for="file in task.files"
-                    :key="file.id"
-                    :href="`/storage/${file.path}`"
-                    target="_blank"
-                    class="flex items-center gap-2 rounded-md border px-3 py-2 hover:bg-muted/50 transition-colors text-sm"
-                >
-                    <FileText class="h-4 w-4 shrink-0 text-blue-500" />
-                    <span class="truncate max-w-[200px]">{{ file.original_name }}</span>
-                    <Download class="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                </a>
-            </div>
-        </div>
-
-        <!-- Rubrics Overview -->
-        <div v-if="task.rubrics?.length" class="space-y-2">
-            <h3 class="text-sm font-semibold">Kriteria Penilaian</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                <div
-                    v-for="rubric in task.rubrics"
-                    :key="rubric.id"
-                    class="rounded-lg border bg-muted/30 p-3 text-center"
-                >
-                    <p class="text-sm font-bold truncate">{{ rubric.title }}</p>
-                    <p class="text-xs">{{ rubric.description }}</p>
-                    <p class="text-lg font-bold text-primary mt-1">{{ rubric.max_score }}</p>
+                <!-- Task Attachments -->
+                <div v-if="task.files?.length" class="space-y-2">
+                    <h3 class="text-sm font-semibold">Lampiran Tugas</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <a
+                            v-for="file in task.files"
+                            :key="file.id"
+                            :href="`/storage/${file.path}`"
+                            target="_blank"
+                            class="flex items-center gap-2 rounded-md border px-3 py-2 hover:bg-muted/50 transition-colors text-sm"
+                        >
+                            <FileText class="h-4 w-4 shrink-0 text-blue-500" />
+                            <span class="truncate max-w-[200px]">{{ file.original_name }}</span>
+                            <Download class="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        </a>
+                    </div>
                 </div>
             </div>
-            <p class="text-xs text-muted-foreground text-right">
-                Total skor maksimal: <span class="font-semibold">{{ totalMaxScore }}</span>
-            </p>
+
+            <!-- Rubrics Overview -->
+            <div v-if="task.rubrics?.length" class="space-y-2 w-full lg:w-1/3">
+                <h3 class="text-sm font-semibold">Kriteria Penilaian</h3>
+                <Accordion type="multiple" v-if="task.rubrics?.length" collapsible class="w-full" :default-value="`item-${task.rubrics[0].id}`">
+                    <AccordionItem 
+                        v-for="rubric in task.rubrics"
+                        :key="rubric.id"
+                        :value="`item-${rubric.id}`">
+                        <AccordionTrigger>
+                            <span class="text-lg font-semibold">
+                                {{ rubric.title }}
+                            </span>
+                            <span class="text-lg ml-auto text-primary text-right tabular-nums">
+                                {{ rubric.max_score }}
+                            </span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <p>
+                            {{ rubric.description }}
+                            </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                <p class="text-sm text-muted-foreground text-right">
+                    Total skor maksimal: <span class="font-semibold text-primary tabular-nums">{{ totalMaxScore }}</span>
+                </p>
+            </div>
         </div>
 
         <Separator />
 
         <!-- Submission Section -->
         <div class="space-y-4">
+            <h3 class="text-sm font-semibold flex items-center gap-2">
+                <History class="h-4 w-4" />
+                Pengumpulan
+            </h3>
             <!-- Submit Button (Large CTA) -->
             <Card
                 class="border-2 transition-all cursor-pointer group"
@@ -235,14 +218,14 @@ const statusConfig = (status: string) => {
                     : 'border-dashed border-muted-foreground/20 opacity-60 cursor-not-allowed'"
                 @click="canSubmit && (isSubmitDialogOpen = true)"
             >
-                <CardContent class="flex flex-col items-center justify-center py-10 gap-3">
+                <CardContent class="flex flex-col items-center justify-center gap-3">
                     <div
                         class="rounded-full p-4 transition-colors"
                         :class="canSubmit
                             ? 'bg-primary/10 text-primary group-hover:bg-primary/20'
                             : 'bg-muted text-muted-foreground'"
                     >
-                        <Plus class="h-8 w-8" />
+                        <Plus class="h-6 w-6" />
                     </div>
                     <div class="text-center">
                         <p class="text-lg font-semibold" :class="canSubmit ? '' : 'text-muted-foreground'">
@@ -265,11 +248,6 @@ const statusConfig = (status: string) => {
 
             <!-- Submission History -->
             <div v-if="submissions.length > 0" class="space-y-3">
-                <h3 class="text-sm font-semibold flex items-center gap-2">
-                    <History class="h-4 w-4" />
-                    Riwayat Pengumpulan ({{ submissions.length }})
-                </h3>
-
                 <div class="space-y-2">
                     <Card
                         v-for="submission in submissions"
