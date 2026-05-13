@@ -26,7 +26,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { download } from '@/routes/file';
-import { show as showSubmission } from '@/routes/student/classroom/task/submission';
 import type { SubmissionDetail, TaskRubric } from '@/types';
 
 interface Progress {
@@ -41,6 +40,7 @@ const props = defineProps<{
     submissionId: number | null;
     rubrics: TaskRubric[];
     status?: string;
+    showRoute: any;
 }>();
 
 const submissionData = ref<SubmissionDetail | null>(null);
@@ -60,7 +60,7 @@ const fetchSubmission = async () => {
 
     try {
         const response = await fetchHttp.get(
-            showSubmission({
+            props.showRoute({
                 classroom: props.classroomId,
                 task: props.taskId,
                 submission: props.submissionId as number,

@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use App\Services\Teacher\SubmissionService;
+use App\Services\Teacher\SubmissionService as TeacherSubmissionService;
+use App\Services\Student\SubmissionService as StudentSubmissionService;
 use App\Models\Classroom;
 use App\Models\Task;
 use App\Models\Submission;
@@ -15,7 +16,8 @@ use Illuminate\Routing\Attributes\Controllers\Authorize;
 class SubmissionController extends Controller
 {
     public function __construct(
-        protected SubmissionService $submissionService,
+        protected TeacherSubmissionService $teacherSubmissionService,
+        protected StudentSubmissionService $studentSubmissionService,
     ) {}
 
     #[Authorize('view', 'task')]
@@ -23,7 +25,7 @@ class SubmissionController extends Controller
     {
         abort_if($task->classroom_id !== $classroom->id, 404);
         
-        $students = $this->submissionService->getEnrolledStudentsWithSubmissions($task);
+        $students = $this->teacherSubmissionService->getEnrolledStudentsWithSubmissions($task);
 
         return Inertia::render('teacher/submission/Index', [
             'task' => $task->load(['files', 'creator', 'rubrics']),
@@ -36,7 +38,7 @@ class SubmissionController extends Controller
     {
         abort_if($task->classroom_id !== $classroom->id, 404);
         
-        $submissions = $this->submissionService->getStudentHistory($task, $student);
+        $submissions = $this->teacherSubmissionService->getStudentHistory($task, $student);
         
         return response()->json([
             'submissions' => $submissions,
@@ -52,9 +54,9 @@ class SubmissionController extends Controller
         abort_if($task->classroom_id !== $classroom->id, 404);
         abort_if($submission->task_id !== $task->id, 404);
 
-        return response()->json([
-            'submission' => $submission->load(['files', 'aiFeedbacks', 'rubricScores.taskRubric']),
-        ]);
+        $data = $this->studentSubmissionService->getSubmissionDetail($submission);
+
+        return response()->json($data);
     }
 
     #[Authorize('update', 'submission')]

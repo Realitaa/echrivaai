@@ -42,6 +42,7 @@ class SubmissionService
         return $task->submissions()
             ->where('user_id', $student->id)
             ->with(['aiFeedbacks', 'files'])
+            ->withSum('rubricScores as final_score', 'score_ai')
             ->orderBy('version', 'desc')
             ->get();
     }
