@@ -45,6 +45,7 @@
         "clsx": "^2.1.1",
         "dayjs": "^1.11.20",
         "laravel-vite-plugin": "^3.0.0",
+        "laravel-vue-i18n": "^2.8.0",
         "reka-ui": "^2.6.1",
         "tailwind-merge": "^3.2.0",
         "tailwindcss": "^4.1.1",

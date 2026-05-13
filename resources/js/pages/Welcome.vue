@@ -66,17 +66,17 @@ const loggedInNavBtn = computed(() => {
                 <a
                     href="#features"
                     class="transition-colors hover:text-purple-600"
-                    >Features</a
+                    >{{ $t('landing.nav.features') }}</a
                 >
                 <a
                     href="#how-it-works"
                     class="transition-colors hover:text-purple-600"
-                    >How it Works</a
+                    >{{ $t('landing.nav.howItWorks') }}</a
                 >
                 <a
                     href="#benefits"
                     class="transition-colors hover:text-purple-600"
-                    >Benefits</a
+                    >{{ $t('landing.nav.benefits') }}</a
                 >
             </nav>
             <div class="flex items-center gap-4">
