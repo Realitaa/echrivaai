@@ -62,4 +62,23 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
+
+    /**
+     * Update the user's locale.
+     */
+    public function updateLocale(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'locale' => 'required|in:en,id,fr',
+        ]);
+
+        $request->user()->update(['locale' => $validated['locale']]);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('flash.setting.profile.locale'),
+        ]);
+
+        return to_route('profile.edit');
+    }
 }

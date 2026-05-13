@@ -20,6 +20,7 @@ return [
   "setting" => [
     "profile" => [
       "updated" => "Profile updated successfully.",
+      "locale" => "Locale updated successfully.",
     ],
     "security" => [
       "updated" => "Password updated successfully.",

@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Services\SidebarService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use Inertia\Inertia;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -58,7 +57,7 @@ class HandleInertiaRequests extends Middleware
                     ? $this->sidebarService->getCachedSidebar($request->user()) 
                     : [],
             ],
-            'locale' => app()->getLocale(),
+            'locale' => $request->user() ? $request->user()->getUserLocale() : app()->getLocale(),
         ];
     }
 }

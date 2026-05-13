@@ -20,6 +20,7 @@ return [
   "setting" => [
     "profile" => [
       "updated" => "Profil berhasil diperbarui.",
+      "locale" => "Bahasa berhasil diperbarui.",
     ],
     "security" => [
       "updated" => "Kata sandi berhasil diperbarui.",

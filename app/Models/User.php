@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Classroom::class, 'teacher_id');
     }
+
+    public function getUserLocale(): string
+    {
+        return $this->locale;
+    }
 }

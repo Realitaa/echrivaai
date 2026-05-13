@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\UserController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -15,6 +16,8 @@ Route::middleware(['auth'])->group(function () {
     Route::inertia('register/pending', 'auth/RegisterPending')
         ->name('register.pending')
         ->middleware('role:teacher');
+    Route::patch('locale', [UserController::class, 'updateLocale'])
+        ->name('locale.update');
 
     require __DIR__ . '/settings.php';
     require __DIR__ . '/users.php';

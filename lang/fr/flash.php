@@ -20,6 +20,7 @@ return [
   "setting" => [
     "profile" => [
       "updated" => "Profil mis à jour avec succès.",
+      "locale" => "Langue mise à jour avec succès.",
     ],
     "security" => [
       "updated" => "Mot de passe mis à jour avec succès.",
