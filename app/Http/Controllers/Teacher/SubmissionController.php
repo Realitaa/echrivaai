@@ -25,6 +25,7 @@ class SubmissionController extends Controller
         $submissions = $this->submissionService->getPaginatedSubmissions($task);
 
         return Inertia::render('teacher/submission/Index', [
+            'task' => $task->load(['files', 'creator', 'rubrics']),
             'submissions' => $submissions,
         ]);
     }
