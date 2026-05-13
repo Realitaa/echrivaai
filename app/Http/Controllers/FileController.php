@@ -55,7 +55,7 @@ class FileController extends Controller
         if (!$file || !Storage::disk('public')->exists($file->path)) {
             return response()->json([
                 'success' => false,
-                'message' => 'File tidak ditemukan.',
+                'message' => __('response.notFoundFile'),
             ], 404);
         }
 

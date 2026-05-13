@@ -61,7 +61,7 @@ class TaskController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Task created successfully!',
+            'message' => __('flash.teacher.task.created'),
         ]);
 
         return to_route('teacher.classroom.task.index', $classroom);
@@ -75,7 +75,7 @@ class TaskController extends Controller
         if ($task->is_published) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'You cannot edit a published task!',
+                'message' => __('flash.teacher.task.published', ['action' => 'edit']),
             ]);
 
             return to_route('teacher.classroom.task.index', $classroom);
@@ -101,7 +101,7 @@ class TaskController extends Controller
         if ($task->is_published) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'You cannot update a published task!',
+                'message' => __('flash.teacher.task.published', ['action' => 'update']),
             ]);
 
             return to_route('teacher.classroom.task.index', $classroom);
@@ -128,7 +128,7 @@ class TaskController extends Controller
         if ($task->is_published) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'You cannot delete a published task!',
+                'message' => __('flash.teacher.task.published', ['action' => 'delete']),
             ]);
 
             return to_route('teacher.classroom.task.index', $classroom);
@@ -137,8 +137,7 @@ class TaskController extends Controller
         if (!$this->taskService->deleteTask($task)) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' =>
-                    'Task cannot be deleted because it has submissions!',
+                'message' => __('flash.teacher.task.hasSubmission', ['action' => 'delete']),
             ]);
 
             return to_route('teacher.classroom.task.index', $classroom);
@@ -146,7 +145,7 @@ class TaskController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Task deleted successfully!',
+            'message' => __('flash.teacher.task.deleted'),
         ]);
 
         return to_route('teacher.classroom.task.index', $classroom);
@@ -160,7 +159,7 @@ class TaskController extends Controller
         if ($task->is_published) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Task is already published!',
+                'message' => __('flash.teacher.task.alreadyPublished'),
             ]);
 
             return to_route('teacher.classroom.task.index', $classroom);
@@ -170,7 +169,7 @@ class TaskController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Task published successfully!',
+            'message' => __('flash.teacher.task.publish'),
         ]);
 
         return to_route('teacher.classroom.task.index', $classroom);
@@ -184,7 +183,7 @@ class TaskController extends Controller
         if (!$task->is_published) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Task is not published!',
+                'message' => __('flash.teacher.task.notPublished'),
             ]);
 
             return to_route('teacher.classroom.task.index', $classroom);
@@ -193,7 +192,7 @@ class TaskController extends Controller
         if (!$this->taskService->unpublishTask($task)) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Cannot unpublish task that has submissions!',
+                'message' => __('flash.teacher.task.hasSubmission', ['action' => 'unpublish']),
             ]);
 
             return to_route('teacher.classroom.task.index', $classroom);
@@ -201,7 +200,7 @@ class TaskController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Task unpublished successfully!',
+            'message' => __('flash.teacher.task.unpublish'),
         ]);
 
         return to_route('teacher.classroom.task.index', $classroom);

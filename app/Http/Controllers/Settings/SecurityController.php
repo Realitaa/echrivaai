@@ -63,7 +63,7 @@ class SecurityController extends Controller implements HasMiddleware
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => __('Password updated.'),
+            'message' => __('flash.setting.security.updated'),
         ]);
 
         return back();

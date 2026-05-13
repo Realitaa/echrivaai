@@ -44,7 +44,7 @@ class UpdateTaskRequest extends FormRequest
                         ->exists();
 
                     if (!$existsInTemp && !$existsInFiles) {
-                        $fail('The selected attachment is invalid.');
+                        $fail(__('validation.exists', ['attribute' => 'attachment']));
                     }
                 },
             ],

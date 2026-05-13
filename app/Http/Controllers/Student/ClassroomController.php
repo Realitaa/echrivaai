@@ -48,7 +48,7 @@ class ClassroomController extends Controller
         if ($isEnrolled) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'You are already enrolled in this classroom!',
+                'message' => __('flash.student.classroom.alreadyEnrolled'),
             ]);
             return redirect()->route('student.classroom.index');
         }
@@ -62,7 +62,7 @@ class ClassroomController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Successfully enrolled in the classroom!',
+            'message' => __('flash.student.classroom.enrolled'),
         ]);
 
         return redirect()->route('student.classroom.show', $classroom);

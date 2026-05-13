@@ -33,8 +33,7 @@ class ClassroomController extends Controller
         if (!$this->classroomService->deleteClassroom($classroom)) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' =>
-                    'Classroom cannot be deleted because it has active tasks.',
+                'message' => __('flash.admin.classroom.activeTasks'),
             ]);
 
             return to_route('admin.classroom.index');
@@ -42,7 +41,7 @@ class ClassroomController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Classroom deleted successfully.',
+            'message' => __('flash.admin.classroom.deleted'),
         ]);
 
         return to_route('admin.classroom.index');

@@ -32,7 +32,7 @@ class ClassroomController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Classroom created successfully!',
+            'message' => __('flash.teacher.classroom.created'),
         ]);
 
         return to_route('teacher.classroom.index');
@@ -62,7 +62,7 @@ class ClassroomController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Classroom updated successfully!',
+            'message' => __('flash.teacher.classroom.updated'),
         ]);
 
         return to_route('teacher.classroom.index');
@@ -84,7 +84,7 @@ class ClassroomController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Classroom deleted successfully!',
+            'message' => __('flash.teacher.classroom.deleted'),
         ]);
 
         return to_route('teacher.classroom.index');

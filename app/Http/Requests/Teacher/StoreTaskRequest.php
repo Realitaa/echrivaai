@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Teacher;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -27,7 +28,7 @@ class StoreTaskRequest extends FormRequest
             'attachments' => ['nullable', 'array'],
             'attachments.*' => [
                 'required',
-                \Illuminate\Validation\Rule::exists(
+                Rule::exists(
                     'temporary_files',
                     'id',
                 )->where(function ($query) {

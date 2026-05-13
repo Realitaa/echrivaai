@@ -43,8 +43,7 @@ class TaskController extends Controller
         if (!$this->taskService->deleteTask($task)) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' =>
-                    'Task cannot be deleted because it has submissions.',
+                'message' => __('flash.admin.task.activeTasks'),
             ]);
 
             return back();
@@ -52,7 +51,7 @@ class TaskController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Task deleted successfully.',
+            'message' => __('flash.admin.task.deleted'),
         ]);
 
         return to_route('admin.task.index');

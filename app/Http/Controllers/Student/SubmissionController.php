@@ -57,7 +57,7 @@ class SubmissionController extends Controller
 
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'The deadline for this task has passed.',
+                'message' => __('flash.student.submission.deadlineOver'),
             ]);
 
             return to_route('student.classroom.task.show', [$classroom, $task]);
@@ -77,8 +77,7 @@ class SubmissionController extends Controller
 
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' =>
-                    'Your previous submission is still being processed. Please wait.',
+                'message' => __('flash.student.submission.unfinishedPrevious'),
             ]);
 
             return to_route('student.classroom.task.show', [$classroom, $task]);
@@ -91,8 +90,7 @@ class SubmissionController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' =>
-                'Submission created successfully! Please wait while AI processes your feedback.',
+            'message' => __('flash.student.submission.created'),
         ]);
 
         return to_route('student.classroom.task.show', [$classroom, $task]);

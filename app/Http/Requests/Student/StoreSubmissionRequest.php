@@ -36,12 +36,12 @@ class StoreSubmissionRequest extends FormRequest
                     $tempFile = TemporaryFile::find($value);
 
                     if (!$tempFile) {
-                        $fail('The selected file does not exist.');
+                        $fail(__('validation.exists', ['attribute' => 'file']));
                         return;
                     }
 
                     if ($tempFile->uploaded_by !== $userId) {
-                        $fail('The selected file does not belong to you.');
+                        $fail(__('validation.custom.temporary_file_ids.owner'));
                     }
                 },
             ],
