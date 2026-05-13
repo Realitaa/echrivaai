@@ -1062,7 +1062,7 @@ test('teacher cannot delete task that already has submissions', function () {
     $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
-        'message' => 'Task cannot be deleted because it has submissions!',
+        'message' => 'Cannot delete task that has submissions!',
     ]);
 
     $this->assertDatabaseHas('tasks', ['id' => $task->id]);

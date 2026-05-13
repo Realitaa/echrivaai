@@ -51,7 +51,7 @@ return [
       "unpublish" => "Tâche dépubliée avec succès !",
       "published" => "Vous ne pouvez pas :action une tâche publiée !",
       "alreadyPublished" => "La tâche est déjà publiée !",
-      "hasSubmission" => "La tâche ne peut pas être :action car elle contient des soumissions !",
+      "hasSubmission" => "Impossible de :action la tâche qui contient des soumissions !",
       "notPublished" => "La tâche n'est pas publiée !"
     ]
   ]

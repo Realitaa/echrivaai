@@ -51,7 +51,7 @@ return [
       "unpublish" => "Tugas berhasil batal diterbitkan!",
       "published" => "Anda tidak dapat :action tugas yang sudah diterbitkan!",
       "alreadyPublished" => "Tugas sudah diterbitkan!",
-      "hasSubmission" => "Tugas tidak dapat di-:action karena sudah memiliki pengumpulan!",
+      "hasSubmission" => "Tidak dapat :action tugas yang memiliki pengumpulan!",
       "notPublished" => "Tugas belum diterbitkan!"
     ]
   ]

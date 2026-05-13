@@ -51,7 +51,7 @@ return [
       "unpublish" => "Task unpublished successfully!",
       "published" => "You cannot :action a published task!",
       "alreadyPublished" => "Task is already published!",
-      "hasSubmission" => "Task cannot be :action because it has submissions!",
+      "hasSubmission" => "Cannot :action task that has submissions!",
       "notPublished" => "Task is not published!"
     ]
   ]

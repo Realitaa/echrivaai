@@ -148,7 +148,7 @@ test('not found file in database handed gracefully', function () {
 
     $this->actingAs($user)->get(route('file.download', 999))->assertJson([
         'success' => false,
-        'message' => 'File tidak ditemukan.',
+        'message' => __('response.notFoundFile'),
     ]);
 });
 
@@ -163,7 +163,7 @@ test('not found file physically handed gracefully', function () {
 
     $this->actingAs($user)->get(route('file.download', $file->id))->assertJson([
         'success' => false,
-        'message' => 'File tidak ditemukan.',
+        'message' => __('response.notFoundFile'),
     ]);
 });
 
