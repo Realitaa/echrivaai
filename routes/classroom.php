@@ -104,6 +104,10 @@ Route::group(
                             TeacherSubmissionController::class,
                             'show',
                         ])->name('show');
+                        Route::get('/history/{student}', [
+                            TeacherSubmissionController::class,
+                            'history',
+                        ])->name('history');
                         Route::put('/{submission}/feedback', [
                             TeacherSubmissionController::class,
                             'feedback',

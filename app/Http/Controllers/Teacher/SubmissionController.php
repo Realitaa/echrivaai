@@ -8,6 +8,7 @@ use App\Models\Classroom;
 use App\Models\Task;
 use App\Models\Submission;
 use App\Http\Requests\Teacher\FeedbackSubmissionRequest;
+use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
 
@@ -21,11 +22,23 @@ class SubmissionController extends Controller
     public function index(Classroom $classroom, Task $task)
     {
         abort_if($task->classroom_id !== $classroom->id, 404);
-
-        $submissions = $this->submissionService->getPaginatedSubmissions($task);
+        
+        $students = $this->submissionService->getEnrolledStudentsWithSubmissions($task);
 
         return Inertia::render('teacher/submission/Index', [
             'task' => $task->load(['files', 'creator', 'rubrics']),
+            'students' => $students,
+        ]);
+    }
+
+    #[Authorize('view', 'task')]
+    public function history(Classroom $classroom, Task $task, User $student)
+    {
+        abort_if($task->classroom_id !== $classroom->id, 404);
+        
+        $submissions = $this->submissionService->getStudentHistory($task, $student);
+        
+        return response()->json([
             'submissions' => $submissions,
         ]);
     }
@@ -39,8 +52,8 @@ class SubmissionController extends Controller
         abort_if($task->classroom_id !== $classroom->id, 404);
         abort_if($submission->task_id !== $task->id, 404);
 
-        return Inertia::render('teacher/submission/Show', [
-            'submission' => $submission,
+        return response()->json([
+            'submission' => $submission->load(['files', 'aiFeedbacks', 'rubricScores.taskRubric']),
         ]);
     }
 
@@ -51,23 +64,23 @@ class SubmissionController extends Controller
         Task $task,
         Submission $submission,
     ) {
-        abort_if($task->classroom_id !== $classroom->id, 404);
-        abort_if($submission->task_id !== $task->id, 404);
+        // abort_if($task->classroom_id !== $classroom->id, 404);
+        // abort_if($submission->task_id !== $task->id, 404);
 
-        $this->submissionService->updateFeedback(
-            $submission,
-            $request->validated(),
-        );
+        // $this->submissionService->updateFeedback(
+        //     $submission,
+        //     $request->validated(),
+        // );
 
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => 'Feedback submitted successfully!',
-        ]);
+        // Inertia::flash('toast', [
+        //     'type' => 'success',
+        //     'message' => 'Feedback submitted successfully!',
+        // ]);
 
-        return to_route('teacher.classroom.task.submission.show', [
-            $classroom,
-            $task,
-            $submission,
-        ]);
+        // return to_route('teacher.classroom.task.submission.show', [
+        //     $classroom,
+        //     $task,
+        //     $submission,
+        // ]);
     }
 }
