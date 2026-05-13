@@ -57,7 +57,7 @@ class HandleInertiaRequests extends Middleware
                     ? $this->sidebarService->getCachedSidebar($request->user()) 
                     : [],
             ],
-            'locale' => $request->user() ? $request->user()->getUserLocale() : app()->getLocale(),
+            'locale' => app()->getLocale(),
         ];
     }
 }

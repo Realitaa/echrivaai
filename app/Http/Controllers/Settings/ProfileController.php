@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Validation\Rule;
+use App\Enums\Locales;
 
 class ProfileController extends Controller
 {
@@ -69,16 +71,25 @@ class ProfileController extends Controller
     public function updateLocale(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'locale' => 'required|in:en,id,fr',
+            'locale' => ['required', Rule::in(Locales::toArray())],
         ]);
 
-        $request->user()->update(['locale' => $validated['locale']]);
+        $locale = $validated['locale'];
 
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => __('flash.setting.profile.locale'),
-        ]);
+        if ($request->user()) {
+            $request->user()->update([
+                'locale' => $locale,
+            ]);
+        }
 
-        return to_route('profile.edit');
+        app()->setLocale($locale);
+
+        return back()->withCookie(
+            cookie(
+                'locale',
+                $locale,
+                60 * 24 * 30 // 30 hari
+            )
+        );
     }
 }
