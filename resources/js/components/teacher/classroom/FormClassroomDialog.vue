@@ -28,13 +28,13 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
                 <DialogTitle>{{
-                    action === 'edit' ? 'Edit Kelas' : 'Buat Kelas Baru'
+                    action === 'edit' ? $t('classroom.teacher.form.editTitle') : $t('classroom.teacher.form.createTitle')
                 }}</DialogTitle>
                 <DialogDescription>
                     {{
                         action === 'edit'
-                            ? 'Ubah informasi kelas Anda di sini.'
-                            : 'Tambahkan kelas baru ke daftar kelas Anda. Kode kelas akan dibuat secara otomatis.'
+                            ? $t('classroom.teacher.form.editDesc')
+                            : $t('classroom.teacher.form.createDesc')
                     }}
                 </DialogDescription>
             </DialogHeader>
@@ -47,12 +47,12 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                 autocomplete="off"
             >
                 <div class="space-y-2">
-                    <Label for="name" :class="{ 'text-destructive': errors.name }">Nama Kelas</Label>
+                    <Label for="name" :class="{ 'text-destructive': errors.name }">{{ $t('classroom.teacher.form.name') }}</Label>
                     <Input
                         id="name"
                         name="name"
                         :defaultValue="classroom?.name"
-                        placeholder="Contoh: Matematika Dasar"
+                        :placeholder="$t('classroom.teacher.form.namePlaceholder')"
                         :class="{ 'border-destructive': errors.name }"
                         required
                     />
@@ -61,12 +61,12 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                     }}</span>
                 </div>
                 <div class="space-y-2">
-                    <Label for="description" :class="{ 'text-destructive': errors.description }">Deskripsi (Opsional)</Label>
+                    <Label for="description" :class="{ 'text-destructive': errors.description }">{{ $t('classroom.teacher.form.description') }}</Label>
                     <Textarea
                         id="description"
                         name="description"
                         :defaultValue="classroom?.description"
-                        placeholder="Masukkan deskripsi kelas..."
+                        :placeholder="$t('classroom.teacher.form.descriptionPlaceholder')"
                         rows="3"
                         :class="{ 'border-destructive': errors.description }"
                     />
@@ -81,9 +81,9 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                         variant="outline"
                         @click="dialogOpen = false"
                         :disabled="processing"
-                    >Batal</Button>
+                    >{{ $t('classroom.teacher.form.cancel') }}</Button>
                     <Button type="submit" :disabled="processing">
-                        {{ processing ? 'Menyimpan...' : 'Simpan' }}
+                        {{ processing ? $t('classroom.teacher.form.saving') : $t('classroom.teacher.form.save') }}
                     </Button>
                 </DialogFooter>
             </Form>

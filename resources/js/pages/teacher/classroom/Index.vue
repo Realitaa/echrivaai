@@ -13,7 +13,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Kelasku',
+                title: 'classroom.teacher.title',
                 href: '#',
             },
         ],
@@ -60,16 +60,16 @@ const submitDelete = () => {
 </script>
 
 <template>
-    <Head title="Kelasku" />
+    <Head :title="$t('classroom.teacher.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">Daftar Kelas</h1>
-                <p class="text-sm text-muted-foreground">Kelola ruang kelas dan pembelajaran Anda.</p>
+                <h1 class="text-2xl font-bold tracking-tight">{{ $t('classroom.teacher.list') }}</h1>
+                <p class="text-sm text-muted-foreground">{{ $t('classroom.teacher.description') }}</p>
             </div>
             <Button @click="openCreateModal">
-                <Plus class="h-4 w-4" /> Kelas Baru
+                <Plus class="h-4 w-4" /> {{ $t('classroom.teacher.new') }}
             </Button>
         </div>
 
@@ -84,9 +84,9 @@ const submitDelete = () => {
         </div>
         <div v-else class="flex h-64 items-center justify-center rounded-xl border-2 border-dashed bg-card/50">
             <div class="text-center">
-                <p class="text-muted-foreground">Anda belum memiliki kelas.</p>
+                <p class="text-muted-foreground">{{ $t('classroom.teacher.empty') }}</p>
                 <Button variant="link" @click="openCreateModal" class="mt-1">
-                    Buat kelas pertama Anda
+                    {{ $t('classroom.teacher.createFirst') }}
                 </Button>
             </div>
         </div>

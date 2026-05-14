@@ -1,6 +1,7 @@
 <?php
 
 return [
+    // Admin
     'title' => 'Classroom Management',
     'description' => 'Manage classrooms available on the platform.',
     'search' => 'Search name or classroom code...',
@@ -31,5 +32,34 @@ return [
         'description' => 'This action cannot be undone. This will permanently delete this class. Note: Classes with active tasks cannot be deleted.',
         'cancel' => 'Cancel',
         'confirm' => 'Delete',
+    ],
+
+    // Teacher
+    'teacher' => [
+        'title' => 'My Class',
+        'list' => 'Class List',
+        'description' => 'Manage your classrooms and learning.',
+        'new' => 'New Class',
+        'empty' => 'You don\'t have any classes yet.',
+        'createFirst' => 'Create your first class',
+        'form' => [
+            'createTitle' => 'Create New Class',
+            'editTitle' => 'Edit Class',
+            'createDesc' => 'Add a new class to your class list. Class code will be generated automatically.',
+            'editDesc' => 'Change your class information here.',
+            'name' => 'Class Name',
+            'namePlaceholder' => 'e.g., Basic Mathematics',
+            'description' => 'Description (Optional)',
+            'descriptionPlaceholder' => 'Enter class description...',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+            'cancel' => 'Cancel',
+        ],
+        'deleteDialog' => [
+            'title' => 'Delete Class?',
+            'description' => 'This action cannot be undone. Classes with active tasks cannot be deleted.',
+            'cancel' => 'Cancel',
+            'confirm' => 'Yes, Delete',
+        ],
     ],
 ];
