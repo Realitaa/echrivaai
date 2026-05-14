@@ -49,9 +49,11 @@ class SetLocale
 
         $response = $next($request);
 
+        $currentLocale = app()->getLocale();
+
         // Sync cookie if it differs from resolved locale
-        if ($request->cookie('locale') !== $locale) {
-            $response->withCookie(cookie('locale', $locale, 60 * 24 * 30));
+        if ($request->cookie('locale') !== $currentLocale && method_exists($response, 'withCookie')) {
+            $response->withCookie(cookie('locale', $currentLocale, 60 * 24 * 30));
         }
 
         return $response;

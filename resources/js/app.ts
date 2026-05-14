@@ -2,7 +2,7 @@ import { createInertiaApp, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { i18nVue, loadLanguageAsync } from 'laravel-vue-i18n'; 
+import { i18nVue } from 'laravel-vue-i18n'; 
 import { createApp, h } from 'vue';
 import type { DefineComponent } from 'vue';
 import { initializeTheme, updateTheme } from '@/composables/useAppearance';
