@@ -1,15 +1,15 @@
 import dayjs from 'dayjs';
-import type { MaybeRef } from 'vue';
-import { computed, unref } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
+import { computed, toValue } from 'vue';
 import { currentLocale } from '@/lib/i18n';
 
 /**
  * Hook to get a reactive fromNow() string.
  * Automatically updates when the global locale changes.
  */
-export function useFromNow(date: MaybeRef<string | Date | number | null | undefined>) {
+export function useFromNow(date: MaybeRefOrGetter<string | Date | number | null | undefined>) {
     return computed(() => {
-        const d = unref(date);
+        const d = toValue(date);
 
         if (!d) {
             return '';
@@ -24,11 +24,11 @@ export function useFromNow(date: MaybeRef<string | Date | number | null | undefi
  * Automatically updates when the global locale changes.
  */
 export function useDateFormat(
-    date: MaybeRef<string | Date | number | null | undefined>,
+    date: MaybeRefOrGetter<string | Date | number | null | undefined>,
     format = 'DD MMM YYYY'
 ) {
     return computed(() => {
-        const d = unref(date);
+        const d = toValue(date);
 
         if (!d) {
             return '';

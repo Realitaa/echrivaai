@@ -86,7 +86,6 @@ const statusConfig = (status: string) => {
                                     </div>
                                     <p class="text-xs text-muted-foreground mt-0.5">
                                         {{ useRelativeTime(submission.submitted_at) }}
-                                        · {{ useRelativeTime(submission.submitted_at) }}
                                     </p>
                                     <p class="text-sm text-muted-foreground mt-0.5">Skor: <span class="font-medium text-primary">{{ submission.final_score ?? '-' }}</span></p>
                                 </div>
