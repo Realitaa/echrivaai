@@ -14,6 +14,7 @@ import {
 import { computed } from 'vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import CardIcon from '@/components/CardIcon.vue';
+import ChangeLocaleDropdown from '@/components/ChangeLocaleDropdown.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -66,17 +67,17 @@ const loggedInNavBtn = computed(() => {
                 <a
                     href="#features"
                     class="transition-colors hover:text-purple-600"
-                    >{{ $t('landing.nav.features') }}</a
+                    >{{ $t('navigation.landing.features') }}</a
                 >
                 <a
                     href="#how-it-works"
                     class="transition-colors hover:text-purple-600"
-                    >{{ $t('landing.nav.howItWorks') }}</a
+                    >{{ $t('navigation.landing.howItWorks') }}</a
                 >
                 <a
                     href="#benefits"
                     class="transition-colors hover:text-purple-600"
-                    >{{ $t('landing.nav.benefits') }}</a
+                    >{{ $t('navigation.landing.benefits') }}</a
                 >
             </nav>
             <div class="flex items-center gap-4">
@@ -108,6 +109,7 @@ const loggedInNavBtn = computed(() => {
                     >
                         <Link :href="register()">Get Started</Link>
                     </Button>
+                    <ChangeLocaleDropdown />
                 </template>
             </div>
         </header>

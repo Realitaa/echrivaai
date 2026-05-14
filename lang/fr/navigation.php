@@ -30,5 +30,11 @@ return [
       "teacherClassroomList" => "Enseigner",
       "studentClassroomList" => "Apprendre",
       "empty" => "Aucune Salle de Classe Enregistrée",
+    ],
+    "i18n" => [
+      "title" => "Changer la Langue",
+      "id" => "Indonésien",
+      "en" => "Anglais",
+      "fr" => "Francais",
     ]
 ];

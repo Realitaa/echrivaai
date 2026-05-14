@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\SidebarService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Enums\Locales;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -58,6 +59,7 @@ class HandleInertiaRequests extends Middleware
                     : [],
             ],
             'locale' => app()->getLocale(),
+            'availableLocales' => Locales::availableLocales(),
         ];
     }
 }
