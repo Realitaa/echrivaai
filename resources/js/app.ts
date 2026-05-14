@@ -37,10 +37,17 @@ createInertiaApp({
                 resolve: (lang: string) => {
                     const langs = import.meta.glob<{ default: any }>('../../lang/*.json', { eager: true });
 
-                    return langs[`../../lang/php_${lang}.json`]?.default;
-                }
+                    return (
+                        langs[`../../lang/php_${lang}.json`] ||
+                        langs[`../../lang/${lang}.json`] ||
+                        Object.entries(langs).find(([path]) => path.endsWith(`php_${lang}.json`))?.[1] ||
+                        Object.entries(langs).find(([path]) => path.endsWith(`${lang}.json`))?.[1]
+                    )?.default;
+                },
             })
             .mount(el);
+
+        currentLocale.value = locale;
     },
     layout: (name) => {
         switch (true) {

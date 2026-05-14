@@ -7,8 +7,11 @@ export const currentLocale = ref('en');
 watch(
     currentLocale,
     async (locale) => {
+        if (!locale) {
+            return;
+        }
+
         dayjs.locale(locale.toLowerCase());
         await loadLanguageAsync(locale);
-    },
-    { immediate: true }
+    }
 );
