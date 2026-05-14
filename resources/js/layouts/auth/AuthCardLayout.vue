@@ -39,10 +39,10 @@ defineProps<{
                     <CardHeader class="px-10 pt-8 pb-0 text-center">
                         <CardTitle
                             class="text-2xl font-bold tracking-tight text-slate-900"
-                            >{{ title }}</CardTitle
+                            >{{ $t(title || '') }}</CardTitle
                         >
                         <CardDescription class="mt-2 text-slate-500">
-                            {{ description }}
+                            {{ $t(description || '') }}
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="px-10 py-8">

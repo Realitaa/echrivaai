@@ -14,14 +14,14 @@ import { store } from '@/routes/register';
 
 defineOptions({
     layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
+        title: 'auth.register.title',
+        description: 'auth.register.subtitle',
     },
 });
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head :title="$t('auth.register.title')" />
 
     <Form
         v-bind="store.form()"
@@ -31,7 +31,7 @@ defineOptions({
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
-                <Label for="name">Name</Label>
+                <Label for="name">{{ $t('auth.form.name') }}</Label>
                 <Input
                     id="name"
                     type="text"
@@ -40,13 +40,13 @@ defineOptions({
                     :tabindex="1"
                     autocomplete="name"
                     name="name"
-                    placeholder="Full name"
+                    :placeholder="$t('auth.placeholder.name')"
                 />
                 <InputError :message="errors.name" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">{{ $t('auth.form.email') }}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -60,33 +60,33 @@ defineOptions({
             </div>
 
             <div class="grid gap-2">
-                <Label for="password">Password</Label>
+                <Label for="password">{{ $t('auth.form.password') }}</Label>
                 <PasswordInput
                     id="password"
                     required
                     :tabindex="3"
                     autocomplete="new-password"
                     name="password"
-                    placeholder="Password"
+                    :placeholder="$t('auth.form.password')"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">Confirm password</Label>
+                <Label for="password_confirmation">{{ $t('auth.form.confirm_password') }}</Label>
                 <PasswordInput
                     id="password_confirmation"
                     required
                     :tabindex="4"
                     autocomplete="new-password"
                     name="password_confirmation"
-                    placeholder="Confirm password"
+                    :placeholder="$t('auth.form.confirm_password')"
                 />
                 <InputError :message="errors.password_confirmation" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="role">Role</Label>
+                <Label for="role">{{ $t('auth.form.role') }}</Label>
                 <RadioGroup
                     name="role"
                     class="grid grid-cols-2 gap-4"
@@ -95,11 +95,11 @@ defineOptions({
                 >
                     <div class="flex items-center gap-2">
                         <RadioGroupItem value="student" id="student" />
-                        <Label for="student">Student</Label>
+                        <Label for="student">{{ $t('auth.form.role_student') }}</Label>
                     </div>
                     <div class="flex items-center gap-2">
                         <RadioGroupItem value="teacher" id="teacher" />
-                        <Label for="teacher">Teacher</Label>
+                        <Label for="teacher">{{ $t('auth.form.role_teacher') }}</Label>
                     </div>
                 </RadioGroup>
                 <InputError :message="errors.role" />
@@ -113,17 +113,17 @@ defineOptions({
                 data-test="register-user-button"
             >
                 <Spinner v-if="processing" />
-                Create account
+                {{ $t('auth.register.button') }}
             </Button>
         </div>
 
         <div class="text-center text-sm text-muted-foreground">
-            Already have an account?
+            {{ $t('auth.links.sign_in') }}
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
                 :tabindex="6"
-                >Log in</TextLink
+                >{{ $t('auth.links.sign_in_link') }}</TextLink
             >
         </div>
     </Form>
