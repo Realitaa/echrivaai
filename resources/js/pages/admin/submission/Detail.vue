@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ArrowLeft, FileText, MessageSquare } from '@lucide/vue';
+import { Download, FileText, MessageSquare } from '@lucide/vue';
+import { ArrowLeft } from '@lucide/vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useRelativeTime } from '@/composables/useDateFormat';
-
 import { index } from '@/routes/admin/submission';
+import { download } from '@/routes/file';
 
 defineProps<{
     submission: any;
@@ -16,11 +17,11 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Penugasan',
+                title: 'submission.title',
                 href: index().url,
             },
             {
-                title: 'Detail Penugasan',
+                title: 'submission.detail.title',
                 href: '#',
             },
         ],
@@ -29,7 +30,7 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Detail Penugasan" />
+    <Head :title="$t('submission.detail.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div class="flex items-center gap-4">
@@ -40,10 +41,10 @@ defineOptions({
             </Button>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">
-                    Detail Penugasan
+                    {{ $t('submission.detail.title') }}
                 </h1>
                 <p class="text-sm text-muted-foreground">
-                    Detail kiriman tugas dari siswa.
+                    {{ $t('submission.detail.description') }}
                 </p>
             </div>
         </div>
@@ -52,28 +53,28 @@ defineOptions({
             <!-- Info Panel -->
             <Card class="md:col-span-1">
                 <CardHeader>
-                    <CardTitle>Informasi Penugasan</CardTitle>
+                    <CardTitle>{{ $t('submission.detail.info') }}</CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <div>
-                        <p class="text-sm text-muted-foreground">Tugas</p>
+                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.task') }}</p>
                         <p class="font-medium">{{ submission.task?.title }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-muted-foreground">Siswa</p>
+                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.student') }}</p>
                         <p class="font-medium">{{ submission.user?.name }}</p>
                         <p class="text-sm text-muted-foreground">
                             {{ submission.user?.email }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-sm text-muted-foreground">Status</p>
+                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.status') }}</p>
                         <Badge class="mt-1" variant="secondary">{{
-                            submission.status ?? 'Menunggu'
+                            submission.status ? $t('submission.status.' + submission.status.toLowerCase()) : $t('submission.status.waiting')
                         }}</Badge>
                     </div>
                     <div>
-                        <p class="text-sm text-muted-foreground">Nilai</p>
+                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.score') }}</p>
                         <p class="text-xl font-bold">
                             {{
                                 submission.score !== null
@@ -84,7 +85,7 @@ defineOptions({
                     </div>
                     <div>
                         <p class="text-sm text-muted-foreground">
-                            Dikirim Pada
+                            {{ $t('submission.detail.submitted') }}
                         </p>
                         <p class="font-medium">
                             {{ useRelativeTime(submission.created_at) }}
@@ -98,7 +99,7 @@ defineOptions({
                 <Card>
                     <CardHeader>
                         <CardTitle class="flex items-center gap-2">
-                            <FileText class="h-5 w-5" /> File Kiriman
+                            <FileText class="h-5 w-5" /> {{ $t('submission.detail.files.title') }}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -109,7 +110,7 @@ defineOptions({
                             "
                             class="py-4 text-sm text-muted-foreground"
                         >
-                            Tidak ada file yang dikirimkan.
+                            {{ $t('submission.detail.files.empty') }}
                         </div>
                         <ul v-else class="space-y-2">
                             <li
@@ -120,15 +121,18 @@ defineOptions({
                                 <div class="flex items-center gap-3">
                                     <FileText class="h-5 w-5 text-blue-500" />
                                     <span class="text-sm font-medium">{{
-                                        file.name ?? 'Berkas'
+                                        file.original_name ?? file.name ?? 'Berkas'
                                     }}</span>
                                 </div>
                                 <Button size="sm" variant="secondary" as-child>
                                     <a
-                                        :href="file.path ?? file.url"
+                                        :href="download({ file: file.id }).url"
                                         target="_blank"
-                                        >Unduh</a
+                                        class="flex items-center gap-2"
                                     >
+                                        <Download class="h-3.5 w-3.5" />
+                                        {{ $t('submission.detail.files.download') }}
+                                    </a>
                                 </Button>
                             </li>
                         </ul>
@@ -139,7 +143,7 @@ defineOptions({
                 <Card>
                     <CardHeader>
                         <CardTitle class="flex items-center gap-2">
-                            <MessageSquare class="h-5 w-5" /> Feedback AI
+                            <MessageSquare class="h-5 w-5" /> {{ $t('submission.detail.feedback.title') }}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -150,7 +154,7 @@ defineOptions({
                             "
                             class="py-4 text-sm text-muted-foreground"
                         >
-                            Belum ada feedback dari AI.
+                            {{ $t('submission.detail.feedback.empty') }}
                         </div>
                         <div v-else class="space-y-4">
                             <div
@@ -176,7 +180,7 @@ defineOptions({
                                     class="mt-2 text-right text-xs font-semibold text-primary"
                                     v-if="feedback.score"
                                 >
-                                    Skor AI: {{ feedback.score }}
+                                    {{ $t('submission.detail.feedback.score') }}: {{ feedback.score }}
                                 </div>
                             </div>
                         </div>

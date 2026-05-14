@@ -19,7 +19,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Penugasan',
+                title: 'submission.title',
                 href: index().url,
             },
         ],
@@ -35,15 +35,15 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Manajemen Penugasan" />
+    <Head :title="$t('submission.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div class="flex flex-col gap-1">
             <h1 class="text-2xl font-bold tracking-tight">
-                Manajemen Penugasan
+                {{ $t('submission.title') }}
             </h1>
             <p class="text-sm text-muted-foreground">
-                Kelola daftar penugasan dan kiriman siswa.
+                {{ $t('submission.description') }}
             </p>
         </div>
 
@@ -51,12 +51,12 @@ defineProps<{
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Tugas</TableHead>
-                        <TableHead>Siswa</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Nilai</TableHead>
-                        <TableHead>Dikirim Pada</TableHead>
-                        <TableHead class="text-right">Aksi</TableHead>
+                        <TableHead>{{ $t('submission.table.task') }}</TableHead>
+                        <TableHead>{{ $t('submission.table.student') }}</TableHead>
+                        <TableHead>{{ $t('submission.table.status') }}</TableHead>
+                        <TableHead>{{ $t('submission.table.score') }}</TableHead>
+                        <TableHead>{{ $t('submission.table.submitted') }}</TableHead>
+                        <TableHead class="text-right">{{ $t('submission.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -67,7 +67,7 @@ defineProps<{
                         <TableCell>{{ sub.user?.name }}</TableCell>
                         <TableCell>
                             <Badge variant="outline">{{
-                                sub.status ?? 'Menunggu'
+                                sub.status ? $t('submission.status.' + sub.status.toLowerCase()) : $t('submission.status.waiting')
                             }}</Badge>
                         </TableCell>
                         <TableCell>{{
@@ -77,7 +77,7 @@ defineProps<{
                         <TableCell class="text-right">
                             <Button variant="outline" size="sm" as-child>
                                 <Link :href="show(sub.id).url">
-                                    <Eye class="mr-2 h-4 w-4" /> Detail
+                                    <Eye class="mr-2 h-4 w-4" /> {{ $t('submission.table.detail') }}
                                 </Link>
                             </Button>
                         </TableCell>
@@ -87,7 +87,7 @@ defineProps<{
                             colspan="6"
                             class="h-24 text-center text-muted-foreground"
                         >
-                            Tidak ada penugasan ditemukan.
+                            {{ $t('submission.empty') }}
                         </TableCell>
                     </TableRow>
                 </TableBody>
