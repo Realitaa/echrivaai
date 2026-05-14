@@ -56,7 +56,7 @@ const sidebarClassroomUrl = computed(() => userRole === 'teacher' ? indexTeacher
 
 <template>
     <SidebarGroup class="px-2 py-0">
-        <SidebarGroupLabel v-if="userRole === 'admin'">Akses Administrator</SidebarGroupLabel>
+        <SidebarGroupLabel v-if="userRole === 'admin'">{{ $t('navigation.section.admin') }}</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton
@@ -67,7 +67,7 @@ const sidebarClassroomUrl = computed(() => userRole === 'teacher' ? indexTeacher
                 >
                     <Link :href="item.href">
                         <component :is="item.icon" class="ml-1 size-5!" />
-                        <span class="text-md">{{ item.title }}</span>
+                        <span class="text-md">{{ $t(item.title) }}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
@@ -75,9 +75,9 @@ const sidebarClassroomUrl = computed(() => userRole === 'teacher' ? indexTeacher
             <Collapsible as-child v-if="userRole !== 'admin'" v-model:open="openClassroom" class="group/collapsible">
                 <SidebarMenuItem>
                     <CollapsibleTrigger as-child>
-                        <SidebarMenuButton :tooltip="userRole === 'teacher' ? 'Mengajar' : 'Kelas Saya'" size="lg" @click="toggleClassroom">
+                        <SidebarMenuButton :tooltip="userRole === 'teacher' ? $t('navigation.toggle.teacherClassroomList') : $t('navigation.toggle.studentClassroomList')" size="lg" @click="toggleClassroom">
                             <GraduationCap class="ml-1 size-5!" />
-                            <span class="text-md">{{ userRole === 'teacher' ? 'Mengajar' : 'Kelas Saya' }}</span>
+                            <span class="text-md">{{ userRole === 'teacher' ? $t('navigation.toggle.teacherClassroomList') : $t('navigation.toggle.studentClassroomList') }}</span>
                             <ChevronUp class="ml-auto size-5 transition-transform duration-300 group-data-[state=open]/collapsible:rotate-180" />
                         </SidebarMenuButton>
                     </CollapsibleTrigger>
@@ -86,7 +86,7 @@ const sidebarClassroomUrl = computed(() => userRole === 'teacher' ? indexTeacher
                         <SidebarMenuSub class="mx-0 px-0">
                             <SidebarMenuSubItem v-if="classLists?.length === 0">
                                 <SidebarMenuSubButton size="md" class="py-6">
-                                    <span class="ml-1 text-sm text-muted-foreground italic">Belum ada kelas</span>
+                                    <span class="ml-1 text-sm text-muted-foreground italic">{{ $t('navigation.toggle.empty') }}</span>
                                 </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                             <SidebarMenuSubItem v-else v-for="classroom in classLists" :key="classroom.title">

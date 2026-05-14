@@ -4,7 +4,7 @@ import type { NavItem } from '@/types';
 
 export const teacherNavItems: NavItem[] = [
     {
-        title: 'Kelas',
+        title: 'navigation.teacher.classrooms',
         href: classroom.index(),
         icon: Home,
     },

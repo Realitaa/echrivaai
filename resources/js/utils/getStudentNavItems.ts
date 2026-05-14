@@ -4,7 +4,7 @@ import type { NavItem } from '@/types';
 
 export const studentNavItems: NavItem[] = [
     {
-        title: 'Kelas',
+        title: 'navigation.student.classrooms',
         href: classroom.index(),
         icon: Home,
     },

@@ -14,27 +14,27 @@ import type { NavItem } from '@/types';
 
 export const adminNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'navigation.admin.dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'Pengguna',
+        title: 'navigation.admin.users',
         href: users.index(),
         icon: Users,
     },
     {
-        title: 'Kelas',
+        title: 'navigation.admin.classrooms',
         href: classroom.index(),
         icon: GraduationCap,
     },
     {
-        title: 'Tugas',
+        title: 'navigation.admin.tasks',
         href: task.index(),
         icon: ClipboardList,
     },
     {
-        title: 'Penugasan',
+        title: 'navigation.admin.submissions',
         href: submission.index(),
         icon: ClipboardCheck,
     },
