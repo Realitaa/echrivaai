@@ -13,7 +13,6 @@ import {
     Bot,
     Download,
 } from '@lucide/vue';
-import dayjs from 'dayjs';
 import { ref, watch, computed } from 'vue';
 import {
   Accordion,
@@ -25,6 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { useRelativeTime } from '@/composables/useDateFormat';
 import { download } from '@/routes/file';
 import type { SubmissionDetail, TaskRubric } from '@/types';
 
@@ -183,7 +183,7 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                         <Badge :variant="statusConfig.variant">{{ statusConfig.label }}</Badge>
                     </div>
                     <span class="text-sm text-muted-foreground">
-                        {{ dayjs(submissionData.submitted_at).format('DD MMM YYYY HH:mm') }}
+                        {{ useRelativeTime(submissionData.submitted_at) }}
                     </span>
                 </div>
 

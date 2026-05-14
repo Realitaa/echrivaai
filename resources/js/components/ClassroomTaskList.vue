@@ -10,10 +10,7 @@ import {
     GlobeLock,
     Info,
 } from '@lucide/vue';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { ref, computed } from 'vue';
-
 import DeleteTaskDialog from '@/components/teacher/task/DeleteTaskDialog.vue';
 import PublishTaskDialog from '@/components/teacher/task/PublishTaskDialog.vue';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -29,6 +26,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { useRelativeTime } from '@/composables/useDateFormat';
 import { show as showStudentClassroom } from '@/routes/student/classroom';
 import { show as showStudentTask } from '@/routes/student/classroom/task';
 import { show as showTeacherClassroom } from '@/routes/teacher/classroom';
@@ -39,8 +37,6 @@ import {
 } from '@/routes/teacher/classroom/task';
 import teacherSubmission from '@/routes/teacher/classroom/task/submission';
 import type { Task, Classroom } from '@/types';
-
-dayjs.extend(relativeTime);
 
 const props = defineProps<{
     classroom: Classroom;
@@ -158,7 +154,7 @@ const getTaskUrl = (taskId: number) => {
                                     </Badge>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
-                                    Dibuat {{ dayjs(task.created_at).fromNow() }}
+                                    Dibuat {{ useRelativeTime(task.created_at) }}
                                 </p>
                             </Link>
 

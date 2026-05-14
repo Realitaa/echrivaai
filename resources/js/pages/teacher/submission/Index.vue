@@ -2,11 +2,10 @@
 import { Head } from '@inertiajs/vue3';
 import { useHttp } from '@inertiajs/vue3';
 import { History, Eye, ArrowLeft, Loader2 } from '@lucide/vue';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { ref } from 'vue';
 import HistoryCard from '@/components/HistoryCard.vue';
 import SubmissionDescription from '@/components/SubmissionDescription.vue';
+import SubmissionDetail from '@/components/SubmissionDetail.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,9 +23,6 @@ import { index as taskIndex } from '@/routes/teacher/classroom/task';
 import { history as submissionHistoryRoute } from '@/routes/teacher/classroom/task/submission';
 import { show as submissionShow } from '@/routes/teacher/classroom/task/submission';
 import type { TaskDetail, SubmissionItem } from '@/types';
-import SubmissionDetail from '@/components/SubmissionDetail.vue';
-
-dayjs.extend(relativeTime);
 
 interface StudentData {
     id: number;

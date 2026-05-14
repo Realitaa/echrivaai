@@ -5,12 +5,12 @@ import {
     History,
 } from '@lucide/vue';
 import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { ref, computed } from 'vue';
 import { watch, onMounted, onUnmounted } from 'vue';
 import HistoryCard from '@/components/HistoryCard.vue';
 import SubmissionForm from '@/components/student/submission/SubmissionForm.vue';
 import SubmissionDescription from '@/components/SubmissionDescription.vue';
+import SubmissionDetail from '@/components/SubmissionDetail.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { index as classroomIndex } from '@/routes/student/classroom';
@@ -18,9 +18,8 @@ import { show as classroomShow } from '@/routes/student/classroom';
 import { index as taskIndex } from '@/routes/student/classroom/task';
 import { show as showSubmission } from '@/routes/student/classroom/task/submission';
 import type { SubmissionItem, TaskDetail } from '@/types';
-import SubmissionDetail from '@/components/SubmissionDetail.vue';
 
-dayjs.extend(relativeTime);
+
 
 const props = defineProps<{
     task: TaskDetail;

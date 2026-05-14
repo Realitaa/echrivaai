@@ -12,8 +12,8 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 import 'dayjs/locale/id';
-import 'dayjs/locale/en';
 import 'dayjs/locale/fr';
+import { currentLocale } from '@/lib/i18n';
 
 dayjs.extend(relativeTime);
 
@@ -29,7 +29,7 @@ createInertiaApp({
         ),
     setup({ el, App, props, plugin }) {
         const locale = props.initialPage.props.locale as string || defaultLocale;
-        dayjs.locale(locale);
+        currentLocale.value = locale;
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(i18nVue, {
@@ -62,11 +62,11 @@ createInertiaApp({
 // This will set light / dark mode on page load...
 initializeTheme();
 
-router.on('navigate', (event) => {
-    if (event.detail.page.props.locale) {
-        const locale = event.detail.page.props.locale as string;
-        dayjs.locale(locale);
-        loadLanguageAsync(locale);
+router.on('success', (event) => {
+    const locale = event.detail.page.props.locale as string;
+
+    if (locale && locale !== currentLocale.value) {
+        currentLocale.value = locale;
     }
 
     const isAuth = event.detail.page.component.startsWith('auth/');

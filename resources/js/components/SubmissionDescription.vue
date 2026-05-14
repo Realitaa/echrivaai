@@ -9,7 +9,6 @@ import {
     Download,
 } from '@lucide/vue';
 import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { computed } from 'vue';
 import {
     Accordion,
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useDateFormat, useFromNow } from '@/composables/useDateFormat';
 import { download } from '@/routes/file';
 import { index as taskIndex } from '@/routes/student/classroom/task';
 import type { TaskDetail } from '@/types';
@@ -27,20 +27,15 @@ const props = defineProps<{
     task: TaskDetail;
 }>();
 
-dayjs.extend(relativeTime);
 
 // Deadline logic
 const isDeadlinePassed = computed(() => {
     return dayjs().isAfter(dayjs(props.task.deadline));
 });
 
-const deadlineFormatted = computed(() => {
-    return dayjs(props.task.deadline).format('DD MMMM YYYY, HH:mm');
-});
-
-const deadlineRelative = computed(() => {
-    return dayjs(props.task.deadline).fromNow();
-});
+const deadlineFormatted = useDateFormat(() => props.task.deadline, 'DD MMMM YYYY, HH:mm');
+const deadlineRelative = useFromNow(() => props.task.deadline);
+const createdAtRelative = useFromNow(() => props.task.created_at);
 
 const totalMaxScore = computed(() => {
     return props.task.rubrics?.reduce((sum, r) => sum + r.max_score, 0) ?? 0;
@@ -64,7 +59,7 @@ const totalMaxScore = computed(() => {
                     </span>
                     <span class="flex items-center gap-1">
                         <Calendar class="h-3.5 w-3.5" />
-                        Dibuat {{ dayjs(task.created_at).fromNow() }}
+                        Dibuat {{ createdAtRelative }}
                     </span>
                 </div>
             </div>

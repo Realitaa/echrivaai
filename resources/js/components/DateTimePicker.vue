@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useDateFormat } from '@/composables/useDateFormat';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -91,12 +92,14 @@ const updateValue = () => {
 
 watch([date, time], updateValue);
 
+const formatted = useDateFormat(() => props.modelValue, 'DD MMMM YYYY, HH:mm');
+
 const formattedValue = computed(() => {
     if (!props.modelValue) {
         return props.placeholder;
     }
 
-    return dayjs(props.modelValue).format('DD MMMM YYYY, HH:mm');
+    return formatted.value;
 });
 
 const isDateDisabled = (date: any) => {

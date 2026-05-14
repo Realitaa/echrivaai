@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { ArrowLeft, Loader2, CheckCircle, AlertCircle, Send } from '@lucide/vue';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { useRelativeTime } from '@/composables/useDateFormat';
 import type { SubmissionItem } from '@/types';
-
-dayjs.extend(relativeTime);
 
 defineProps<{
     submissions: SubmissionItem[];
@@ -88,8 +85,8 @@ const statusConfig = (status: string) => {
                                         </Badge>
                                     </div>
                                     <p class="text-xs text-muted-foreground mt-0.5">
-                                        {{ dayjs(submission.submitted_at).format('DD MMM YYYY, HH:mm') }}
-                                        · {{ dayjs(submission.submitted_at).fromNow() }}
+                                        {{ useRelativeTime(submission.submitted_at) }}
+                                        · {{ useRelativeTime(submission.submitted_at) }}
                                     </p>
                                     <p class="text-sm text-muted-foreground mt-0.5">Skor: <span class="font-medium text-primary">{{ submission.final_score ?? '-' }}</span></p>
                                 </div>

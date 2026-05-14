@@ -8,7 +8,6 @@ import {
     XCircle,
     Plus,
 } from '@lucide/vue';
-import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
 import DeleteUserDialog from '@/components/admin/users/DeleteUserDialog.vue';
 import FormUserDialog from '@/components/admin/users/FormUserDialog.vue';
@@ -39,6 +38,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useRelativeTime } from '@/composables/useDateFormat';
 import { approve, index, destroy } from '@/routes/admin/user';
 import type { User } from '@/types/auth';
 
@@ -219,9 +219,7 @@ const toggleApprove = (user: User) => {
                                 }}
                             </Badge>
                         </TableCell>
-                        <TableCell>{{
-                            dayjs(user.created_at).format('DD MMM YYYY')
-                        }}</TableCell>
+                        <TableCell>{{ useRelativeTime(user.created_at) }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>

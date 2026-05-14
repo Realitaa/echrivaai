@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, FileText, MessageSquare } from '@lucide/vue';
-import dayjs from 'dayjs';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRelativeTime } from '@/composables/useDateFormat';
 
 import { index } from '@/routes/admin/submission';
 
@@ -88,11 +87,7 @@ defineOptions({
                             Dikirim Pada
                         </p>
                         <p class="font-medium">
-                            {{
-                                dayjs(submission.created_at).format(
-                                    'DD MMM YYYY, HH:mm',
-                                )
-                            }}
+                            {{ useRelativeTime(submission.created_at) }}
                         </p>
                     </div>
                 </CardContent>
@@ -171,11 +166,7 @@ defineOptions({
                                     >
                                     <span
                                         class="text-xs text-muted-foreground"
-                                        >{{
-                                            dayjs(feedback.created_at).format(
-                                                'DD MMM YYYY, HH:mm',
-                                            )
-                                        }}</span
+                                        >{{ useRelativeTime(feedback.created_at) }}</span
                                     >
                                 </div>
                                 <div class="text-sm whitespace-pre-wrap">

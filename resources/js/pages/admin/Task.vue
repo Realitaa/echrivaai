@@ -1,28 +1,8 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { MoreHorizontal, Trash2 } from '@lucide/vue';
-import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
-
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import LookupCombobox from '@/components/admin/LookupCombobox.vue';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -33,6 +13,16 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -41,8 +31,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { useRelativeTime } from '@/composables/useDateFormat';
 
-import LookupCombobox from '@/components/admin/LookupCombobox.vue';
 import { index, destroy } from '@/routes/admin/task';
 
 defineOptions({
@@ -114,6 +112,7 @@ watch(
         if (timeout) {
             clearTimeout(timeout);
         }
+
         timeout = setTimeout(() => {
             router.get(
                 index().url,
@@ -235,9 +234,7 @@ const deleteTask = () => {
                                 {{ task.is_published ? 'Published' : 'Draft' }}
                             </Badge>
                         </TableCell>
-                        <TableCell>{{
-                            dayjs(task.created_at).format('DD MMM YYYY')
-                        }}</TableCell>
+                        <TableCell>{{ useRelativeTime(task.created_at )}}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>

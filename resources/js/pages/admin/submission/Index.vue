@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { Eye } from '@lucide/vue';
-import dayjs from 'dayjs';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useRelativeTime } from '@/composables/useDateFormat';
 
 import { index, show } from '@/routes/admin/submission';
 
@@ -27,7 +26,7 @@ defineOptions({
     },
 });
 
-const props = defineProps<{
+defineProps<{
     submissions: {
         data: any[];
         links: { url: string | null; label: string; active: boolean }[];
@@ -74,9 +73,7 @@ const props = defineProps<{
                         <TableCell>{{
                             sub.score !== null ? sub.score : '-'
                         }}</TableCell>
-                        <TableCell>{{
-                            dayjs(sub.created_at).format('DD MMM YYYY HH:mm')
-                        }}</TableCell>
+                        <TableCell>{{ useRelativeTime(sub.created_at) }}</TableCell>
                         <TableCell class="text-right">
                             <Button variant="outline" size="sm" as-child>
                                 <Link :href="show(sub.id).url">

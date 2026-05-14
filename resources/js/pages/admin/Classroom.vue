@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router, useHttp } from '@inertiajs/vue3';
 import { MoreHorizontal, Trash2, Users } from '@lucide/vue';
-import dayjs from 'dayjs';
 import { ref, watch } from 'vue';
 import LookupCombobox from '@/components/admin/LookupCombobox.vue';
 import {
@@ -40,6 +39,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useRelativeTime } from '@/composables/useDateFormat';
 import { index, destroy, enrollments } from '@/routes/admin/classroom';
 import type { Classroom, Teacher } from '@/types';
 
@@ -189,9 +189,7 @@ const deleteClassroom = () => {
                             cls.name
                         }}</TableCell>
                         <TableCell>{{ cls.teacher.name }}</TableCell>
-                        <TableCell>{{
-                            dayjs(cls.created_at).format('DD MMM YYYY')
-                        }}</TableCell>
+                        <TableCell>{{ useRelativeTime(cls.created_at) }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>

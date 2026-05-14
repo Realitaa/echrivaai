@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { GraduationCap, Hourglass, ShieldUser, User } from '@lucide/vue';
-import dayjs from 'dayjs';
 import type { Component } from 'vue';
 import CardIcon from '@/components/CardIcon.vue';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useRelativeTime } from '@/composables/useDateFormat';
 import { dashboard } from '@/routes';
 import { approve } from '@/routes/admin/user';
 
@@ -130,7 +130,7 @@ const statLists: Array<{
                         <TableCell>{{ teacher.name }}</TableCell>
                         <TableCell>{{ teacher.email }}</TableCell>
                         <TableCell>{{
-                            dayjs(teacher.created_at).fromNow()
+                            useRelativeTime(teacher.created_at)
                         }}</TableCell>
                         <TableCell>
                             <Button as-child>
