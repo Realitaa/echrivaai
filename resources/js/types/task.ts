@@ -1,3 +1,4 @@
+import type { Classroom } from "./classroom";
 import type { FileItem } from "./file";
 
 export type Task = {
@@ -8,6 +9,7 @@ export type Task = {
     is_published: boolean;
     created_at: string;
     classroom_id: number;
+    classroom?: Classroom;
     files?: any[];
     rubrics?: any[];
 }

@@ -3,16 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { MoreHorizontal, Trash2 } from '@lucide/vue';
 import { ref, watch } from 'vue';
 import LookupCombobox from '@/components/admin/LookupCombobox.vue';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteTaskDialog from '@/components/admin/task/DeleteTaskDialog.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,39 +31,19 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { useRelativeTime } from '@/composables/useDateFormat';
-
 import { index, destroy } from '@/routes/admin/task';
+import type { Task } from '@/types';
 
 defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Manajemen Tugas',
+                title: 'task.title',
                 href: index().url,
             },
         ],
     },
 });
-
-interface Teacher {
-    id: number;
-    name: string;
-}
-
-interface Classroom {
-    id: number;
-    name: string;
-    teacher: Teacher;
-}
-
-interface Task {
-    id: number;
-    title: string;
-    classroom: Classroom;
-    is_published: boolean;
-    created_at: string;
-    deadline: string;
-}
 
 const props = defineProps<{
     tasks: {
@@ -147,7 +118,7 @@ const deleteTask = () => {
 </script>
 
 <template>
-    <Head title="Manajemen Tugas" />
+    <Head :title="$t('task.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div
@@ -155,10 +126,10 @@ const deleteTask = () => {
         >
             <div class="flex flex-col gap-1">
                 <h1 class="text-2xl font-bold tracking-tight">
-                    Manajemen Tugas
+                    {{ $t('task.title') }}
                 </h1>
                 <p class="text-sm text-muted-foreground">
-                    Kelola tugas yang tersedia di platform.
+                    {{ $t('task.description') }}
                 </p>
             </div>
         </div>
@@ -168,37 +139,37 @@ const deleteTask = () => {
         >
             <Input
                 v-model="search"
-                placeholder="Cari judul tugas..."
+                :placeholder="$t('task.search')"
                 class="md:max-w-[250px]"
             />
 
             <LookupCombobox
                 :items="teachers"
-                label="Semua Guru"
-                empty-text="Tidak ada guru"
-                placeholder="Cari guru..."
+                :label="$t('task.lookup.teacher')"
+                :empty-text="$t('task.lookup.teacherEmpty')"
+                :placeholder="$t('task.lookup.teacherPlaceholder')"
                 :default-value="teacherId"
                 @selected="(id) => (teacherId = id)"
             />
 
             <LookupCombobox
                 :items="classrooms"
-                label="Semua Kelas"
-                empty-text="Tidak ada kelas"
-                placeholder="Cari kelas..."
+                :label="$t('task.lookup.classroom')"
+                :empty-text="$t('task.lookup.classroomEmpty')"
+                :placeholder="$t('task.lookup.classroomPlaceholder')"
                 :default-value="classroomId"
                 @selected="(id) => (classroomId = id)"
             />
 
             <Select v-model="isPublished">
                 <SelectTrigger class="w-full md:w-[180px]">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue :placeholder="$t('task.filter.status')" />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value="all">Semua Status</SelectItem>
-                        <SelectItem value="1">Published</SelectItem>
-                        <SelectItem value="0">Draft</SelectItem>
+                        <SelectItem value="all">{{ $t('task.filter.all') }}</SelectItem>
+                        <SelectItem value="1">{{ $t('task.filter.published') }}</SelectItem>
+                        <SelectItem value="0">{{ $t('task.filter.draft') }}</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -208,12 +179,12 @@ const deleteTask = () => {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Judul Tugas</TableHead>
-                        <TableHead>Kelas</TableHead>
-                        <TableHead>Guru</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Dibuat</TableHead>
-                        <TableHead class="text-right">Aksi</TableHead>
+                        <TableHead>{{ $t('task.table.title') }}</TableHead>
+                        <TableHead>{{ $t('task.table.classroom') }}</TableHead>
+                        <TableHead>{{ $t('task.table.teacher') }}</TableHead>
+                        <TableHead>{{ $t('task.table.status') }}</TableHead>
+                        <TableHead>{{ $t('task.table.created') }}</TableHead>
+                        <TableHead class="text-right">{{ $t('task.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -231,25 +202,25 @@ const deleteTask = () => {
                                     task.is_published ? 'default' : 'secondary'
                                 "
                             >
-                                {{ task.is_published ? 'Published' : 'Draft' }}
+                                {{ task.is_published ? $t('task.filter.published') : $t('task.filter.draft') }}
                             </Badge>
                         </TableCell>
-                        <TableCell>{{ useRelativeTime(task.created_at )}}</TableCell>
+                        <TableCell>{{ useRelativeTime(task.created_at) }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
                                     <Button variant="ghost" class="h-8 w-8 p-0">
-                                        <span class="sr-only">Buka menu</span>
+                                        <span class="sr-only">{{ $t('task.table.openMenu') }}</span>
                                         <MoreHorizontal class="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                                    <DropdownMenuLabel>{{ $t('task.table.actions') }}</DropdownMenuLabel>
                                     <DropdownMenuItem
                                         class="text-destructive"
                                         @click="confirmDelete(task.id)"
                                     >
-                                        <Trash2 class="mr-2 h-4 w-4" /> Hapus
+                                        <Trash2 class="mr-2 h-4 w-4" /> {{ $t('task.actions.delete') }}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -260,7 +231,7 @@ const deleteTask = () => {
                             colspan="6"
                             class="h-24 text-center text-muted-foreground"
                         >
-                            Tidak ada tugas ditemukan.
+                            {{ $t('task.empty') }}
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -292,27 +263,5 @@ const deleteTask = () => {
     </div>
 
     <!-- Delete Alert Dialog -->
-    <AlertDialog v-model:open="deleteDialogOpen">
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan. Ini akan menghapus
-                    tugas ini secara permanen. Catatan: Tugas yang memiliki
-                    kiriman (submission) tidak dapat dihapus.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel @click="deleteDialogOpen = false"
-                    >Batal</AlertDialogCancel
-                >
-                <AlertDialogAction
-                    @click="deleteTask"
-                    class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                    Hapus
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+    <DeleteTaskDialog v-model:open="deleteDialogOpen" @confirm="deleteTask" />
 </template>
