@@ -48,22 +48,22 @@ const statLists: Array<{
     icon: Component;
 }> = [
     {
-        title: 'Total Admin',
+        title: 'dashboard.total_admin',
         count: props.stats.admin,
         icon: ShieldUser,
     },
     {
-        title: 'Total Guru',
+        title: 'dashboard.total_teacher',
         count: props.stats.teacher,
         icon: GraduationCap,
     },
     {
-        title: 'Total Siswa',
+        title: 'dashboard.total_student',
         count: props.stats.student,
         icon: User,
     },
     {
-        title: 'Guru Menunggu Persetujuan',
+        title: 'dashboard.approvalNeeded.title',
         count: props.stats.unapproved_teacher,
         icon: Hourglass,
     },
@@ -87,7 +87,7 @@ const statLists: Array<{
                     <h3
                         class="flex items-center gap-2 text-xl font-semibold text-blue-900"
                     >
-                        {{ stat.title }}
+                        {{ $t(stat.title) }}
                     </h3>
                     <p
                         class="py-4 text-4xl font-bold text-blue-900 tabular-nums"
@@ -98,24 +98,23 @@ const statLists: Array<{
             </CardIcon>
         </div>
         <div v-if="notApprovedTeacher.length > 0">
-            <h1
-                class="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance"
-            >
-                Guru Menunggu Persetujuan
-            </h1>
-            <p class="mt-1 text-lg text-foreground/60">
-                Berikut adalah tabel daftar guru yang menunggu persetujuan
-                pendaftaran.
-            </p>
+            <div class="flex flex-col gap-1">
+                <h1 class="text-2xl font-bold tracking-tight">
+                    {{ $t('dashboard.approvalNeeded.title') }}
+                </h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ $t('dashboard.approvalNeeded.description') }}
+                </p>
+            </div>
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead class="w-[100px]">No</TableHead>
-                        <TableHead>Nama Lengkap</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Menunggu Sejak</TableHead>
+                        <TableHead>{{ $t('dashboard.approvalNeeded.table.name') }}</TableHead>
+                        <TableHead>{{ $t('dashboard.approvalNeeded.table.email') }}</TableHead>
+                        <TableHead>{{ $t('dashboard.approvalNeeded.table.waiting') }}</TableHead>
                         <TableHead>
-                            <span>Actions</span>
+                            <span>{{ $t('dashboard.approvalNeeded.table.actions') }}</span>
                         </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -134,7 +133,7 @@ const statLists: Array<{
                         }}</TableCell>
                         <TableCell>
                             <Button as-child>
-                                <Link :href="approve(teacher.id)">Approve</Link>
+                                <Link :href="approve(teacher.id)">{{ $t('dashboard.approvalNeeded.table.approve') }}</Link>
                             </Button>
                         </TableCell>
                     </TableRow>
