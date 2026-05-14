@@ -46,7 +46,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Manajemen Pengguna',
+                title: 'users.title',
                 href: index,
             },
         ],
@@ -133,53 +133,53 @@ const toggleApprove = (user: User) => {
 </script>
 
 <template>
-    <Head title="Manajemen Pengguna" />
+    <Head :title="$t('users.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div
             class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
         >
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">Pengguna</h1>
+                <h1 class="text-2xl font-bold tracking-tight">{{ $t('users.title') }}</h1>
                 <p class="text-sm text-muted-foreground">
-                    Kelola pengguna yang terdaftar di platform.
+                    {{ $t('users.description') }}
                 </p>
             </div>
             <Button @click="openCreateDialog">
-                <Plus class="h-4 w-4" /> Tambah Pengguna
+                <Plus class="h-4 w-4" /> {{ $t('users.createDialog.create') }}
             </Button>
         </div>
 
         <div class="flex flex-col gap-4 md:flex-row md:items-center">
             <Input
                 v-model="search"
-                placeholder="Cari nama atau email..."
+                :placeholder="$t('users.search')"
                 class="md:max-w-[300px]"
             />
 
             <Select v-model="role">
                 <SelectTrigger class="w-full md:w-[180px]">
-                    <SelectValue placeholder="Semua Peran" />
+                    <SelectValue :placeholder="$t('users.filter.roles.all')" />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value="all">Semua Peran</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="teacher">Teacher</SelectItem>
-                        <SelectItem value="student">Student</SelectItem>
+                        <SelectItem value="all">{{ $t('users.filter.roles.all') }}</SelectItem>
+                        <SelectItem value="admin">{{ $t('users.filter.roles.admin') }}</SelectItem>
+                        <SelectItem value="teacher">{{ $t('users.filter.roles.teacher') }}</SelectItem>
+                        <SelectItem value="student">{{ $t('users.filter.roles.student') }}</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
 
             <Select v-model="isApproved">
                 <SelectTrigger class="w-full md:w-[180px]">
-                    <SelectValue placeholder="Status Approval" />
+                    <SelectValue :placeholder="$t('users.filter.statuses.all')" />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value="all">Semua Status</SelectItem>
-                        <SelectItem value="1">Disetujui</SelectItem>
-                        <SelectItem value="0">Belum Disetujui</SelectItem>
+                        <SelectItem value="all">{{ $t('users.filter.statuses.all') }}</SelectItem>
+                        <SelectItem value="1">{{ $t('users.filter.statuses.approved') }}</SelectItem>
+                        <SelectItem value="0">{{ $t('users.filter.statuses.unapproved') }}</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -189,12 +189,12 @@ const toggleApprove = (user: User) => {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Nama</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Peran</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Bergabung</TableHead>
-                        <TableHead class="text-right">Aksi</TableHead>
+                        <TableHead>{{ $t('users.table.name') }}</TableHead>
+                        <TableHead>{{ $t('users.table.email') }}</TableHead>
+                        <TableHead>{{ $t('users.table.role') }}</TableHead>
+                        <TableHead>{{ $t('users.table.status') }}</TableHead>
+                        <TableHead>{{ $t('users.table.joined') }}</TableHead>
+                        <TableHead class="text-right">{{ $t('users.table.actions') }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -204,7 +204,7 @@ const toggleApprove = (user: User) => {
                         }}</TableCell>
                         <TableCell>{{ user.email }}</TableCell>
                         <TableCell>
-                            <span class="capitalize">{{ user.role }}</span>
+                            <span class="capitalize">{{ $t('users.filter.roles.' + user.role) }}</span>
                         </TableCell>
                         <TableCell>
                             <Badge
@@ -214,8 +214,8 @@ const toggleApprove = (user: User) => {
                             >
                                 {{
                                     user.is_approved
-                                        ? 'Disetujui'
-                                        : 'Belum Disetujui'
+                                        ? $t('users.filter.statuses.approved')
+                                        : $t('users.filter.statuses.unapproved')
                                 }}
                             </Badge>
                         </TableCell>
@@ -224,16 +224,16 @@ const toggleApprove = (user: User) => {
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
                                     <Button variant="ghost" class="h-8 w-8 p-0">
-                                        <span class="sr-only">Buka menu</span>
+                                        <span class="sr-only">{{ $t('users.table.actions') }}</span>
                                         <MoreHorizontal class="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                                    <DropdownMenuLabel>{{ $t('users.table.actions') }}</DropdownMenuLabel>
                                     <DropdownMenuItem
                                         @click="openEditDialog(user)"
                                     >
-                                        <Pencil class="mr-2 h-4 w-4" /> Edit
+                                        <Pencil class="mr-2 h-4 w-4" /> {{ $t('users.actions.edit') ?? 'Edit' }}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         @click="toggleApprove(user)"
@@ -243,13 +243,13 @@ const toggleApprove = (user: User) => {
                                             <XCircle
                                                 class="mr-2 h-4 w-4 text-destructive"
                                             />
-                                            Cabut Approval
+                                            {{ $t('users.actions.revoke') }}
                                         </template>
                                         <template v-else>
                                             <CheckCircle
                                                 class="mr-2 h-4 w-4 text-green-500"
                                             />
-                                            Setujui
+                                            {{ $t('users.actions.approve') }}
                                         </template>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
@@ -257,7 +257,7 @@ const toggleApprove = (user: User) => {
                                         class="text-destructive"
                                         @click="confirmDelete(user.id)"
                                     >
-                                        <Trash2 class="mr-2 h-4 w-4" /> Hapus
+                                        <Trash2 class="mr-2 h-4 w-4" /> {{ $t('users.actions.delete') }}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -268,7 +268,7 @@ const toggleApprove = (user: User) => {
                             colspan="6"
                             class="h-24 text-center text-muted-foreground"
                         >
-                            Tidak ada pengguna ditemukan.
+                            {{ $t('users.empty') }}
                         </TableCell>
                     </TableRow>
                 </TableBody>

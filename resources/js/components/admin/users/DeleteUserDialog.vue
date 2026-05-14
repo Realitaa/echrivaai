@@ -19,19 +19,18 @@ const emit = defineEmits(['delete']);
     <AlertDialog v-model:open="dialogOpen">
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                <AlertDialogTitle>{{ $t('users.deleteDialog.title') }}</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan. Ini akan menghapus
-                    pengguna secara permanen dari sistem.
+                    {{ $t('users.deleteDialog.description') }}
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogCancel>{{ $t('users.deleteDialog.cancel') }}</AlertDialogCancel>
                 <AlertDialogAction
                     @click="emit('delete')"
                     class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                    Hapus
+                    {{ $t('users.deleteDialog.confirm') }}
                 </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>

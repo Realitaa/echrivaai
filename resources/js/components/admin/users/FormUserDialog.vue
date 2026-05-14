@@ -35,13 +35,13 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
                 <DialogTitle>{{
-                    action === 'edit' ? 'Edit Pengguna' : 'Tambah Pengguna'
+                    action === 'edit' ? $t('users.editDialog.title') : $t('users.createDialog.title')
                 }}</DialogTitle>
                 <DialogDescription>
                     {{
                         action === 'edit'
-                            ? 'Ubah data pengguna di sini.'
-                            : 'Tambahkan pengguna baru ke sistem.'
+                            ? $t('users.editDialog.description')
+                            : $t('users.createDialog.description')
                     }}
                 </DialogDescription>
             </DialogHeader>
@@ -54,7 +54,7 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                 autocomplete="off"
             >
                 <div class="space-y-2">
-                    <Label for="name">Nama</Label>
+                    <Label for="name">{{ $t('users.createDialog.name') }}</Label>
                     <Input
                         id="name"
                         name="name"
@@ -66,7 +66,7 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                     }}</span>
                 </div>
                 <div class="space-y-2">
-                    <Label for="email">Email</Label>
+                    <Label for="email">{{ $t('users.createDialog.email') }}</Label>
                     <Input
                         id="email"
                         name="email"
@@ -82,10 +82,10 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                 </div>
                 <div class="space-y-2">
                     <Label for="password"
-                        >Password
+                        >{{ $t('users.createDialog.password') }}
                         {{
                             action === 'edit'
-                                ? '(Kosongkan jika tidak diubah)'
+                                ? '(' + $t('users.editDialog.passwordNote') + ')'
                                 : ''
                         }}</Label
                     >
@@ -102,16 +102,16 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                     >
                 </div>
                 <div class="space-y-2">
-                    <Label for="role">Peran</Label>
+                    <Label for="role">{{ $t('users.createDialog.role') }}</Label>
                     <Select name="role" :defaultValue="user?.role ?? 'student'">
                         <SelectTrigger>
-                            <SelectValue placeholder="Pilih Peran" />
+                            <SelectValue :placeholder="$t('users.createDialog.role')" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="admin">Admin</SelectItem>
-                                <SelectItem value="teacher">Teacher</SelectItem>
-                                <SelectItem value="student">Student</SelectItem>
+                                <SelectItem value="admin">{{ $t('users.createDialog.roles.admin') }}</SelectItem>
+                                <SelectItem value="teacher">{{ $t('users.createDialog.roles.teacher') }}</SelectItem>
+                                <SelectItem value="student">{{ $t('users.createDialog.roles.student') }}</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
@@ -126,10 +126,10 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                         variant="outline"
                         @click="dialogOpen = false"
                         :disabled="processing"
-                        >Batal</Button
+                        >{{ $t('users.createDialog.close') }}</Button
                     >
                     <Button type="submit" :disabled="processing">
-                        {{ processing ? 'Menyimpan...' : 'Simpan' }}
+                        {{ processing ? $t('users.createDialog.creating') : (action === 'edit' ? $t('users.editDialog.update') : $t('users.createDialog.create')) }}
                     </Button>
                 </DialogFooter>
             </Form>
