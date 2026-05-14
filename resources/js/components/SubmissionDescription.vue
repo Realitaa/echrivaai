@@ -55,11 +55,11 @@ const totalMaxScore = computed(() => {
                 <div class="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
                     <span class="flex items-center gap-1">
                         <User class="h-3.5 w-3.5" />
-                        {{ task.creator?.name ?? 'Guru' }}
+                        {{ task.creator?.name ?? $t('submission.teacher.description.creator') }}
                     </span>
                     <span class="flex items-center gap-1">
                         <Calendar class="h-3.5 w-3.5" />
-                        Dibuat {{ createdAtRelative }}
+                        {{ $t('submission.teacher.description.created') }} {{ createdAtRelative }}
                     </span>
                 </div>
             </div>
@@ -69,10 +69,10 @@ const totalMaxScore = computed(() => {
         <div class="flex items-center gap-2">
             <Clock class="h-4 w-4" :class="isDeadlinePassed ? 'text-destructive' : 'text-primary'" />
             <span class="text-sm font-medium" :class="isDeadlinePassed ? 'text-destructive' : 'text-primary'">
-                Tenggat: {{ deadlineFormatted }}
+                {{ $t('submission.teacher.description.deadline') }}: {{ deadlineFormatted }}
             </span>
             <Badge :variant="isDeadlinePassed ? 'destructive' : 'secondary'" class="text-xs">
-                {{ isDeadlinePassed ? 'Lewat tenggat' : deadlineRelative }}
+                {{ isDeadlinePassed ? $t('submission.teacher.description.overdue') : deadlineRelative }}
             </Badge>
         </div>
 
@@ -85,7 +85,7 @@ const totalMaxScore = computed(() => {
 
                 <!-- Task Attachments -->
                 <div v-if="task.files?.length" class="space-y-2">
-                    <h3 class="text-sm font-semibold">Lampiran Tugas</h3>
+                    <h3 class="text-sm font-semibold">{{ $t('submission.teacher.description.attachments') }}</h3>
                     <div class="flex flex-wrap gap-2">
                         <a
                             v-for="file in task.files"
@@ -104,7 +104,7 @@ const totalMaxScore = computed(() => {
 
             <!-- Rubrics Overview -->
             <div v-if="task.rubrics?.length" class="space-y-2 w-full lg:w-1/3">
-                <h3 class="text-sm font-semibold">Kriteria Penilaian</h3>
+                <h3 class="text-sm font-semibold">{{ $t('submission.teacher.description.assessmentCriteria') }}</h3>
                 <Accordion type="multiple" v-if="task.rubrics?.length" collapsible class="w-full">
                     <AccordionItem 
                         v-for="rubric in task.rubrics"
@@ -126,7 +126,7 @@ const totalMaxScore = computed(() => {
                     </AccordionItem>
                 </Accordion>
                 <p class="text-sm text-muted-foreground text-right">
-                    Total skor maksimal: <span class="font-semibold text-primary tabular-nums">{{ totalMaxScore }}</span>
+                    {{ $t('submission.teacher.description.maxScoreTotal') }}: <span class="font-semibold text-primary tabular-nums">{{ totalMaxScore }}</span>
                 </p>
             </div>
         </div>

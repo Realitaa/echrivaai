@@ -97,13 +97,13 @@ const statusConfig = computed(() => {
 
     switch (status) {
         case 'processing':
-            return { icon: Clock, label: 'Sedang Diproses AI', variant: 'secondary' as const, color: 'text-yellow-600' };
+            return { icon: Clock, label: 'submission.teacher.detail.statusLabel.processing', variant: 'secondary' as const, color: 'text-yellow-600' };
         case 'graded':
-            return { icon: CheckCircle, label: 'Sudah Dinilai', variant: 'default' as const, color: 'text-green-600' };
+            return { icon: CheckCircle, label: 'submission.teacher.detail.statusLabel.graded', variant: 'default' as const, color: 'text-green-600' };
         case 'failed':
-            return { icon: AlertCircle, label: 'Gagal Diproses', variant: 'destructive' as const, color: 'text-red-600' };
+            return { icon: AlertCircle, label: 'submission.teacher.detail.statusLabel.failed', variant: 'destructive' as const, color: 'text-red-600' };
         default:
-            return { icon: Clock, label: 'Terkirim', variant: 'secondary' as const, color: 'text-gray-600' };
+            return { icon: Clock, label: 'submission.teacher.detail.statusLabel.submitted', variant: 'secondary' as const, color: 'text-gray-600' };
     }
 });
 
@@ -112,10 +112,17 @@ const progressIcon = computed(() => {
         return null;
     }
     
+    // Check against English labels from backend if they are fixed, 
+    // but typically these labels come from the translation file logic if we want to translate them.
+    // However, the labels like 'Meningkat' might be from the backend. 
+    // Looking at the code, it's comparing against Indonesian 'Meningkat'.
+    // I should probably map these to keys.
     switch (progressData.value.label) {
         case 'Meningkat':
+        case 'Increasing':
             return TrendingUp;
         case 'Menurun':
+        case 'Decreasing':
             return TrendingDown;
         default:
             return Minus;
@@ -129,11 +136,27 @@ const progressColor = computed(() => {
 
     switch (progressData.value.label) {
         case 'Meningkat':
+        case 'Increasing':
             return 'text-green-600';
         case 'Menurun':
+        case 'Decreasing':
             return 'text-red-600';
         default:
             return 'text-gray-500';
+    }
+});
+
+const localizedProgressLabel = computed(() => {
+    if (!progressData.value) return '';
+    switch (progressData.value.label) {
+        case 'Meningkat':
+        case 'Increasing':
+            return 'submission.teacher.detail.progress.increasing';
+        case 'Menurun':
+        case 'Decreasing':
+            return 'submission.teacher.detail.progress.decreasing';
+        default:
+            return 'submission.teacher.detail.progress.stable';
     }
 });
 
@@ -158,13 +181,13 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
     <div class="h-full flex flex-col">
         <div class="mb-6">
             <h2 class="text-lg font-semibold tracking-tight flex items-center gap-2">
-                Detail Pengumpulan
+                {{ $t('submission.teacher.detail.title') }}
                 <Badge v-if="submissionData" variant="outline" class="ml-2">
-                    Versi {{ submissionData.version }}
+                    {{ $t('submission.teacher.detail.version', { version: submissionData.version }) }}
                 </Badge>
             </h2>
             <p class="text-sm text-muted-foreground">
-                Lihat detail pengumpulan dan umpan balik.
+                {{ $t('submission.teacher.detail.description') }}
             </p>
         </div>
 
@@ -180,7 +203,7 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <component :is="statusConfig.icon" class="h-5 w-5" :class="statusConfig.color" />
-                        <Badge :variant="statusConfig.variant">{{ statusConfig.label }}</Badge>
+                        <Badge :variant="statusConfig.variant">{{ $t(statusConfig.label) }}</Badge>
                     </div>
                     <span class="text-sm text-muted-foreground">
                         {{ useRelativeTime(submissionData.submitted_at) }}
@@ -192,14 +215,17 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                     <div class="flex items-center gap-3">
                         <component :is="progressIcon" class="h-5 w-5" :class="progressColor" />
                         <p class="text-sm font-medium" :class="progressColor">
-                            {{ progressData?.label }}, Skor sebelumnya: {{ progressData?.previous_score }} <ArrowRight class="h-4 w-5 inline" :class="progressColor" /> Skor saat ini: {{ progressData?.current_score }}
+                            {{ $t(localizedProgressLabel) }}, 
+                            {{ $t('submission.teacher.detail.progress.previous', { score: progressData?.previous_score }) }} 
+                            <ArrowRight class="h-4 w-5 inline" :class="progressColor" /> 
+                            {{ $t('submission.teacher.detail.progress.current', { score: progressData?.current_score }) }}
                         </p>
                     </div>
                 </template>
 
                 <!-- Submitted Content -->
                 <div class="space-y-2">
-                    <h4 class="text-sm font-semibold">Konten Esai</h4>
+                    <h4 class="text-sm font-semibold">{{ $t('submission.teacher.detail.content') }}</h4>
                     <div class="rounded-lg border bg-muted/30 p-4">
                         <p class="text-sm whitespace-pre-wrap">{{ submissionData.content }}</p>
                     </div>
@@ -207,7 +233,7 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
 
                 <!-- Attached Files -->
                 <div v-if="submissionData.files?.length" class="space-y-2">
-                    <h4 class="text-sm font-semibold">Lampiran</h4>
+                    <h4 class="text-sm font-semibold">{{ $t('submission.teacher.detail.attachments') }}</h4>
                     <div class="space-y-2">
                         <a
                             v-for="file in submissionData.files"
@@ -229,7 +255,7 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                 <div v-if="submissionData.status === 'processing'" class="text-center py-6 space-y-2">
                     <Loader2 class="h-8 w-8 animate-spin text-primary mx-auto" />
                     <p class="text-sm text-muted-foreground">
-                        AI sedang memproses pengumpulan Anda. Mohon tunggu...
+                        {{ $t('submission.teacher.detail.aiProcessing') }}
                     </p>
                 </div>
 
@@ -237,7 +263,7 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                 <div v-else-if="submissionData.status === 'failed'" class="text-center py-6 space-y-2">
                     <AlertCircle class="h-8 w-8 text-destructive mx-auto" />
                     <p class="text-sm text-muted-foreground">
-                        Terjadi kesalahan saat memproses pengumpulan Anda. Silakan coba lagi.
+                        {{ $t('submission.teacher.detail.aiFailed') }}
                     </p>
                 </div>
 
@@ -245,13 +271,13 @@ const scoreColor = (score: number | null, maxScore: number | null) => {
                 <template v-else-if="submissionData.status === 'graded'">
                     <div v-if="submissionData.ai_feedbacks?.length" class="space-y-3">
                         <h4 class="text-sm font-semibold flex items-center gap-2">
-                            <Bot class="h-4 w-4 text-primary" /> Umpan Balik AI
+                            <Bot class="h-4 w-4 text-primary" /> {{ $t('submission.teacher.detail.aiFeedback') }}
                         </h4>
                         <Card v-for="feedback in submissionData.ai_feedbacks" :key="feedback.id">
                             <CardContent class="pt-4 pb-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <Badge class="text-base font-bold px-3 py-1">
-                                        Skor: {{ feedback.score }}
+                                        {{ $t('submission.teacher.detail.score') }}: {{ feedback.score }}
                                     </Badge>
                                 </div>
                                 <p class="text-sm whitespace-pre-wrap">{{ feedback.result }}</p>

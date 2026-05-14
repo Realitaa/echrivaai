@@ -46,7 +46,7 @@ defineOptions({
     layout: (props: any) => ({
         breadcrumbs: [
             {
-                title: 'Kelasku',
+                title: 'submission.teacher.breadcrumb',
                 href: classroomIndex().url,
             },
             {
@@ -54,7 +54,7 @@ defineOptions({
                 href: classroomShow(props.task.classroom_id).url,
             },
             {
-                title: 'Daftar Tugas',
+                title: 'submission.teacher.listTitle',
                 href: taskIndex(props.task.classroom_id).url,
             },
             {
@@ -117,7 +117,7 @@ const openDetailDialog = (submissionId: number) => {
 </script>
 
 <template>
-    <Head :title="`Tugas: ${task.title}`" />
+    <Head :title="$t('submission.teacher.pageTitle', { title: task.title })" />
 
     <div class="flex h-full flex-1 flex-col gap-6 p-4 lg:p-8">
         <SubmissionDescription :task="task" />
@@ -128,7 +128,7 @@ const openDetailDialog = (submissionId: number) => {
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold flex items-center gap-2">
                     <History class="h-4 w-4" />
-                    Pengumpulan 
+                    {{ $t('submission.teacher.stats.submissions') }}
                     <template v-if="selectedStudent">
                         &mdash; {{ selectedStudent.name }}
                     </template>
@@ -136,7 +136,7 @@ const openDetailDialog = (submissionId: number) => {
                 
                 <Button v-if="selectedStudent" variant="outline" size="sm" @click="backToTable">
                     <ArrowLeft class="mr-2 h-4 w-4" />
-                    Kembali ke Tabel Siswa
+                    {{ $t('submission.teacher.stats.backToTable') }}
                 </Button>
             </div>
 
@@ -145,12 +145,12 @@ const openDetailDialog = (submissionId: number) => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Nama Siswa</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead class="text-center">Total Pengumpulan</TableHead>
-                            <TableHead class="text-center">Nilai Tertinggi</TableHead>
-                            <TableHead class="text-center">Status</TableHead>
-                            <TableHead class="text-right">Aksi</TableHead>
+                            <TableHead>{{ $t('submission.teacher.table.studentName') }}</TableHead>
+                            <TableHead>{{ $t('submission.teacher.table.email') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('submission.teacher.table.totalSubmissions') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('submission.teacher.table.highestScore') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('submission.teacher.table.status') }}</TableHead>
+                            <TableHead class="text-right">{{ $t('submission.teacher.table.actions') }}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -163,19 +163,23 @@ const openDetailDialog = (submissionId: number) => {
                                 <span v-else class="text-muted-foreground">-</span>
                             </TableCell>
                             <TableCell class="text-center">
-                                <Badge v-if="student.submission_count > 0" variant="default" class="bg-green-600">Sudah Mengumpulkan</Badge>
-                                <Badge v-else variant="secondary">Belum Mengumpulkan</Badge>
+                                <Badge v-if="student.submission_count > 0" variant="default" class="bg-green-600">
+                                    {{ $t('submission.teacher.table.hasSubmitted') }}
+                                </Badge>
+                                <Badge v-else variant="secondary">
+                                    {{ $t('submission.teacher.table.notSubmitted') }}
+                                </Badge>
                             </TableCell>
                             <TableCell class="text-right">
                                 <Button variant="ghost" size="sm" @click="selectStudent(student)">
                                     <Eye class="mr-2 h-4 w-4" />
-                                    Lihat Riwayat
+                                    {{ $t('submission.teacher.table.viewHistory') }}
                                 </Button>
                             </TableCell>
                         </TableRow>
                         <TableRow v-if="students.data.length === 0">
                             <TableCell colspan="6" class="h-24 text-center">
-                                Tidak ada siswa terdaftar di kelas ini.
+                                {{ $t('submission.teacher.table.empty') }}
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -192,7 +196,7 @@ const openDetailDialog = (submissionId: number) => {
                         </div>
                         <template v-else>
                             <div v-if="submissions.length === 0" class="text-center p-4 text-muted-foreground border rounded-lg border-dashed">
-                                Siswa ini belum mengirimkan tugas.
+                                {{ $t('submission.teacher.history.empty') }}
                             </div>
                             <!-- History Cards -->
                             <HistoryCard 
@@ -219,7 +223,7 @@ const openDetailDialog = (submissionId: number) => {
                     />
 
                     <div v-else class="h-full flex items-center justify-center text-muted-foreground">
-                        Pilih pengumpulan untuk melihat detail
+                        {{ $t('submission.teacher.history.selectSubmission') }}
                     </div>
                 </div>
             </div>
