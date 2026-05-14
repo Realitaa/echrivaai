@@ -19,18 +19,18 @@ const emit = defineEmits(['delete']);
     <AlertDialog v-model:open="dialogOpen">
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>Hapus Tugas?</AlertDialogTitle>
+                <AlertDialogTitle>{{ $t('task.teacher.deleteDialog.title') }}</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan. Tugas yang sudah dipublikasikan atau memiliki pengumpulan tidak dapat dihapus.
+                    {{ $t('task.teacher.deleteDialog.description') }}
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogCancel>{{ $t('task.teacher.deleteDialog.cancel') }}</AlertDialogCancel>
                 <AlertDialogAction
                     @click="emit('delete')"
                     class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                    Ya, Hapus
+                    {{ $t('task.teacher.deleteDialog.confirm') }}
                 </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>

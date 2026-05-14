@@ -38,21 +38,21 @@ const submitAction = () => {
         <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle>
-                    {{ isPublished ? 'Batalkan Publikasi Tugas?' : 'Publikasikan Tugas?' }}
+                    {{ isPublished ? $t('task.teacher.publishDialog.unpublishTitle') : $t('task.teacher.publishDialog.publishTitle') }}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                     <template v-if="isPublished">
-                        Tugas ini akan ditarik dari siswa. Tugas yang sudah memiliki pengumpulan tidak dapat dibatalkan publikasinya.
+                        {{ $t('task.teacher.publishDialog.unpublishDesc') }}
                     </template>
                     <template v-else>
-                        Tugas ini akan dipublikasikan dan dapat dilihat oleh siswa di kelas.
+                        {{ $t('task.teacher.publishDialog.publishDesc') }}
                     </template>
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogCancel>{{ $t('task.teacher.publishDialog.cancel') }}</AlertDialogCancel>
                 <AlertDialogAction @click="submitAction">
-                    {{ isPublished ? 'Ya, Batalkan Publikasi' : 'Ya, Publikasikan' }}
+                    {{ isPublished ? $t('task.teacher.publishDialog.unpublishConfirm') : $t('task.teacher.publishDialog.publishConfirm') }}
                 </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>

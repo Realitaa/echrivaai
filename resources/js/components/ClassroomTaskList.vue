@@ -103,12 +103,12 @@ const getTaskUrl = (taskId: number) => {
         <div class="flex-1 lg:basis-3/4">
             <div class="mb-4 flex items-center justify-between">
                 <div class="space-y-2">
-                    <h2 class="text-lg font-semibold">Daftar Tugas</h2>
-                    <p class="text-sm text-muted-foreground">Daftar tugas di kelas {{ classroom.name }}</p>
+                    <h2 class="text-lg font-semibold">{{ $t('task.teacher.listTitle') }}</h2>
+                    <p class="text-sm text-muted-foreground">{{ $t('task.teacher.listDesc', { name: classroom.name }) }}</p>
                 </div>
                 <Button v-if="userRole === 'teacher'" size="sm" as-child>
                     <Link :href="createTask(classroom.id).url">
-                        <Plus class="h-4 w-4" /> Tugas Baru
+                        <Plus class="h-4 w-4" /> {{ $t('task.teacher.new') }}
                     </Link>
                 </Button>
             </div>
@@ -143,18 +143,18 @@ const getTaskUrl = (taskId: number) => {
                                         variant="default"
                                         class="shrink-0 text-[10px] px-1.5 py-0"
                                     >
-                                        Publik
+                                        {{ $t('task.teacher.status.published') }}
                                     </Badge>
                                     <Badge
                                         v-else
                                         variant="secondary"
                                         class="shrink-0 text-[10px] px-1.5 py-0"
                                     >
-                                        Draf
+                                        {{ $t('task.teacher.status.draft') }}
                                     </Badge>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
-                                    Dibuat {{ useRelativeTime(task.created_at) }}
+                                    {{ $t('task.teacher.status.created') }} {{ useRelativeTime(task.created_at) }}
                                 </p>
                             </Link>
 
@@ -168,14 +168,14 @@ const getTaskUrl = (taskId: number) => {
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem @click="openPublishDialog(task)">
                                         <component :is="task.is_published ? GlobeLock : Globe" class="mr-2 h-4 w-4" />
-                                        {{ task.is_published ? 'Batalkan Publikasi' : 'Publikasikan' }}
+                                        {{ task.is_published ? $t('task.teacher.actions.unpublish') : $t('task.teacher.actions.publish') }}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem as-child v-if="!task.is_published">
                                         <Link
                                             :href="editTask({ classroom: classroom.id, task: task.id }).url"
                                             class="cursor-pointer"
                                         >
-                                            <Edit class="mr-2 h-4 w-4" /> Edit Tugas
+                                            <Edit class="mr-2 h-4 w-4" /> {{ $t('task.teacher.actions.edit') }}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
@@ -184,7 +184,7 @@ const getTaskUrl = (taskId: number) => {
                                         class="text-destructive"
                                         @click="openDeleteDialog(task.id)"
                                     >
-                                        <Trash2 class="mr-2 h-4 w-4" /> Hapus
+                                        <Trash2 class="mr-2 h-4 w-4" /> {{ $t('task.teacher.actions.delete') }}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -194,10 +194,10 @@ const getTaskUrl = (taskId: number) => {
                     <div v-else class="flex h-48 items-center justify-center rounded-lg border-2 border-dashed">
                         <div class="text-center">
                             <ClipboardList class="mx-auto mb-2 h-10 w-10 text-muted-foreground/50" />
-                            <p class="text-sm text-muted-foreground">Belum ada tugas di kelas ini.</p>
+                            <p class="text-sm text-muted-foreground">{{ $t('task.teacher.empty') }}</p>
                             <Button v-if="userRole === 'teacher'" variant="link" size="sm" as-child class="mt-1">
                                 <Link :href="createTask(classroom.id).url">
-                                    Buat tugas pertama
+                                    {{ $t('task.teacher.createFirst') }}
                                 </Link>
                             </Button>
                         </div>
@@ -260,11 +260,11 @@ const getTaskUrl = (taskId: number) => {
                     <div class="grid grid-cols-2 gap-2 text-center">
                         <div>
                             <p class="text-2xl font-bold">{{ classroom.tasks_count ?? 0 }}</p>
-                            <p class="text-xs text-muted-foreground">Tugas</p>
+                            <p class="text-xs text-muted-foreground">{{ $t('task.table.classroom') }}</p>
                         </div>
                         <div>
                             <p class="text-2xl font-bold">{{ classroom.enrollments_count ?? 0 }}</p>
-                            <p class="text-xs text-muted-foreground">Siswa</p>
+                            <p class="text-xs text-muted-foreground">{{ $t('classroom.teacher.stats.students') }}</p>
                         </div>
                     </div>
 
@@ -273,7 +273,7 @@ const getTaskUrl = (taskId: number) => {
                     <div class="flex flex-col gap-2">
                         <Button variant="outline" size="sm" as-child class="w-full">
                             <Link :href="showClassroom(classroom.id).url">
-                                <Info class="h-4 w-4" /> Tentang Kelas
+                                <Info class="h-4 w-4" /> {{ $t('task.teacher.actions.aboutClassroom') }}
                             </Link>
                         </Button>
                     </div>

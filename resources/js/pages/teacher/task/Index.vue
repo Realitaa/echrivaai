@@ -15,7 +15,7 @@ defineOptions({
     layout: (props: any) => ({
         breadcrumbs: [
             {
-                title: 'Kelasku',
+                title: 'classroom.teacher.title',
                 href: index().url,
             },
             {
@@ -23,7 +23,7 @@ defineOptions({
                 href: show(props.classroom.id).url,
             },
             {
-                title: 'Daftar Tugas',
+                title: 'task.teacher.listTitle',
                 href: "#"
             }
         ],
@@ -32,7 +32,7 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="`Tugas di Kelas ${classroom.name}`" />
+    <Head :title="$t('task.teacher.title', { name: classroom.name })" />
 
     <div class="flex h-full flex-1 flex-col p-4 lg:p-8">
         <ClassroomTaskList
