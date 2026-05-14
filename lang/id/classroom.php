@@ -61,5 +61,16 @@ return [
             'cancel' => 'Batal',
             'confirm' => 'Ya, Hapus',
         ],
+        'detailTitle' => 'Detail Kelas :name',
+        'stats' => [
+            'students' => 'Jumlah Siswa',
+            'tasks' => 'Tugas Aktif',
+        ],
+        'studentList' => 'Daftar Siswa Terdaftar',
+        'table' => [
+            'studentName' => 'Nama Siswa',
+            'email' => 'Email',
+            'empty' => 'Belum ada siswa yang terdaftar di kelas ini.',
+        ],
     ],
 ];

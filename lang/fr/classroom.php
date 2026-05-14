@@ -61,5 +61,16 @@ return [
             'cancel' => 'Annuler',
             'confirm' => 'Oui, Supprimer',
         ],
+        'detailTitle' => 'Détail de la classe :name',
+        'stats' => [
+            'students' => 'Total des étudiants',
+            'tasks' => 'Devoirs actifs',
+        ],
+        'studentList' => 'Liste des étudiants inscrits',
+        'table' => [
+            'studentName' => 'Nom de l\'étudiant',
+            'email' => 'E-mail',
+            'empty' => 'Aucun étudiant inscrit dans cette classe pour le moment.',
+        ],
     ],
 ];

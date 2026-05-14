@@ -10,7 +10,7 @@ defineProps<{
 defineOptions({
     layout: (props: any) => ({
         breadcrumbs: [
-            { title: 'Kelasku', href: index().url },
+            { title: 'classroom.teacher.title', href: index().url },
             { title: props.classroom.name, href: '#' },
         ],
     }),
@@ -18,7 +18,7 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="`Detail Kelas ${classroom.name}`" />
+    <Head :title="$t('classroom.teacher.detailTitle', { name: classroom.name })" />
 
     <ClassroomDetail :classroom="classroom" :back-url="index().url" />
 </template>

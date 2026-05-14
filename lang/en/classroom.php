@@ -61,5 +61,16 @@ return [
             'cancel' => 'Cancel',
             'confirm' => 'Yes, Delete',
         ],
+        'detailTitle' => 'Class Detail :name',
+        'stats' => [
+            'students' => 'Total Students',
+            'tasks' => 'Active Tasks',
+        ],
+        'studentList' => 'Enrolled Students List',
+        'table' => [
+            'studentName' => 'Student Name',
+            'email' => 'Email',
+            'empty' => 'No students enrolled in this class yet.',
+        ],
     ],
 ];

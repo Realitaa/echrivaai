@@ -41,7 +41,7 @@ defineProps<{
             <div class="md:col-span-1 space-y-4">
                 <Card>
                     <CardHeader class="pb-2">
-                        <CardTitle class="text-sm font-medium text-muted-foreground">Jumlah Siswa</CardTitle>
+                        <CardTitle class="text-sm font-medium text-muted-foreground">{{ $t('classroom.teacher.stats.students') }}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div class="text-2xl font-bold">{{ classroom.enrollments_count ?? classroom.students?.length ?? 0 }}</div>
@@ -49,7 +49,7 @@ defineProps<{
                 </Card>
                 <Card>
                     <CardHeader class="pb-2">
-                        <CardTitle class="text-sm font-medium text-muted-foreground">Tugas Aktif</CardTitle>
+                        <CardTitle class="text-sm font-medium text-muted-foreground">{{ $t('classroom.teacher.stats.tasks') }}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div class="text-2xl font-bold">{{ classroom.tasks_count ?? 0 }}</div>
@@ -61,15 +61,15 @@ defineProps<{
             <Card class="md:col-span-3">
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
-                        <Users class="h-5 w-5" /> Daftar Siswa Terdaftar
+                        <Users class="h-5 w-5" /> {{ $t('classroom.teacher.studentList') }}
                     </CardTitle>
                 </CardHeader>
                 <CardContent class="p-0">
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead class="pl-6">Nama Siswa</TableHead>
-                                <TableHead>Email</TableHead>
+                                <TableHead class="pl-6">{{ $t('classroom.teacher.table.studentName') }}</TableHead>
+                                <TableHead>{{ $t('classroom.teacher.table.email') }}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -79,7 +79,7 @@ defineProps<{
                             </TableRow>
                             <TableRow v-if="!classroom.students || classroom.students.length === 0">
                                 <TableCell colspan="2" class="h-24 text-center text-muted-foreground">
-                                    Belum ada siswa yang terdaftar di kelas ini.
+                                    {{ $t('classroom.teacher.table.empty') }}
                                 </TableCell>
                             </TableRow>
                         </TableBody>
