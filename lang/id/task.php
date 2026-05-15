@@ -103,4 +103,43 @@ return [
             'unpublishConfirm' => 'Ya, Batalkan Publikasi',
         ],
     ],
+
+    // Student
+    'student' => [
+        'breadcrumb' => 'Kelasku',
+        'listTitle' => 'Daftar Tugas',
+        'pageTitle' => 'Tugas: :title',
+        'inClassTitle' => 'Tugas di Kelas :name',
+        'history' => [
+            'title' => 'Pengumpulan',
+            'addSubmission' => 'Tambah Pengumpulan',
+            'deadlineOverdue' => 'Tenggat lewat.',
+            'processingAi' => 'Sedang diproses AI.',
+            'submitNew' => 'Kirim tugas baru.',
+            'selectSubmission' => 'Pilih pengumpulan untuk melihat detail',
+            'version' => 'Pengumpulan #:version',
+            'latest' => 'Terbaru',
+            'score' => 'Skor: :score',
+        ],
+        'form' => [
+            'title' => 'Kirim Pengumpulan',
+            'description' => 'Tulis esai dan lampirkan dokumen pendukung.',
+            'contentLabel' => 'Konten Esai',
+            'contentPlaceholder' => 'Tulis esai atau jawaban tugas Anda di sini...',
+            'attachmentsLabel' => 'Lampiran Dokumen',
+            'upload' => 'Unggah File',
+            'uploading' => 'Mengunggah...',
+            'uploadHint' => 'Format: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG, GIF (maks 20MB)',
+            'uploadError' => 'Gagal mengunggah file.',
+            'cancel' => 'Batal',
+            'submitting' => 'Mengirim...',
+            'submit' => 'Kirim Pengumpulan',
+        ],
+        'status' => [
+            'processing' => 'Sedang Diproses',
+            'graded' => 'Dinilai',
+            'failed' => 'Gagal',
+            'submitted' => 'Terkirim',
+        ],
+    ],
 ];

@@ -22,13 +22,13 @@ const openDetailDialog = (submissionId: number) => {
 const statusConfig = (status: string) => {
     switch (status) {
         case 'processing':
-            return { icon: Loader2, label: 'Sedang Diproses', variant: 'secondary' as const, color: 'text-yellow-600', iconClass: 'animate-spin' };
+            return { icon: Loader2, label: 'task.student.status.processing', variant: 'secondary' as const, color: 'text-yellow-600', iconClass: 'animate-spin' };
         case 'graded':
-            return { icon: CheckCircle, label: 'Dinilai', variant: 'default' as const, color: 'text-green-600', iconClass: '' };
+            return { icon: CheckCircle, label: 'task.student.status.graded', variant: 'default' as const, color: 'text-green-600', iconClass: '' };
         case 'failed':
-            return { icon: AlertCircle, label: 'Gagal', variant: 'destructive' as const, color: 'text-red-600', iconClass: '' };
+            return { icon: AlertCircle, label: 'task.student.status.failed', variant: 'destructive' as const, color: 'text-red-600', iconClass: '' };
         default:
-            return { icon: Send, label: 'Terkirim', variant: 'secondary' as const, color: 'text-gray-600', iconClass: '' };
+            return { icon: Send, label: 'task.student.status.submitted', variant: 'secondary' as const, color: 'text-gray-600', iconClass: '' };
     }
 };
 </script>
@@ -68,26 +68,28 @@ const statusConfig = (status: string) => {
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2">
                                         <p class="text-sm font-semibold">
-                                            Pengumpulan #{{ submission.version }}
+                                            {{ $t('task.student.history.version', { version: submission.version }) }}
                                         </p>
                                         <Badge
                                             v-if="submission.is_latest"
                                             variant="default"
                                             class="text-[10px] px-1.5 py-0"
                                         >
-                                            Terbaru
+                                            {{ $t('task.student.history.latest') }}
                                         </Badge>
                                         <Badge
                                             :variant="statusConfig(submission.status).variant"
                                             class="text-[10px] px-1.5 py-0"
                                         >
-                                            {{ statusConfig(submission.status).label }}
+                                            {{ $t(statusConfig(submission.status).label) }}
                                         </Badge>
                                     </div>
                                     <p class="text-xs text-muted-foreground mt-0.5">
                                         {{ useRelativeTime(submission.submitted_at) }}
                                     </p>
-                                    <p class="text-sm text-muted-foreground mt-0.5">Skor: <span class="font-medium text-primary">{{ submission.final_score ?? '-' }}</span></p>
+                                    <p class="text-sm text-muted-foreground mt-0.5">
+                                        {{ $t('task.student.history.score', { score: submission.final_score ?? '-' }) }}
+                                    </p>
                                 </div>
 
                                 <!-- Arrow -->

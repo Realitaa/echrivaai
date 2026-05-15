@@ -30,7 +30,7 @@ defineOptions({
     layout: (props: any) => ({
         breadcrumbs: [
             {
-                title: 'Kelasku',
+                title: 'task.student.breadcrumb',
                 href: classroomIndex().url,
             },
             {
@@ -38,7 +38,7 @@ defineOptions({
                 href: classroomShow(props.task.classroom_id).url,
             },
             {
-                title: 'Daftar Tugas',
+                title: 'task.student.listTitle',
                 href: taskIndex(props.task.classroom_id).url,
             },
             {
@@ -150,7 +150,7 @@ watch(
 </script>
 
 <template>
-    <Head :title="`Tugas: ${task.title}`" />
+    <Head :title="$t('task.student.pageTitle', { title: task.title })" />
 
     <div class="flex h-full flex-1 flex-col gap-6 p-4 lg:p-8">
         <SubmissionDescription :task="task" />
@@ -161,7 +161,7 @@ watch(
         <div class="space-y-4">
             <h3 class="text-sm font-semibold flex items-center gap-2">
                 <History class="h-4 w-4" />
-                Pengumpulan
+                {{ $t('task.student.history.title') }}
             </h3>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -190,17 +190,17 @@ watch(
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-semibold" :class="canSubmit ? '' : 'text-muted-foreground'">
-                                        Tambah Pengumpulan
+                                        {{ $t('task.student.history.addSubmission') }}
                                     </p>
                                     <p class="text-xs text-muted-foreground mt-0.5">
                                         <template v-if="isDeadlinePassed">
-                                            Tenggat lewat.
+                                            {{ $t('task.student.history.deadlineOverdue') }}
                                         </template>
                                         <template v-else-if="hasProcessingSubmission">
-                                            Sedang diproses AI.
+                                            {{ $t('task.student.history.processingAi') }}
                                         </template>
                                         <template v-else>
-                                            Kirim tugas baru.
+                                            {{ $t('task.student.history.submitNew') }}
                                         </template>
                                     </p>
                                 </div>
@@ -237,7 +237,7 @@ watch(
                     />
 
                     <div v-else class="h-full flex items-center justify-center text-muted-foreground">
-                        Pilih pengumpulan untuk melihat detail
+                        {{ $t('task.student.history.selectSubmission') }}
                     </div>
                 </div>
             </div>

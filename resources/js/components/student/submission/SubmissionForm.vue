@@ -57,7 +57,7 @@ const handleFileUpload = async (event: Event) => {
             }
         } catch (error: unknown) {
             const err = error as { response?: { data?: { message?: string } } };
-            uploadError.value = err.response?.data?.message ?? 'Gagal mengunggah file.';
+            uploadError.value = err.response?.data?.message ?? usePage().props.t('task.student.form.uploadError');
         }
     }
 
@@ -114,9 +114,9 @@ const cancel = () => {
 <template>
     <div class="h-full flex flex-col">
         <div class="mb-6">
-            <h2 class="text-lg font-semibold tracking-tight">Kirim Pengumpulan</h2>
+            <h2 class="text-lg font-semibold tracking-tight">{{ $t('task.student.form.title') }}</h2>
             <p class="text-sm text-muted-foreground">
-                Tulis esai dan lampirkan dokumen pendukung.
+                {{ $t('task.student.form.description') }}
             </p>
         </div>
 
@@ -124,12 +124,12 @@ const cancel = () => {
             <!-- Content -->
             <div class="space-y-2 flex-1 flex flex-col">
                 <Label for="submission-content" :class="{ 'text-destructive': form.errors.content }">
-                    Konten Esai
+                    {{ $t('task.student.form.contentLabel') }}
                 </Label>
                 <Textarea
                     id="submission-content"
                     v-model="form.content"
-                    placeholder="Tulis esai atau jawaban tugas Anda di sini..."
+                    :placeholder="$t('task.student.form.contentPlaceholder')"
                     class="flex-1 min-h-[200px] resize-none"
                     :class="{ 'border-destructive': form.errors.content }"
                 />
@@ -141,7 +141,7 @@ const cancel = () => {
             <!-- File Upload -->
             <div class="space-y-2">
                 <Label :class="{ 'text-destructive': form.errors.temporary_file_ids }">
-                    Lampiran Dokumen
+                    {{ $t('task.student.form.attachmentsLabel') }}
                 </Label>
                 <div class="flex items-center gap-2">
                     <Button
@@ -152,10 +152,10 @@ const cancel = () => {
                         :disabled="uploadHttp.processing"
                     >
                         <template v-if="uploadHttp.processing">
-                            <Loader2 class="h-4 w-4 animate-spin" /> Mengunggah...
+                            <Loader2 class="h-4 w-4 animate-spin" /> {{ $t('task.student.form.uploading') }}
                         </template>
                         <template v-else>
-                            <Upload class="h-4 w-4" /> Unggah File
+                            <Upload class="h-4 w-4" /> {{ $t('task.student.form.upload') }}
                         </template>
                     </Button>
                     <input
@@ -168,7 +168,7 @@ const cancel = () => {
                     />
                 </div>
                 <p class="text-xs text-muted-foreground">
-                    Format: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG, GIF (maks 20MB)
+                    {{ $t('task.student.form.uploadHint') }}
                 </p>
                 <span v-if="uploadError" class="text-xs text-destructive">{{ uploadError }}</span>
                 <span v-if="form.errors.temporary_file_ids" class="text-xs text-destructive">
@@ -209,14 +209,14 @@ const cancel = () => {
 
             <div class="flex justify-end gap-3 mt-4 pt-4 border-t">
                 <Button type="button" variant="outline" @click="cancel" :disabled="form.processing">
-                    Batal
+                    {{ $t('task.student.form.cancel') }}
                 </Button>
                 <Button type="submit" :disabled="!canSubmit || form.processing">
                     <template v-if="form.processing">
-                        <Loader2 class="h-4 w-4 animate-spin" /> Mengirim...
+                        <Loader2 class="h-4 w-4 animate-spin" /> {{ $t('task.student.form.submitting') }}
                     </template>
                     <template v-else>
-                        <Send class="h-4 w-4" /> Kirim Pengumpulan
+                        <Send class="h-4 w-4" /> {{ $t('task.student.form.submit') }}
                     </template>
                 </Button>
             </div>

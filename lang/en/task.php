@@ -103,4 +103,43 @@ return [
             'unpublishConfirm' => 'Yes, Unpublish',
         ],
     ],
+
+    // Student
+    'student' => [
+        'breadcrumb' => 'My Class',
+        'listTitle' => 'Task List',
+        'pageTitle' => 'Task: :title',
+        'inClassTitle' => 'Tasks in Class :name',
+        'history' => [
+            'title' => 'Submissions',
+            'addSubmission' => 'Add Submission',
+            'deadlineOverdue' => 'Deadline passed.',
+            'processingAi' => 'Processing by AI.',
+            'submitNew' => 'Submit new task.',
+            'selectSubmission' => 'Select a submission to view details',
+            'version' => 'Submission #:version',
+            'latest' => 'Latest',
+            'score' => 'Score: :score',
+        ],
+        'form' => [
+            'title' => 'Send Submission',
+            'description' => 'Write your essay and attach supporting documents.',
+            'contentLabel' => 'Essay Content',
+            'contentPlaceholder' => 'Write your essay or task answer here...',
+            'attachmentsLabel' => 'Document Attachments',
+            'upload' => 'Upload File',
+            'uploading' => 'Uploading...',
+            'uploadHint' => 'Format: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG, GIF (max 20MB)',
+            'uploadError' => 'Failed to upload file.',
+            'cancel' => 'Cancel',
+            'submitting' => 'Sending...',
+            'submit' => 'Send Submission',
+        ],
+        'status' => [
+            'processing' => 'Processing',
+            'graded' => 'Graded',
+            'failed' => 'Failed',
+            'submitted' => 'Submitted',
+        ],
+    ],
 ];

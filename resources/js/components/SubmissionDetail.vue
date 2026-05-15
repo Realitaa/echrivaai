@@ -147,7 +147,10 @@ const progressColor = computed(() => {
 });
 
 const localizedProgressLabel = computed(() => {
-    if (!progressData.value) return '';
+    if (!progressData.value) {
+        return '';
+    }
+
     switch (progressData.value.label) {
         case 'Meningkat':
         case 'Increasing':
