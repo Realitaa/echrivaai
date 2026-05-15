@@ -11,7 +11,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Kelasku',
+                title: 'classroom.student.title',
                 href: '#',
             },
         ],
@@ -29,16 +29,16 @@ const openEnrollmentModal = ref(false);
 </script>
 
 <template>
-    <Head title="Kelasku" />
+    <Head :title="$t('classroom.student.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">Daftar Kelas</h1>
-                <p class="text-sm text-muted-foreground">Kelola ruang kelas dan pembelajaran Anda.</p>
+                <h1 class="text-2xl font-bold tracking-tight">{{ $t('classroom.student.listTitle') }}</h1>
+                <p class="text-sm text-muted-foreground">{{ $t('classroom.student.description') }}</p>
             </div>
             <Button @click="openEnrollmentModal = true">
-                <Plus class="h-4 w-4" /> Gabung ke Kelas
+                <Plus class="h-4 w-4" /> {{ $t('classroom.student.joinClass') }}
             </Button>
         </div>
 
@@ -51,9 +51,9 @@ const openEnrollmentModal = ref(false);
         </div>
         <div v-else class="flex h-64 items-center justify-center rounded-xl border-2 border-dashed bg-card/50">
             <div class="text-center">
-                <p class="text-muted-foreground">Anda belum tergabung ke dalam kelas. </p>
+                <p class="text-muted-foreground">{{ $t('classroom.student.empty') }} </p>
                 <Button variant="link" @click="openEnrollmentModal = true" class="mt-1">
-                    Gabung ke Kelas
+                    {{ $t('classroom.student.joinClass') }}
                 </Button>
             </div>
         </div>

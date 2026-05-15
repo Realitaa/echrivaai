@@ -20,9 +20,9 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
     <Dialog v-model:open="dialogOpen">
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Masuk ke Kelas</DialogTitle>
+                <DialogTitle>{{ $t('classroom.student.enrollDialog.title') }}</DialogTitle>
                 <DialogDescription>
-                    Masukkan kode kelas yang diberikan oleh guru Anda.
+                    {{ $t('classroom.student.enrollDialog.description') }}
                 </DialogDescription>
             </DialogHeader>
             <Form
@@ -34,11 +34,13 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                 autocomplete="off"
             >
                 <div class="space-y-2">
-                    <Label for="code" :class="{ 'text-destructive': errors.code }">Kode Kelas</Label>
+                    <Label for="code" :class="{ 'text-destructive': errors.code }">
+                        {{ $t('classroom.student.enrollDialog.codeLabel') }}
+                    </Label>
                     <Input
                         id="code"
                         name="code"
-                        placeholder="Contoh: 123456"
+                        :placeholder="$t('classroom.student.enrollDialog.codePlaceholder')"
                         :class="{ 'border-destructive': errors.name }"
                         required
                     />
@@ -53,9 +55,9 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                         variant="outline"
                         @click="dialogOpen = false"
                         :disabled="processing"
-                    >Batal</Button>
+                    >{{ $t('classroom.student.enrollDialog.cancel') }}</Button>
                     <Button type="submit" :disabled="processing">
-                        {{ processing ? 'Memproses...' : 'Gabung' }}
+                        {{ processing ? $t('classroom.student.enrollDialog.joining') : $t('classroom.student.enrollDialog.join') }}
                     </Button>
                 </DialogFooter>
             </Form>

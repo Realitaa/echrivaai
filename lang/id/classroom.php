@@ -73,4 +73,33 @@ return [
             'empty' => 'Belum ada siswa yang terdaftar di kelas ini.',
         ],
     ],
+
+    // Student
+    'student' => [
+        'title' => 'Kelasku',
+        'listTitle' => 'Daftar Kelas',
+        'description' => 'Kelola ruang kelas dan pembelajaran Anda.',
+        'joinClass' => 'Gabung ke Kelas',
+        'empty' => 'Anda belum tergabung ke dalam kelas.',
+        'detailTitle' => 'Detail Kelas :name',
+        'card' => [
+            'code' => 'Kode',
+            'copyCode' => 'Salin kode kelas',
+            'copySuccess' => 'Kode kelas :code berhasil disalin!',
+            'teacher' => 'Guru',
+            'noDescription' => 'Tidak ada deskripsi untuk kelas ini.',
+            'viewDetail' => 'Lihat Detail',
+            'editClass' => 'Edit Kelas',
+            'delete' => 'Hapus',
+        ],
+        'enrollDialog' => [
+            'title' => 'Masuk ke Kelas',
+            'description' => 'Masukkan kode kelas yang diberikan oleh guru Anda.',
+            'codeLabel' => 'Kode Kelas',
+            'codePlaceholder' => 'Contoh: 123456',
+            'cancel' => 'Batal',
+            'joining' => 'Memproses...',
+            'join' => 'Gabung',
+        ],
+    ],
 ];

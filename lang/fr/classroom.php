@@ -70,7 +70,36 @@ return [
         'table' => [
             'studentName' => 'Nom de l\'étudiant',
             'email' => 'E-mail',
-            'empty' => 'Aucun étudiant inscrit dans cette classe pour le moment.',
+            'empty' => 'Aucun étudiant n\'est encore inscrit dans cette classe.',
+        ],
+    ],
+
+    // Student
+    'student' => [
+        'title' => 'Ma Classe',
+        'listTitle' => 'Liste des Classes',
+        'description' => 'Gérez vos classes et votre apprentissage.',
+        'joinClass' => 'Rejoindre une Classe',
+        'empty' => 'Vous n\'avez pas encore rejoint de classe.',
+        'detailTitle' => 'Détail de la Classe :name',
+        'card' => [
+            'code' => 'Code',
+            'copyCode' => 'Copier le code de la classe',
+            'copySuccess' => 'Le code de la classe :code a été copié avec succès !',
+            'teacher' => 'Enseignant',
+            'noDescription' => 'Aucune description pour cette classe.',
+            'viewDetail' => 'Voir le Détail',
+            'editClass' => 'Modifier la Classe',
+            'delete' => 'Supprimer',
+        ],
+        'enrollDialog' => [
+            'title' => 'Rejoindre une Classe',
+            'description' => 'Entrez le code de classe fourni par votre enseignant.',
+            'codeLabel' => 'Code de la Classe',
+            'codePlaceholder' => 'ex: 123456',
+            'cancel' => 'Annuler',
+            'joining' => 'Traitement...',
+            'join' => 'Rejoindre',
         ],
     ],
 ];

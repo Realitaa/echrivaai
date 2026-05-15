@@ -73,4 +73,33 @@ return [
             'empty' => 'No students enrolled in this class yet.',
         ],
     ],
+
+    // Student
+    'student' => [
+        'title' => 'My Class',
+        'listTitle' => 'Class List',
+        'description' => 'Manage your classrooms and learning.',
+        'joinClass' => 'Join Class',
+        'empty' => 'You haven\'t joined any classes yet.',
+        'detailTitle' => 'Class Detail :name',
+        'card' => [
+            'code' => 'Code',
+            'copyCode' => 'Copy classroom code',
+            'copySuccess' => 'Classroom code :code copied successfully!',
+            'teacher' => 'Teacher',
+            'noDescription' => 'No description for this class.',
+            'viewDetail' => 'View Detail',
+            'editClass' => 'Edit Class',
+            'delete' => 'Delete',
+        ],
+        'enrollDialog' => [
+            'title' => 'Join Class',
+            'description' => 'Enter the class code provided by your teacher.',
+            'codeLabel' => 'Class Code',
+            'codePlaceholder' => 'e.g., 123456',
+            'cancel' => 'Cancel',
+            'joining' => 'Joining...',
+            'join' => 'Join',
+        ],
+    ],
 ];

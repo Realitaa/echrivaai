@@ -26,7 +26,7 @@ const { copy } = useClipboard()
 
 function copyClassroomCode(code: string) {
     copy(code);
-    toast.success(`Kode kelas ${code} berhasil disalin!`);
+    toast.success(usePage().props.t('classroom.student.card.copySuccess', { code }));
 }
 
 const taskIndex = computed(() => {
@@ -66,10 +66,10 @@ const taskIndex = computed(() => {
                 </Link>
                 <p 
                   @click="copyClassroomCode(classroom.code)"
-                  title="Salin kode kelas"
+                  :title="$t('classroom.student.card.copyCode')"
                   class="line-clamp-1 text-xs font-mono font-medium text-muted-foreground tracking-wider cursor-pointer flex items-center gap-2">
                     <span>
-                        Kode: {{ classroom.code }}
+                        {{ $t('classroom.student.card.code') }}: {{ classroom.code }}
                     </span>
                     <Button
                         variant="ghost"
@@ -79,11 +79,11 @@ const taskIndex = computed(() => {
                         <Copy class="h-4 w-4" />
                     </Button>
                 </p>
-                <p class="text-sm" v-if="userRole === 'student'">Guru: {{ classroom.teacher.name }}</p>
+                <p class="text-sm" v-if="userRole === 'student'">{{ $t('classroom.student.card.teacher') }}: {{ classroom.teacher.name }}</p>
             </div>
 
             <p class="line-clamp-2 min-h-10 text-sm text-muted-foreground">
-                {{ classroom.description || 'Tidak ada deskripsi untuk kelas ini.' }}
+                {{ classroom.description || $t('classroom.student.card.noDescription') }}
             </p>
             
             <!-- Actions Area (Footer) -->
@@ -94,7 +94,7 @@ const taskIndex = computed(() => {
                         size="icon" 
                         as-child 
                         class="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" 
-                        title="Lihat Detail"
+                        :title="$t('classroom.student.card.viewDetail')"
                     >
                         <Link :href="show(classroom.id).url">
                             <Eye class="h-5 w-5" />
@@ -105,7 +105,7 @@ const taskIndex = computed(() => {
                         size="icon" 
                         @click="$emit('edit', classroom)" 
                         class="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" 
-                        title="Edit Kelas"
+                        :title="$t('classroom.student.card.editClass')"
                     >
                         <Edit class="h-5 w-5" />
                     </Button>
@@ -116,7 +116,7 @@ const taskIndex = computed(() => {
                     size="icon" 
                     @click="$emit('delete', classroom.id)" 
                     class="h-10 w-10 rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors" 
-                    title="Hapus"
+                    :title="$t('classroom.student.card.delete')"
                 >
                     <Trash2 class="h-5 w-5" />
                 </Button>
