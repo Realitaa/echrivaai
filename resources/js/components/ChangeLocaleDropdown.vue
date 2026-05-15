@@ -28,20 +28,26 @@ function changeLocale(locale: string) {
 </script>
 
 <template>
-  <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                <Button variant="outline" size="icon" aria-label="Language">
-                    <Globe class="h-4 w-4" />
-                </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-56" align="start">
-                <DropdownMenuLabel>{{ $t('navigation.i18n.title') }}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem v-for="(locale, key) in availableLocales" :key="key" @click="changeLocale(key)">
-                        {{ locale }}
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
+    <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+            <Button variant="outline" size="icon" aria-label="Language">
+                <Globe class="h-4 w-4" />
+            </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent class="w-56" align="start">
+            <DropdownMenuLabel>{{
+                $t('navigation.i18n.title')
+            }}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+                <DropdownMenuItem
+                    v-for="(locale, key) in availableLocales"
+                    :key="key"
+                    @click="changeLocale(key)"
+                >
+                    {{ locale }}
+                </DropdownMenuItem>
+            </DropdownMenuGroup>
+        </DropdownMenuContent>
+    </DropdownMenu>
 </template>

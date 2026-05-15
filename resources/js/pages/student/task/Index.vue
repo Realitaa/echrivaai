@@ -24,8 +24,8 @@ defineOptions({
             },
             {
                 title: 'task.student.listTitle',
-                href: "#"
-            }
+                href: '#',
+            },
         ],
     }),
 });

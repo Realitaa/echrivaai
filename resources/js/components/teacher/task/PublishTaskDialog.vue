@@ -25,11 +25,15 @@ const submitAction = () => {
         ? unpublish({ classroom: props.classroomId, task: props.taskId })
         : publish({ classroom: props.classroomId, task: props.taskId });
 
-    router.patch(route.url, {}, {
-        onFinish: () => {
-            dialogOpen.value = false;
+    router.patch(
+        route.url,
+        {},
+        {
+            onFinish: () => {
+                dialogOpen.value = false;
+            },
         },
-    });
+    );
 };
 </script>
 
@@ -38,7 +42,11 @@ const submitAction = () => {
         <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle>
-                    {{ isPublished ? $t('task.teacher.publishDialog.unpublishTitle') : $t('task.teacher.publishDialog.publishTitle') }}
+                    {{
+                        isPublished
+                            ? $t('task.teacher.publishDialog.unpublishTitle')
+                            : $t('task.teacher.publishDialog.publishTitle')
+                    }}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                     <template v-if="isPublished">
@@ -50,9 +58,15 @@ const submitAction = () => {
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>{{ $t('task.teacher.publishDialog.cancel') }}</AlertDialogCancel>
+                <AlertDialogCancel>{{
+                    $t('task.teacher.publishDialog.cancel')
+                }}</AlertDialogCancel>
                 <AlertDialogAction @click="submitAction">
-                    {{ isPublished ? $t('task.teacher.publishDialog.unpublishConfirm') : $t('task.teacher.publishDialog.publishConfirm') }}
+                    {{
+                        isPublished
+                            ? $t('task.teacher.publishDialog.unpublishConfirm')
+                            : $t('task.teacher.publishDialog.publishConfirm')
+                    }}
                 </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>

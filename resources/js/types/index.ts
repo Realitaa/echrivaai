@@ -7,3 +7,4 @@ export * from './task';
 export * from './file';
 export * from './submission';
 export * from './ai';
+export * from './student';

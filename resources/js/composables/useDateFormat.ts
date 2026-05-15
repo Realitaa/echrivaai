@@ -7,7 +7,9 @@ import { currentLocale } from '@/lib/i18n';
  * Hook to get a reactive fromNow() string.
  * Automatically updates when the global locale changes.
  */
-export function useFromNow(date: MaybeRefOrGetter<string | Date | number | null | undefined>) {
+export function useFromNow(
+    date: MaybeRefOrGetter<string | Date | number | null | undefined>,
+) {
     return computed(() => {
         const d = toValue(date);
 
@@ -25,7 +27,7 @@ export function useFromNow(date: MaybeRefOrGetter<string | Date | number | null 
  */
 export function useDateFormat(
     date: MaybeRefOrGetter<string | Date | number | null | undefined>,
-    format = 'DD MMM YYYY'
+    format = 'DD MMM YYYY',
 ) {
     return computed(() => {
         const d = toValue(date);

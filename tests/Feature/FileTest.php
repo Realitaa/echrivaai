@@ -140,16 +140,21 @@ test('user can download file', function () {
     $response = $this->actingAs($user)->get(route('file.download', $file->id));
 
     $response->assertSuccessful();
-    $response->assertHeader('Content-Disposition', 'attachment; filename=document.pdf');
+    $response->assertHeader(
+        'Content-Disposition',
+        'attachment; filename=document.pdf',
+    );
 });
 
 test('not found file in database handed gracefully', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get(route('file.download', 999))->assertJson([
-        'success' => false,
-        'message' => __('response.notFoundFile'),
-    ]);
+    $this->actingAs($user)
+        ->get(route('file.download', 999))
+        ->assertJson([
+            'success' => false,
+            'message' => __('response.notFoundFile'),
+        ]);
 });
 
 test('not found file physically handed gracefully', function () {
@@ -161,10 +166,12 @@ test('not found file physically handed gracefully', function () {
     ]);
     Storage::disk('public')->delete($file->path);
 
-    $this->actingAs($user)->get(route('file.download', $file->id))->assertJson([
-        'success' => false,
-        'message' => __('response.notFoundFile'),
-    ]);
+    $this->actingAs($user)
+        ->get(route('file.download', $file->id))
+        ->assertJson([
+            'success' => false,
+            'message' => __('response.notFoundFile'),
+        ]);
 });
 
 test('guest cannot download file', function () {

@@ -36,7 +36,7 @@ const deletingId = ref<number | null>(null);
 const openCreateModal = () => {
     editingClassroom.value = null;
     dialogOpen.value = true;
-}
+};
 
 const openEditModal = (classroom: Classroom) => {
     editingClassroom.value = classroom;
@@ -63,35 +63,52 @@ const submitDelete = () => {
     <Head :title="$t('classroom.teacher.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div
+            class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        >
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">{{ $t('classroom.teacher.list') }}</h1>
-                <p class="text-sm text-muted-foreground">{{ $t('classroom.teacher.description') }}</p>
+                <h1 class="text-2xl font-bold tracking-tight">
+                    {{ $t('classroom.teacher.list') }}
+                </h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ $t('classroom.teacher.description') }}
+                </p>
             </div>
             <Button @click="openCreateModal">
                 <Plus class="h-4 w-4" /> {{ $t('classroom.teacher.new') }}
             </Button>
         </div>
 
-        <div v-if="classrooms.data.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <ClassroomCard 
-                v-for="cls in classrooms.data" 
-                :key="cls.id" 
-                :classroom="cls" 
-                @edit="openEditModal" 
-                @delete="confirmDelete" 
+        <div
+            v-if="classrooms.data.length > 0"
+            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
+            <ClassroomCard
+                v-for="cls in classrooms.data"
+                :key="cls.id"
+                :classroom="cls"
+                @edit="openEditModal"
+                @delete="confirmDelete"
             />
         </div>
-        <div v-else class="flex h-64 items-center justify-center rounded-xl border-2 border-dashed bg-card/50">
+        <div
+            v-else
+            class="flex h-64 items-center justify-center rounded-xl border-2 border-dashed bg-card/50"
+        >
             <div class="text-center">
-                <p class="text-muted-foreground">{{ $t('classroom.teacher.empty') }}</p>
+                <p class="text-muted-foreground">
+                    {{ $t('classroom.teacher.empty') }}
+                </p>
                 <Button variant="link" @click="openCreateModal" class="mt-1">
                     {{ $t('classroom.teacher.createFirst') }}
                 </Button>
             </div>
         </div>
 
-        <div class="flex items-center justify-end space-x-2" v-if="classrooms.links && classrooms.links.length > 3">
+        <div
+            class="flex items-center justify-end space-x-2"
+            v-if="classrooms.links && classrooms.links.length > 3"
+        >
             <template v-for="(link, idx) in classrooms.links" :key="idx">
                 <Button
                     v-if="link.url"
@@ -103,20 +120,23 @@ const submitDelete = () => {
                 >
                     <span v-html="link.label"></span>
                 </Button>
-                <span v-else class="px-2 text-muted-foreground" v-html="link.label"></span>
+                <span
+                    v-else
+                    class="px-2 text-muted-foreground"
+                    v-html="link.label"
+                ></span>
             </template>
         </div>
     </div>
 
-    <FormClassroomDialog 
-        v-model:open="dialogOpen" 
-        :action="editingClassroom ? 'edit' : 'create'" 
-        :classroom="editingClassroom" 
+    <FormClassroomDialog
+        v-model:open="dialogOpen"
+        :action="editingClassroom ? 'edit' : 'create'"
+        :classroom="editingClassroom"
     />
 
-    <DeleteClassroomDialog 
-        v-model:open="isDeleteModalOpen" 
-        @delete="submitDelete" 
+    <DeleteClassroomDialog
+        v-model:open="isDeleteModalOpen"
+        @delete="submitDelete"
     />
-
 </template>

@@ -13,11 +13,16 @@ use Illuminate\Support\Facades\Cache;
 
 class ClassroomController extends Controller
 {
-    public function __construct(protected TeacherClassroomService $teacherClassroomService) {}
-    
+    public function __construct(
+        protected TeacherClassroomService $teacherClassroomService,
+    ) {}
+
     public function index()
     {
-        $classrooms = Classroom::whereHas('enrollments', fn($query) => $query->where('user_id', auth()->id()))
+        $classrooms = Classroom::whereHas(
+            'enrollments',
+            fn($query) => $query->where('user_id', auth()->id()),
+        )
             ->with('teacher', fn($query) => $query->select('id', 'name'))
             ->paginate(10);
 
@@ -71,8 +76,10 @@ class ClassroomController extends Controller
     #[Authorize('viewAsStudent', 'classroom')]
     public function show(Classroom $classroom)
     {
-        $classroom = $this->teacherClassroomService->loadClassroomDetails($classroom);
-        
+        $classroom = $this->teacherClassroomService->loadClassroomDetails(
+            $classroom,
+        );
+
         return Inertia::render('student/classroom/Show', [
             'classroom' => $classroom,
         ]);

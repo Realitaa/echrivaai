@@ -32,14 +32,18 @@ const passwordInput = useTemplateRef('passwordInput');
             class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
         >
             <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
-                <p class="font-medium">{{ $t('profile.delete.warning_title') }}</p>
+                <p class="font-medium">
+                    {{ $t('profile.delete.warning_title') }}
+                </p>
                 <p class="text-sm">
                     {{ $t('profile.delete.warning_message') }}
                 </p>
             </div>
             <Dialog>
                 <DialogTrigger as-child>
-                    <Button variant="destructive" data-test="delete-user-button"
+                    <Button
+                        variant="destructive"
+                        data-test="delete-user-button"
                         >{{ $t('profile.delete.title') }}</Button
                     >
                 </DialogTrigger>
@@ -55,16 +59,18 @@ const passwordInput = useTemplateRef('passwordInput');
                         v-slot="{ errors, processing, reset, clearErrors }"
                     >
                         <DialogHeader class="space-y-3">
-                            <DialogTitle
-                                >{{ $t('profile.delete.dialog_title') }}</DialogTitle
-                            >
+                            <DialogTitle>{{
+                                $t('profile.delete.dialog_title')
+                            }}</DialogTitle>
                             <DialogDescription>
                                 {{ $t('profile.delete.dialog_description') }}
                             </DialogDescription>
                         </DialogHeader>
 
                         <div class="grid gap-2">
-                            <Label for="password" class="sr-only">{{ $t('profile.labels.password') }}</Label>
+                            <Label for="password" class="sr-only">{{
+                                $t('profile.labels.password')
+                            }}</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"

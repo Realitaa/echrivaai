@@ -7,60 +7,65 @@ use App\Models\TaskRubric;
 use App\Models\Submission;
 // use App\Models\SubmissionRubricScore;
 use App\Models\Enrollment;
-use \App\Models\AiFeedback;
+use App\Models\AiFeedback;
 use Inertia\Testing\AssertableInertia as Assert;
 
 // === Teacher/SubmissionController.index ===
 
-test('teacher can view submission detail and enrolled student table with their submission data', function () {
-    $teacher = User::factory()->create(['role' => 'teacher']);
-    $student = User::factory()->create(['role' => 'student']);
-    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    
-    // Enroll the student
-    Enrollment::create([
-        'user_id' => $student->id,
-        'classroom_id' => $classroom->id,
-        'role' => 'student',
-        'joined_at' => now(),
-    ]);
+test(
+    'teacher can view submission detail and enrolled student table with their submission data',
+    function () {
+        $teacher = User::factory()->create(['role' => 'teacher']);
+        $student = User::factory()->create(['role' => 'student']);
+        $classroom = Classroom::factory()->create([
+            'teacher_id' => $teacher->id,
+        ]);
 
-    $task = Task::factory()->create([
-        'classroom_id' => $classroom->id,
-        'created_by' => $teacher->id,
-    ]);
+        // Enroll the student
+        Enrollment::create([
+            'user_id' => $student->id,
+            'classroom_id' => $classroom->id,
+            'role' => 'student',
+            'joined_at' => now(),
+        ]);
 
-    // Create a submission with score
-    $submission = Submission::factory()->create([
-        'task_id' => $task->id,
-        'user_id' => $student->id,
-        'status' => 'graded',
-    ]);
+        $task = Task::factory()->create([
+            'classroom_id' => $classroom->id,
+            'created_by' => $teacher->id,
+        ]);
 
-    AiFeedback::factory()->create([
-        'submission_id' => $submission->id,
-        'score' => 85,
-    ]);
+        // Create a submission with score
+        $submission = Submission::factory()->create([
+            'task_id' => $task->id,
+            'user_id' => $student->id,
+            'status' => 'graded',
+        ]);
 
-    $this->actingAs($teacher)
-        ->get(
-            route('teacher.classroom.task.submission.index', [
-                $classroom,
-                $task,
-            ]),
-        )
-        ->assertSuccessful()
-        ->assertInertia(
-            fn(Assert $page) => $page
-                ->component('teacher/submission/Index')
-                ->has('task.title')
-                ->has('students.data', 1)
-                ->where('students.data.0.name', $student->name)
-                ->where('students.data.0.email', $student->email)
-                ->where('students.data.0.highest_score', 85)
-                ->where('students.data.0.submission_count', 1)
-        );
-});
+        AiFeedback::factory()->create([
+            'submission_id' => $submission->id,
+            'score' => 85,
+        ]);
+
+        $this->actingAs($teacher)
+            ->get(
+                route('teacher.classroom.task.submission.index', [
+                    $classroom,
+                    $task,
+                ]),
+            )
+            ->assertSuccessful()
+            ->assertInertia(
+                fn(Assert $page) => $page
+                    ->component('teacher/submission/Index')
+                    ->has('task.title')
+                    ->has('students.data', 1)
+                    ->where('students.data.0.name', $student->name)
+                    ->where('students.data.0.email', $student->email)
+                    ->where('students.data.0.highest_score', 85)
+                    ->where('students.data.0.submission_count', 1),
+            );
+    },
+);
 
 test(
     'teacher cannot view submission detail and enrolled student table from other task teacher',
@@ -97,7 +102,7 @@ test('teacher can view a student submission history via AJAX', function () {
         'classroom_id' => $classroom->id,
         'created_by' => $teacher->id,
     ]);
-    
+
     Submission::factory()->create([
         'task_id' => $task->id,
         'user_id' => $student->id,
@@ -193,7 +198,7 @@ test(
 //             'classroom_id' => $classroom->id,
 //             'created_by' => $teacher->id,
 //         ]);
-// 
+//
 //         $rubric1 = TaskRubric::factory()->create([
 //             'task_id' => $task->id,
 //             'max_score' => 50,
@@ -202,12 +207,12 @@ test(
 //             'task_id' => $task->id,
 //             'max_score' => 50,
 //         ]);
-// 
+//
 //         $submission = Submission::factory()->create([
 //             'task_id' => $task->id,
 //             'user_id' => $student->id,
 //         ]);
-// 
+//
 //         // AI biasanya sudah membuat record penilaian sebelumnya, Dosen tinggal update
 //         $score1 = SubmissionRubricScore::factory()->create([
 //             'submission_id' => $submission->id,
@@ -217,7 +222,7 @@ test(
 //             'submission_id' => $submission->id,
 //             'task_rubric_id' => $rubric2->id,
 //         ]);
-// 
+//
 //         $response = $this->actingAs($teacher)->put(
 //             route('teacher.classroom.task.submission.feedback', [
 //                 $classroom,
@@ -241,7 +246,7 @@ test(
 //                 ],
 //             ],
 //         );
-// 
+//
 //         $response->assertRedirect(
 //             route('teacher.classroom.task.submission.show', [
 //                 $classroom,
@@ -249,18 +254,18 @@ test(
 //                 $submission,
 //             ]),
 //         );
-// 
+//
 //         $response->assertInertiaFlash('toast', [
 //             'type' => 'success',
 //             'message' => 'Feedback submitted successfully!',
 //         ]);
-// 
+//
 //         $this->assertDatabaseHas('submission_rubric_scores', [
 //             'id' => $score1->id,
 //             'score_teacher' => 45,
 //             'feedback_teacher' => 'Excellent use of complex sentences.',
 //         ]);
-// 
+//
 //         $this->assertDatabaseHas('submission_rubric_scores', [
 //             'id' => $score2->id,
 //             'score_teacher' => 30,
@@ -268,7 +273,7 @@ test(
 //         ]);
 //     },
 // );
-// 
+//
 // test(
 //     'teacher cannot give teacher score exceeding rubric max score',
 //     function () {
@@ -281,7 +286,7 @@ test(
 //             'classroom_id' => $classroom->id,
 //             'created_by' => $teacher->id,
 //         ]);
-// 
+//
 //         // Max score adalah 20
 //         $rubric = TaskRubric::factory()->create([
 //             'task_id' => $task->id,
@@ -295,7 +300,7 @@ test(
 //             'submission_id' => $submission->id,
 //             'task_rubric_id' => $rubric->id,
 //         ]);
-// 
+//
 //         $this->actingAs($teacher)
 //             ->put(
 //                 route('teacher.classroom.task.submission.feedback', [
@@ -316,7 +321,7 @@ test(
 //             ->assertSessionHasErrors('rubrics.0.score_teacher');
 //     },
 // );
-// 
+//
 // test('teacher cannot give score without feedback per rubric', function () {
 //     $teacher = User::factory()->create(['role' => 'teacher']);
 //     $student = User::factory()->create(['role' => 'student']);
@@ -325,7 +330,7 @@ test(
 //         'classroom_id' => $classroom->id,
 //         'created_by' => $teacher->id,
 //     ]);
-// 
+//
 //     $rubric = TaskRubric::factory()->create([
 //         'task_id' => $task->id,
 //         'max_score' => 50,
@@ -338,7 +343,7 @@ test(
 //         'submission_id' => $submission->id,
 //         'task_rubric_id' => $rubric->id,
 //     ]);
-// 
+//
 //     $this->actingAs($teacher)
 //         ->put(
 //             route('teacher.classroom.task.submission.feedback', [
@@ -358,7 +363,7 @@ test(
 //         )
 //         ->assertSessionHasErrors('rubrics.0.feedback_teacher');
 // });
-// 
+//
 // test('teacher cannot give feedback without score per rubric', function () {
 //     $teacher = User::factory()->create(['role' => 'teacher']);
 //     $student = User::factory()->create(['role' => 'student']);
@@ -367,7 +372,7 @@ test(
 //         'classroom_id' => $classroom->id,
 //         'created_by' => $teacher->id,
 //     ]);
-// 
+//
 //     $rubric = TaskRubric::factory()->create([
 //         'task_id' => $task->id,
 //         'max_score' => 50,
@@ -380,7 +385,7 @@ test(
 //         'submission_id' => $submission->id,
 //         'task_rubric_id' => $rubric->id,
 //     ]);
-// 
+//
 //     $this->actingAs($teacher)
 //         ->put(
 //             route('teacher.classroom.task.submission.feedback', [
@@ -400,14 +405,14 @@ test(
 //         )
 //         ->assertSessionHasErrors('rubrics.0.score_teacher');
 // });
-// 
+//
 // test(
 //     'teacher cannot give score and feedback into other teacher submission',
 //     function () {
 //         $teacher1 = User::factory()->create(['role' => 'teacher']);
 //         $teacher2 = User::factory()->create(['role' => 'teacher']);
 //         $student = User::factory()->create(['role' => 'student']);
-// 
+//
 //         $classroom2 = Classroom::factory()->create([
 //             'teacher_id' => $teacher2->id,
 //         ]);
@@ -427,7 +432,7 @@ test(
 //             'submission_id' => $submission2->id,
 //             'task_rubric_id' => $rubric2->id,
 //         ]);
-// 
+//
 //         $this->actingAs($teacher1)
 //             ->put(
 //                 route('teacher.classroom.task.submission.feedback', [
@@ -448,7 +453,7 @@ test(
 //             ->assertForbidden();
 //     },
 // );
-// 
+//
 // === Route Access ===
 
 test('non-teacher cannot access teacher submission routes', function () {

@@ -4,7 +4,7 @@ export type FileItem = {
     filename: string;
     isTemp?: boolean;
     path?: string;
-}
+};
 
 /**
  * Inertia type file response
@@ -18,5 +18,5 @@ export type FileResponse = {
         original_name: string;
         updated_at: string;
         uploaded_by: number;
-    }
-}
+    };
+};

@@ -15,7 +15,7 @@ class HandleInertiaRequests extends Middleware
     {
         $this->sidebarService = $sidebarService;
     }
-    
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -54,8 +54,8 @@ class HandleInertiaRequests extends Middleware
                 !$request->hasCookie('sidebar_state') ||
                 $request->cookie('sidebar_state') === 'true',
             'sidebar' => [
-                'list' => $request->user() 
-                    ? $this->sidebarService->getCachedSidebar($request->user()) 
+                'list' => $request->user()
+                    ? $this->sidebarService->getCachedSidebar($request->user())
                     : [],
             ],
             'locale' => app()->getLocale(),

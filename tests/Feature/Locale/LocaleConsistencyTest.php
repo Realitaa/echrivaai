@@ -28,10 +28,7 @@ describe('Locale Consistency', function () {
         $result = [];
 
         foreach ($array as $key => $value) {
-
-            $fullKey = $prefix
-                ? "{$prefix}.{$key}"
-                : $key;
+            $fullKey = $prefix ? "{$prefix}.{$key}" : $key;
 
             if (is_array($value)) {
                 $result += flattenTranslations($value, $fullKey);
@@ -47,8 +44,8 @@ describe('Locale Consistency', function () {
     function getTranslationFiles(string $localePath): array
     {
         return collect(File::files($localePath))
-            ->filter(fn ($file) => $file->getExtension() === 'php')
-            ->map(fn ($file) => $file->getFilenameWithoutExtension())
+            ->filter(fn($file) => $file->getExtension() === 'php')
+            ->map(fn($file) => $file->getFilenameWithoutExtension())
             ->values()
             ->toArray();
     }
@@ -60,8 +57,9 @@ describe('Locale Consistency', function () {
 
         $baseLocalePath = "{$langPath}/{$baseLocale}";
 
-        expect(File::exists($baseLocalePath))
-            ->toBeTrue("Base locale directory [{$baseLocale}] does not exist.");
+        expect(File::exists($baseLocalePath))->toBeTrue(
+            "Base locale directory [{$baseLocale}] does not exist.",
+        );
 
         $translationFiles = getTranslationFiles($baseLocalePath);
 
@@ -69,23 +67,18 @@ describe('Locale Consistency', function () {
         $missingFiles = [];
 
         foreach ($translationFiles as $file) {
-
             $baseTranslations = require "{$baseLocalePath}/{$file}.php";
 
-            $baseKeys = array_keys(
-                flattenTranslations($baseTranslations)
-            );
+            $baseKeys = array_keys(flattenTranslations($baseTranslations));
 
             foreach ($locales as $locale) {
-
                 if ($locale === $baseLocale) {
                     continue;
                 }
 
                 $localeFilePath = "{$langPath}/{$locale}/{$file}.php";
 
-                if (! File::exists($localeFilePath)) {
-
+                if (!File::exists($localeFilePath)) {
                     $missingFiles[] = "[{$locale}] Missing file: {$file}.php";
 
                     continue;
@@ -94,13 +87,12 @@ describe('Locale Consistency', function () {
                 $localeTranslations = require $localeFilePath;
 
                 $localeKeys = array_keys(
-                    flattenTranslations($localeTranslations)
+                    flattenTranslations($localeTranslations),
                 );
 
                 $missing = array_diff($baseKeys, $localeKeys);
 
                 foreach ($missing as $key) {
-
                     $missingKeys[] = "[{$locale}] Missing key in {$file}.php => {$key}";
                 }
             }
@@ -108,11 +100,9 @@ describe('Locale Consistency', function () {
 
         $errors = array_merge($missingFiles, $missingKeys);
 
-        expect($errors)
-            ->toBe(
-                [],
-                "\n\nMissing translations detected:\n\n"
-                . implode("\n", $errors)
-            );
+        expect($errors)->toBe(
+            [],
+            "\n\nMissing translations detected:\n\n" . implode("\n", $errors),
+        );
     });
 });

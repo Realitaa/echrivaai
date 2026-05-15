@@ -73,7 +73,9 @@ defineOptions({
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">{{ $t('auth.form.confirm_password') }}</Label>
+                <Label for="password_confirmation">{{
+                    $t('auth.form.confirm_password')
+                }}</Label>
                 <PasswordInput
                     id="password_confirmation"
                     required
@@ -95,11 +97,15 @@ defineOptions({
                 >
                     <div class="flex items-center gap-2">
                         <RadioGroupItem value="student" id="student" />
-                        <Label for="student">{{ $t('auth.form.role_student') }}</Label>
+                        <Label for="student">{{
+                            $t('auth.form.role_student')
+                        }}</Label>
                     </div>
                     <div class="flex items-center gap-2">
                         <RadioGroupItem value="teacher" id="teacher" />
-                        <Label for="teacher">{{ $t('auth.form.role_teacher') }}</Label>
+                        <Label for="teacher">{{
+                            $t('auth.form.role_teacher')
+                        }}</Label>
                     </div>
                 </RadioGroup>
                 <InputError :message="errors.role" />

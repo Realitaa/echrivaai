@@ -12,33 +12,28 @@ describe('Guest Locale', function () {
     });
 
     it('uses app default locale for first visit', function () {
-        $response = $this
-            ->withHeader('Accept-Language', '')
-            ->get('/');
+        $response = $this->withHeader('Accept-Language', '')->get('/');
         $response->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('id');
+        expect(app()->getLocale())->toBe('id');
     });
 
     it('uses browser locale when no cookie exists', function () {
-        $response = $this
-            ->withHeader('Accept-Language', 'en-US,en;q=0.9')
-            ->get('/');
+        $response = $this->withHeader('Accept-Language', 'en-US,en;q=0.9')->get(
+            '/',
+        );
         $response->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('en');
+        expect(app()->getLocale())->toBe('en');
     });
 
     it('falls back to app locale for unsupported browser locale', function () {
-        $response = $this
-            ->withHeader('Accept-Language', 'jp-JP,jp;q=0.9')
-            ->get('/');
+        $response = $this->withHeader('Accept-Language', 'jp-JP,jp;q=0.9')->get(
+            '/',
+        );
         $response->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('id');
+        expect(app()->getLocale())->toBe('id');
     });
 
     it('allows guest to change locale', function () {
@@ -50,44 +45,33 @@ describe('Guest Locale', function () {
     });
 
     it('persists guest locale using cookie', function () {
-        $response = $this
-            ->withCookie('locale', 'fr')
-            ->get('/');
+        $response = $this->withCookie('locale', 'fr')->get('/');
         $response->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('fr');
+        expect(app()->getLocale())->toBe('fr');
     });
 
     it('prioritizes cookie locale over browser locale', function () {
-        $response = $this
-            ->withCookie('locale', 'fr')
+        $response = $this->withCookie('locale', 'fr')
             ->withHeader('Accept-Language', 'en-US,en;q=0.9')
             ->get('/');
         $response->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('fr');
+        expect(app()->getLocale())->toBe('fr');
     });
 
     it('rejects unsupported locale', function () {
         $response = $this->patch(route('locale.update'), [
             'locale' => 'jp',
         ]);
-        $response
-            ->assertSessionHasErrors([
-                'locale',
-            ]);
+        $response->assertSessionHasErrors(['locale']);
     });
 
     it('rejects invalid locale format', function () {
         $response = $this->patch(route('locale.update'), [
             'locale' => '<script>alert(1)</script>',
         ]);
-        $response
-            ->assertSessionHasErrors([
-                'locale',
-            ]);
+        $response->assertSessionHasErrors(['locale']);
     });
 
     it('does not save locale to database for guest', function () {
@@ -99,8 +83,7 @@ describe('Guest Locale', function () {
             'locale' => 'en',
         ]);
 
-        expect($user->fresh()->locale)
-            ->toBe('fr');
+        expect($user->fresh()->locale)->toBe('fr');
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
@@ -109,21 +92,13 @@ describe('Guest Locale', function () {
     });
 
     it('keeps locale across multiple guest requests', function () {
-        $this
-            ->withCookie('locale', 'en')
-            ->get('/')
-            ->assertOk();
+        $this->withCookie('locale', 'en')->get('/')->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('en');
+        expect(app()->getLocale())->toBe('en');
 
-        $this
-            ->withCookie('locale', 'en')
-            ->get('/')
-            ->assertOk();
+        $this->withCookie('locale', 'en')->get('/')->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('en');
+        expect(app()->getLocale())->toBe('en');
     });
 
     it('authenticated user locale overrides cookie locale', function () {
@@ -131,14 +106,12 @@ describe('Guest Locale', function () {
             'locale' => 'id',
         ]);
 
-        $response = $this
-            ->actingAs($user)
+        $response = $this->actingAs($user)
             ->withCookie('locale', 'en')
             ->get('/');
 
         $response->assertOk();
 
-        expect(app()->getLocale())
-            ->toBe('id');
+        expect(app()->getLocale())->toBe('id');
     });
 });

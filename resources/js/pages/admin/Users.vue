@@ -140,7 +140,9 @@ const toggleApprove = (user: User) => {
             class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
         >
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">{{ $t('users.title') }}</h1>
+                <h1 class="text-2xl font-bold tracking-tight">
+                    {{ $t('users.title') }}
+                </h1>
                 <p class="text-sm text-muted-foreground">
                     {{ $t('users.description') }}
                 </p>
@@ -163,23 +165,39 @@ const toggleApprove = (user: User) => {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value="all">{{ $t('users.filter.roles.all') }}</SelectItem>
-                        <SelectItem value="admin">{{ $t('users.filter.roles.admin') }}</SelectItem>
-                        <SelectItem value="teacher">{{ $t('users.filter.roles.teacher') }}</SelectItem>
-                        <SelectItem value="student">{{ $t('users.filter.roles.student') }}</SelectItem>
+                        <SelectItem value="all">{{
+                            $t('users.filter.roles.all')
+                        }}</SelectItem>
+                        <SelectItem value="admin">{{
+                            $t('users.filter.roles.admin')
+                        }}</SelectItem>
+                        <SelectItem value="teacher">{{
+                            $t('users.filter.roles.teacher')
+                        }}</SelectItem>
+                        <SelectItem value="student">{{
+                            $t('users.filter.roles.student')
+                        }}</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
 
             <Select v-model="isApproved">
                 <SelectTrigger class="w-full md:w-[180px]">
-                    <SelectValue :placeholder="$t('users.filter.statuses.all')" />
+                    <SelectValue
+                        :placeholder="$t('users.filter.statuses.all')"
+                    />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value="all">{{ $t('users.filter.statuses.all') }}</SelectItem>
-                        <SelectItem value="1">{{ $t('users.filter.statuses.approved') }}</SelectItem>
-                        <SelectItem value="0">{{ $t('users.filter.statuses.unapproved') }}</SelectItem>
+                        <SelectItem value="all">{{
+                            $t('users.filter.statuses.all')
+                        }}</SelectItem>
+                        <SelectItem value="1">{{
+                            $t('users.filter.statuses.approved')
+                        }}</SelectItem>
+                        <SelectItem value="0">{{
+                            $t('users.filter.statuses.unapproved')
+                        }}</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -194,7 +212,9 @@ const toggleApprove = (user: User) => {
                         <TableHead>{{ $t('users.table.role') }}</TableHead>
                         <TableHead>{{ $t('users.table.status') }}</TableHead>
                         <TableHead>{{ $t('users.table.joined') }}</TableHead>
-                        <TableHead class="text-right">{{ $t('users.table.actions') }}</TableHead>
+                        <TableHead class="text-right">{{
+                            $t('users.table.actions')
+                        }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -204,7 +224,9 @@ const toggleApprove = (user: User) => {
                         }}</TableCell>
                         <TableCell>{{ user.email }}</TableCell>
                         <TableCell>
-                            <span class="capitalize">{{ $t('users.filter.roles.' + user.role) }}</span>
+                            <span class="capitalize">{{
+                                $t('users.filter.roles.' + user.role)
+                            }}</span>
                         </TableCell>
                         <TableCell>
                             <Badge
@@ -219,21 +241,28 @@ const toggleApprove = (user: User) => {
                                 }}
                             </Badge>
                         </TableCell>
-                        <TableCell>{{ useRelativeTime(user.created_at) }}</TableCell>
+                        <TableCell>{{
+                            useRelativeTime(user.created_at)
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
                                     <Button variant="ghost" class="h-8 w-8 p-0">
-                                        <span class="sr-only">{{ $t('users.table.actions') }}</span>
+                                        <span class="sr-only">{{
+                                            $t('users.table.actions')
+                                        }}</span>
                                         <MoreHorizontal class="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>{{ $t('users.table.actions') }}</DropdownMenuLabel>
+                                    <DropdownMenuLabel>{{
+                                        $t('users.table.actions')
+                                    }}</DropdownMenuLabel>
                                     <DropdownMenuItem
                                         @click="openEditDialog(user)"
                                     >
-                                        <Pencil class="mr-2 h-4 w-4" /> {{ $t('users.actions.edit') ?? 'Edit' }}
+                                        <Pencil class="mr-2 h-4 w-4" />
+                                        {{ $t('users.actions.edit') ?? 'Edit' }}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         @click="toggleApprove(user)"
@@ -257,7 +286,8 @@ const toggleApprove = (user: User) => {
                                         class="text-destructive"
                                         @click="confirmDelete(user.id)"
                                     >
-                                        <Trash2 class="mr-2 h-4 w-4" /> {{ $t('users.actions.delete') }}
+                                        <Trash2 class="mr-2 h-4 w-4" />
+                                        {{ $t('users.actions.delete') }}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

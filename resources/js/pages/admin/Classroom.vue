@@ -138,9 +138,15 @@ const deleteClassroom = () => {
                     <TableRow>
                         <TableHead>{{ $t('classroom.table.code') }}</TableHead>
                         <TableHead>{{ $t('classroom.table.name') }}</TableHead>
-                        <TableHead>{{ $t('classroom.table.teacher') }}</TableHead>
-                        <TableHead>{{ $t('classroom.table.created') }}</TableHead>
-                        <TableHead class="text-right">{{ $t('classroom.table.actions') }}</TableHead>
+                        <TableHead>{{
+                            $t('classroom.table.teacher')
+                        }}</TableHead>
+                        <TableHead>{{
+                            $t('classroom.table.created')
+                        }}</TableHead>
+                        <TableHead class="text-right">{{
+                            $t('classroom.table.actions')
+                        }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -154,28 +160,38 @@ const deleteClassroom = () => {
                             cls.name
                         }}</TableCell>
                         <TableCell>{{ cls.teacher.name }}</TableCell>
-                        <TableCell>{{ useRelativeTime(cls.created_at) }}</TableCell>
+                        <TableCell>{{
+                            useRelativeTime(cls.created_at)
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
                                     <Button variant="ghost" class="h-8 w-8 p-0">
-                                        <span class="sr-only">{{ $t('classroom.table.openMenu') }}</span>
+                                        <span class="sr-only">{{
+                                            $t('classroom.table.openMenu')
+                                        }}</span>
                                         <MoreHorizontal class="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>{{ $t('classroom.table.actions') }}</DropdownMenuLabel>
+                                    <DropdownMenuLabel>{{
+                                        $t('classroom.table.actions')
+                                    }}</DropdownMenuLabel>
                                     <DropdownMenuItem
                                         @click="openEnrollments(cls)"
                                     >
-                                        <Users class="mr-2 h-4 w-4" /> {{ $t('classroom.actions.viewStudents') }}
+                                        <Users class="mr-2 h-4 w-4" />
+                                        {{
+                                            $t('classroom.actions.viewStudents')
+                                        }}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                         class="text-destructive"
                                         @click="confirmDelete(cls.id)"
                                     >
-                                        <Trash2 class="mr-2 h-4 w-4" /> {{ $t('classroom.actions.delete') }}
+                                        <Trash2 class="mr-2 h-4 w-4" />
+                                        {{ $t('classroom.actions.delete') }}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -218,8 +234,14 @@ const deleteClassroom = () => {
     </div>
 
     <!-- Enrollment Dialog -->
-    <EnrollmentDialog v-model:open="enrollmentsDialogOpen" :classroom="currentClassroom" />
+    <EnrollmentDialog
+        v-model:open="enrollmentsDialogOpen"
+        :classroom="currentClassroom"
+    />
 
     <!-- Delete Alert Dialog -->
-    <DeleteClassroomDialog v-model:open="deleteDialogOpen" @confirm="deleteClassroom" />
+    <DeleteClassroomDialog
+        v-model:open="deleteDialogOpen"
+        @confirm="deleteClassroom"
+    />
 </template>

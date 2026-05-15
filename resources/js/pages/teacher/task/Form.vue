@@ -18,12 +18,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress'
+import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { upload as fileUpload, remove as fileRemove } from '@/routes/file';
 import { index, show } from '@/routes/teacher/classroom';
-import { index as taskIndex, store, update } from '@/routes/teacher/classroom/task';
-import type { Classroom, Task, TaskRubric, FileItem, FileResponse } from '@/types';
+import {
+    index as taskIndex,
+    store,
+    update,
+} from '@/routes/teacher/classroom/task';
+import type {
+    Classroom,
+    Task,
+    TaskRubric,
+    FileItem,
+    FileResponse,
+} from '@/types';
 
 const props = defineProps<{
     classroom: Classroom;
@@ -44,9 +54,11 @@ defineOptions({
                 href: show(props.classroom.id).url,
             },
             {
-                title: props.task ? 'task.teacher.form.editTitle' : 'task.teacher.form.createTitle',
-                href: "#"
-            }
+                title: props.task
+                    ? 'task.teacher.form.editTitle'
+                    : 'task.teacher.form.createTitle',
+                href: '#',
+            },
         ],
     }),
 });
@@ -93,7 +105,8 @@ const handleFileUpload = async (event: Event) => {
             }
         } catch (error: unknown) {
             const err = error as { response?: { data?: { message?: string } } };
-            uploadError.value = err.response?.data?.message ?? 'task.teacher.form.uploadError';
+            uploadError.value =
+                err.response?.data?.message ?? 'task.teacher.form.uploadError';
         }
     }
 
@@ -126,7 +139,12 @@ const rubrics = ref<TaskRubric[]>(
 
 const addRubric = () => {
     const nextOrder = rubrics.value.length + 1;
-    rubrics.value.push({ title: '', description: '', max_score: 25, order: nextOrder });
+    rubrics.value.push({
+        title: '',
+        description: '',
+        max_score: 25,
+        order: nextOrder,
+    });
 };
 
 const removeRubric = (index: number) => {
@@ -198,21 +216,40 @@ const totalScore = computed(() =>
 </script>
 
 <template>
-    <Head :title="isEdit ? $t('task.teacher.form.editTitle') : $t('task.teacher.form.createTitle')" />
+    <Head
+        :title="
+            isEdit
+                ? $t('task.teacher.form.editTitle')
+                : $t('task.teacher.form.createTitle')
+        "
+    />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
         <div class="flex items-center gap-4">
             <Button variant="outline" size="icon" as-child>
-                <Link :href="taskIndex(isEdit ? task!.classroom_id : classroom.id).url">
+                <Link
+                    :href="
+                        taskIndex(isEdit ? task!.classroom_id : classroom.id)
+                            .url
+                    "
+                >
                     <ArrowLeft class="h-4 w-4" />
                 </Link>
             </Button>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">
-                    {{ isEdit ? $t('task.teacher.form.editTitle') : $t('task.teacher.form.createTitle') }}
+                    {{
+                        isEdit
+                            ? $t('task.teacher.form.editTitle')
+                            : $t('task.teacher.form.createTitle')
+                    }}
                 </h1>
                 <p class="text-sm text-muted-foreground">
-                    {{ isEdit ? $t('task.teacher.form.editDesc') : $t('task.teacher.form.createDesc') }}
+                    {{
+                        isEdit
+                            ? $t('task.teacher.form.editDesc')
+                            : $t('task.teacher.form.createDesc')
+                    }}
                 </p>
             </div>
         </div>
@@ -223,39 +260,68 @@ const totalScore = computed(() =>
                 <div class="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>{{ $t('task.teacher.form.details') }}</CardTitle>
+                            <CardTitle>{{
+                                $t('task.teacher.form.details')
+                            }}</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div class="space-y-2">
-                                <Label for="title" :class="{ 'text-destructive': form.errors.title }">
+                                <Label
+                                    for="title"
+                                    :class="{
+                                        'text-destructive': form.errors.title,
+                                    }"
+                                >
                                     {{ $t('task.teacher.form.title') }}
                                 </Label>
                                 <Input
                                     id="title"
                                     v-model="form.title"
-                                    :placeholder="$t('task.teacher.form.titlePlaceholder')"
-                                    :class="{ 'border-destructive': form.errors.title }"
+                                    :placeholder="
+                                        $t('task.teacher.form.titlePlaceholder')
+                                    "
+                                    :class="{
+                                        'border-destructive': form.errors.title,
+                                    }"
                                 />
-                                <span v-if="form.errors.title" class="text-xs text-destructive">
+                                <span
+                                    v-if="form.errors.title"
+                                    class="text-xs text-destructive"
+                                >
                                     {{ form.errors.title }}
                                 </span>
                             </div>
 
                             <div class="space-y-2">
-                                <Label for="description">{{ $t('task.teacher.form.description') }}</Label>
+                                <Label for="description">{{
+                                    $t('task.teacher.form.description')
+                                }}</Label>
                                 <Textarea
                                     id="description"
                                     v-model="form.description"
-                                    :placeholder="$t('task.teacher.form.descriptionPlaceholder')"
+                                    :placeholder="
+                                        $t(
+                                            'task.teacher.form.descriptionPlaceholder',
+                                        )
+                                    "
                                     rows="4"
                                 />
-                                <span v-if="form.errors.description" class="text-xs text-destructive">
+                                <span
+                                    v-if="form.errors.description"
+                                    class="text-xs text-destructive"
+                                >
                                     {{ form.errors.description }}
                                 </span>
                             </div>
 
                             <div class="space-y-2">
-                                <Label for="deadline" :class="{ 'text-destructive': form.errors.deadline }">
+                                <Label
+                                    for="deadline"
+                                    :class="{
+                                        'text-destructive':
+                                            form.errors.deadline,
+                                    }"
+                                >
                                     {{ $t('task.teacher.form.deadline') }}
                                 </Label>
                                 <DateTimePicker
@@ -264,7 +330,10 @@ const totalScore = computed(() =>
                                     :error="!!form.errors.deadline"
                                     disablePast
                                 />
-                                <span v-if="form.errors.deadline" class="text-xs text-destructive">
+                                <span
+                                    v-if="form.errors.deadline"
+                                    class="text-xs text-destructive"
+                                >
                                     {{ form.errors.deadline }}
                                 </span>
                             </div>
@@ -274,7 +343,10 @@ const totalScore = computed(() =>
                                     id="is_published"
                                     v-model="form.is_published"
                                 />
-                                <Label for="is_published" class="cursor-pointer">
+                                <Label
+                                    for="is_published"
+                                    class="cursor-pointer"
+                                >
                                     {{ $t('task.teacher.form.publishNow') }}
                                 </Label>
                             </div>
@@ -284,7 +356,9 @@ const totalScore = computed(() =>
                     <!-- Attachments -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>{{ $t('task.teacher.form.attachments') }}</CardTitle>
+                            <CardTitle>{{
+                                $t('task.teacher.form.attachments')
+                            }}</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div class="space-y-2">
@@ -293,17 +367,35 @@ const totalScore = computed(() =>
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        @click="($refs.fileInput as HTMLInputElement).click()"
+                                        @click="
+                                            (
+                                                $refs.fileInput as HTMLInputElement
+                                            ).click()
+                                        "
                                         :disabled="uploadHttp.processing"
                                     >
                                         <template v-if="uploadHttp.processing">
-                                            <Loader2 class="h-4 w-4 animate-spin" /> {{ $t('task.teacher.form.uploading') }}
+                                            <Loader2
+                                                class="h-4 w-4 animate-spin"
+                                            />
+                                            {{
+                                                $t(
+                                                    'task.teacher.form.uploading',
+                                                )
+                                            }}
                                         </template>
                                         <template v-else>
-                                            <Upload class="h-4 w-4" /> {{ $t('task.teacher.form.upload') }}
+                                            <Upload class="h-4 w-4" />
+                                            {{ $t('task.teacher.form.upload') }}
                                         </template>
                                     </Button>
-                                    <Progress v-if="uploadHttp.progress" :model-value="uploadHttp.progress.percentage" class="w-full" />
+                                    <Progress
+                                        v-if="uploadHttp.progress"
+                                        :model-value="
+                                            uploadHttp.progress.percentage
+                                        "
+                                        class="w-full"
+                                    />
                                     <input
                                         ref="fileInput"
                                         type="file"
@@ -316,21 +408,38 @@ const totalScore = computed(() =>
                                 <p class="text-xs text-muted-foreground">
                                     {{ $t('task.teacher.form.uploadHint') }}
                                 </p>
-                                <span v-if="uploadError" class="text-xs text-destructive">{{ $t(uploadError) }}</span>
-                                <span v-if="form.errors.attachments" class="text-xs text-destructive">
+                                <span
+                                    v-if="uploadError"
+                                    class="text-xs text-destructive"
+                                    >{{ $t(uploadError) }}</span
+                                >
+                                <span
+                                    v-if="form.errors.attachments"
+                                    class="text-xs text-destructive"
+                                >
                                     {{ form.errors.attachments }}
                                 </span>
                             </div>
 
-                            <div v-if="uploadedFiles.length > 0" class="space-y-2">
+                            <div
+                                v-if="uploadedFiles.length > 0"
+                                class="space-y-2"
+                            >
                                 <div
                                     v-for="(file, index) in uploadedFiles"
                                     :key="file.id"
                                     class="flex items-center justify-between rounded-md border p-3"
                                 >
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        <FileText class="h-4 w-4 shrink-0 text-blue-500" />
-                                        <span class="truncate text-sm font-medium">{{ file.original_name }}</span>
+                                    <div
+                                        class="flex min-w-0 items-center gap-3"
+                                    >
+                                        <FileText
+                                            class="h-4 w-4 shrink-0 text-blue-500"
+                                        />
+                                        <span
+                                            class="truncate text-sm font-medium"
+                                            >{{ file.original_name }}</span
+                                        >
                                     </div>
                                     <Button
                                         type="button"
@@ -352,9 +461,12 @@ const totalScore = computed(() =>
                     <Card>
                         <CardHeader>
                             <div class="flex items-center justify-between">
-                                <CardTitle>{{ $t('task.teacher.form.rubrics') }}</CardTitle>
+                                <CardTitle>{{
+                                    $t('task.teacher.form.rubrics')
+                                }}</CardTitle>
                                 <Badge class="text-sm font-semibold">
-                                    {{ $t('task.teacher.form.totalScore') }}: {{ totalScore }}
+                                    {{ $t('task.teacher.form.totalScore') }}:
+                                    {{ totalScore }}
                                 </Badge>
                             </div>
                         </CardHeader>
@@ -363,7 +475,10 @@ const totalScore = computed(() =>
                                 v-for="(rubric, index) in rubrics"
                                 :key="index"
                                 class="relative rounded-lg border bg-card p-4 transition-all"
-                                :class="{ 'opacity-50 border-dashed': dragIndex === index }"
+                                :class="{
+                                    'border-dashed opacity-50':
+                                        dragIndex === index,
+                                }"
                                 draggable="true"
                                 @dragstart="onDragStart(index)"
                                 @dragover="onDragOver"
@@ -372,19 +487,32 @@ const totalScore = computed(() =>
                             >
                                 <div class="flex items-start gap-3">
                                     <!-- Drag Handle -->
-                                    <div class="mt-1 cursor-grab text-muted-foreground active:cursor-grabbing">
+                                    <div
+                                        class="mt-1 cursor-grab text-muted-foreground active:cursor-grabbing"
+                                    >
                                         <GripVertical class="h-5 w-5" />
                                     </div>
 
                                     <div class="flex-1 space-y-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <div class="flex items-center gap-2">
-                                                <Badge variant="outline" class="text-xs">
+                                        <div
+                                            class="flex items-center justify-between gap-2"
+                                        >
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
+                                                <Badge
+                                                    variant="outline"
+                                                    class="text-xs"
+                                                >
                                                     #{{ rubric.order }}
                                                 </Badge>
                                                 <Input
                                                     v-model="rubric.title"
-                                                    :placeholder="$t('task.teacher.form.rubricNamePlaceholder')"
+                                                    :placeholder="
+                                                        $t(
+                                                            'task.teacher.form.rubricNamePlaceholder',
+                                                        )
+                                                    "
                                                     class="h-8 text-sm font-semibold"
                                                 />
                                             </div>
@@ -402,17 +530,29 @@ const totalScore = computed(() =>
 
                                         <Textarea
                                             v-model="rubric.description"
-                                            :placeholder="$t('task.teacher.form.rubricDescPlaceholder')"
+                                            :placeholder="
+                                                $t(
+                                                    'task.teacher.form.rubricDescPlaceholder',
+                                                )
+                                            "
                                             rows="2"
                                             class="text-sm"
                                         />
 
                                         <div class="flex items-center gap-2">
-                                            <Label class="shrink-0 text-xs text-muted-foreground">
-                                                {{ $t('task.teacher.form.maxScore') }}
+                                            <Label
+                                                class="shrink-0 text-xs text-muted-foreground"
+                                            >
+                                                {{
+                                                    $t(
+                                                        'task.teacher.form.maxScore',
+                                                    )
+                                                }}
                                             </Label>
                                             <Input
-                                                v-model.number="rubric.max_score"
+                                                v-model.number="
+                                                    rubric.max_score
+                                                "
                                                 type="number"
                                                 min="1"
                                                 class="h-8 w-24 text-sm"
@@ -433,8 +573,14 @@ const totalScore = computed(() =>
                                 </span>
                             </template>
 
-                            <Button type="button" variant="outline" class="w-full" @click="addRubric">
-                                <Plus class="h-4 w-4" /> {{ $t('task.teacher.form.addRubric') }}
+                            <Button
+                                type="button"
+                                variant="outline"
+                                class="w-full"
+                                @click="addRubric"
+                            >
+                                <Plus class="h-4 w-4" />
+                                {{ $t('task.teacher.form.addRubric') }}
                             </Button>
                         </CardContent>
                     </Card>
@@ -443,13 +589,30 @@ const totalScore = computed(() =>
 
             <!-- Submit -->
             <div class="mt-6 flex items-center justify-end gap-3">
-                <Button type="button" variant="outline" as-child :disabled="form.processing">
-                    <Link :href="taskIndex(isEdit ? task!.classroom_id : classroom.id).url">
+                <Button
+                    type="button"
+                    variant="outline"
+                    as-child
+                    :disabled="form.processing"
+                >
+                    <Link
+                        :href="
+                            taskIndex(
+                                isEdit ? task!.classroom_id : classroom.id,
+                            ).url
+                        "
+                    >
                         {{ $t('task.teacher.form.cancel') }}
                     </Link>
                 </Button>
                 <Button type="submit" :disabled="form.processing">
-                    {{ form.processing ? $t('task.teacher.form.saving') : isEdit ? $t('task.teacher.form.saveChanges') : $t('task.teacher.form.save') }}
+                    {{
+                        form.processing
+                            ? $t('task.teacher.form.saving')
+                            : isEdit
+                              ? $t('task.teacher.form.saveChanges')
+                              : $t('task.teacher.form.save')
+                    }}
                 </Button>
             </div>
         </form>

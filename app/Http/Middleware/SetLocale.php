@@ -21,23 +21,17 @@ class SetLocale
 
         if ($request->user()?->locale) {
             $locale = $request->user()->locale;
-        }
-
-        elseif ($request->cookie('locale')) {
-
+        } elseif ($request->cookie('locale')) {
             $cookieLocale = $request->cookie('locale');
 
             if (in_array($cookieLocale, $supportedLocales)) {
                 $locale = $cookieLocale;
             }
-        }
-
-        else {
-
+        } else {
             $browserLocale = substr(
                 $request->server('HTTP_ACCEPT_LANGUAGE', ''),
                 0,
-                2
+                2,
             );
 
             if (in_array($browserLocale, $supportedLocales)) {
@@ -52,8 +46,13 @@ class SetLocale
         $currentLocale = app()->getLocale();
 
         // Sync cookie if it differs from resolved locale
-        if ($request->cookie('locale') !== $currentLocale && method_exists($response, 'withCookie')) {
-            $response->withCookie(cookie('locale', $currentLocale, 60 * 24 * 30));
+        if (
+            $request->cookie('locale') !== $currentLocale &&
+            method_exists($response, 'withCookie')
+        ) {
+            $response->withCookie(
+                cookie('locale', $currentLocale, 60 * 24 * 30),
+            );
         }
 
         return $response;

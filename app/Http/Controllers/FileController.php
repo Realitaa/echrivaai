@@ -53,12 +53,18 @@ class FileController extends Controller
         $file = File::find($fileId);
 
         if (!$file || !Storage::disk('public')->exists($file->path)) {
-            return response()->json([
-                'success' => false,
-                'message' => __('response.notFoundFile'),
-            ], 404);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => __('response.notFoundFile'),
+                ],
+                404,
+            );
         }
 
-        return Storage::disk('public')->download($file->path, $file->original_name);
+        return Storage::disk('public')->download(
+            $file->path,
+            $file->original_name,
+        );
     }
 }

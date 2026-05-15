@@ -26,7 +26,7 @@ const fetchEnrollments = async () => {
     if (!props.classroom) {
         return;
     }
-    
+
     loading.value = true;
 
     try {
@@ -57,22 +57,29 @@ watch(dialogOpen, (val) => {
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
                 <DialogTitle>
-                    {{ $t('classroom.enrollmentDialog.title', { name: classroom?.name }) }}
+                    {{
+                        $t('classroom.enrollmentDialog.title', {
+                            name: classroom?.name,
+                        })
+                    }}
                 </DialogTitle>
                 <DialogDescription>
                     {{ $t('classroom.enrollmentDialog.description') }}
                 </DialogDescription>
             </DialogHeader>
-            
+
             <div v-if="loading" class="py-6 text-center text-muted-foreground">
                 {{ $t('classroom.enrollmentDialog.loading') }}
             </div>
-            
+
             <div v-else>
-                <div v-if="enrollmentsData.length === 0" class="py-6 text-center text-muted-foreground">
+                <div
+                    v-if="enrollmentsData.length === 0"
+                    class="py-6 text-center text-muted-foreground"
+                >
                     {{ $t('classroom.enrollmentDialog.empty') }}
                 </div>
-                
+
                 <div v-else class="max-h-[60vh] space-y-4 overflow-y-auto pr-2">
                     <div
                         v-for="enrollment in enrollmentsData"

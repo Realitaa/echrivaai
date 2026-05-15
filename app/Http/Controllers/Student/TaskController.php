@@ -16,7 +16,11 @@ class TaskController extends Controller
         $classroom->loadCount(['tasks', 'enrollments']);
         return Inertia::render('student/task/Index', [
             'classroom' => $classroom,
-            'tasks' => $classroom->publishedTasks()->with('files')->latest()->paginate(10),
+            'tasks' => $classroom
+                ->publishedTasks()
+                ->with('files')
+                ->latest()
+                ->paginate(10),
         ]);
     }
 

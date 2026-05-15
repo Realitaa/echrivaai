@@ -11,20 +11,24 @@ class SubmissionService
 {
     public function getEnrolledStudentsWithSubmissions(Task $task)
     {
-        return $task->classroom->students()
-            ->with(['submissions' => function ($query) use ($task) {
-                $query->where('task_id', $task->id)
-                    ->with(['aiFeedbacks']);
-            }])
+        return $task->classroom
+            ->students()
+            ->with([
+                'submissions' => function ($query) use ($task) {
+                    $query->where('task_id', $task->id)->with(['aiFeedbacks']);
+                },
+            ])
             ->paginate(10)
             ->through(function ($student) use ($task) {
                 $submissions = $student->submissions;
-                
+
                 // Calculate highest score for this student for this task
-                $highestScore = $submissions->map(function ($submission) {
-                    // Using score from aiFeedbacks (latest one or sum? usually it's one per submission)
-                    return $submission->aiFeedbacks->max('score') ?? 0;
-                })->max();
+                $highestScore = $submissions
+                    ->map(function ($submission) {
+                        // Using score from aiFeedbacks (latest one or sum? usually it's one per submission)
+                        return $submission->aiFeedbacks->max('score') ?? 0;
+                    })
+                    ->max();
 
                 return [
                     'id' => $student->id,
@@ -39,7 +43,8 @@ class SubmissionService
 
     public function getStudentHistory(Task $task, User $student)
     {
-        return $task->submissions()
+        return $task
+            ->submissions()
             ->where('user_id', $student->id)
             ->with(['aiFeedbacks', 'files'])
             ->withSum('rubricScores as final_score', 'score_ai')

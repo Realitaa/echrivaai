@@ -18,20 +18,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { index as classroomIndex, show as classroomShow } from '@/routes/teacher/classroom';
+import {
+    index as classroomIndex,
+    show as classroomShow,
+} from '@/routes/teacher/classroom';
 import { index as taskIndex } from '@/routes/teacher/classroom/task';
 import { history as submissionHistoryRoute } from '@/routes/teacher/classroom/task/submission';
 import { show as submissionShow } from '@/routes/teacher/classroom/task/submission';
-import type { TaskDetail, SubmissionItem } from '@/types';
-
-interface StudentData {
-    id: number;
-    name: string;
-    email: string;
-    highest_score: number | null;
-    submission_count: number;
-    last_submission_at: string | null;
-}
+import type { TaskDetail, SubmissionItem, StudentData } from '@/types';
 
 interface PaginationData<T> {
     data: T[];
@@ -59,8 +53,8 @@ defineOptions({
             },
             {
                 title: props.task.title,
-                href: "#"
-            }
+                href: '#',
+            },
         ],
     }),
 });
@@ -81,18 +75,20 @@ const selectStudent = async (student: StudentData) => {
     selectedSubmissionId.value = null;
 
     try {
-        const response = await historyHttp.get(
+        const response = (await historyHttp.get(
             submissionHistoryRoute({
                 classroom: props.task.classroom_id,
                 task: props.task.id,
                 student: student.id,
-            }).url
-        ) as unknown as { submissions: SubmissionItem[] };
-        
+            }).url,
+        )) as unknown as { submissions: SubmissionItem[] };
+
         submissions.value = response.submissions;
-        
+
         if (submissions.value.length > 0) {
-            const latest = submissions.value.find(s => s.is_latest) || submissions.value[0];
+            const latest =
+                submissions.value.find((s) => s.is_latest) ||
+                submissions.value[0];
             selectedSubmissionId.value = latest.id;
             currentView.value = 'detail';
         }
@@ -126,15 +122,20 @@ const openDetailDialog = (submissionId: number) => {
 
         <div class="space-y-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold flex items-center gap-2">
+                <h3 class="flex items-center gap-2 text-sm font-semibold">
                     <History class="h-4 w-4" />
                     {{ $t('submission.teacher.stats.submissions') }}
                     <template v-if="selectedStudent">
                         &mdash; {{ selectedStudent.name }}
                     </template>
                 </h3>
-                
-                <Button v-if="selectedStudent" variant="outline" size="sm" @click="backToTable">
+
+                <Button
+                    v-if="selectedStudent"
+                    variant="outline"
+                    size="sm"
+                    @click="backToTable"
+                >
                     <ArrowLeft class="mr-2 h-4 w-4" />
                     {{ $t('submission.teacher.stats.backToTable') }}
                 </Button>
@@ -145,35 +146,83 @@ const openDetailDialog = (submissionId: number) => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>{{ $t('submission.teacher.table.studentName') }}</TableHead>
-                            <TableHead>{{ $t('submission.teacher.table.email') }}</TableHead>
-                            <TableHead class="text-center">{{ $t('submission.teacher.table.totalSubmissions') }}</TableHead>
-                            <TableHead class="text-center">{{ $t('submission.teacher.table.highestScore') }}</TableHead>
-                            <TableHead class="text-center">{{ $t('submission.teacher.table.status') }}</TableHead>
-                            <TableHead class="text-right">{{ $t('submission.teacher.table.actions') }}</TableHead>
+                            <TableHead>{{
+                                $t('submission.teacher.table.studentName')
+                            }}</TableHead>
+                            <TableHead>{{
+                                $t('submission.teacher.table.email')
+                            }}</TableHead>
+                            <TableHead class="text-center">{{
+                                $t('submission.teacher.table.totalSubmissions')
+                            }}</TableHead>
+                            <TableHead class="text-center">{{
+                                $t('submission.teacher.table.highestScore')
+                            }}</TableHead>
+                            <TableHead class="text-center">{{
+                                $t('submission.teacher.table.status')
+                            }}</TableHead>
+                            <TableHead class="text-right">{{
+                                $t('submission.teacher.table.actions')
+                            }}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow v-for="student in students.data" :key="student.id">
-                            <TableCell class="font-medium">{{ student.name }}</TableCell>
+                        <TableRow
+                            v-for="student in students.data"
+                            :key="student.id"
+                        >
+                            <TableCell class="font-medium">{{
+                                student.name
+                            }}</TableCell>
                             <TableCell>{{ student.email }}</TableCell>
-                            <TableCell class="text-center">{{ student.submission_count }}</TableCell>
+                            <TableCell class="text-center">{{
+                                student.submission_count
+                            }}</TableCell>
                             <TableCell class="text-center">
-                                <span v-if="student.highest_score !== null && student.highest_score > 0" class="font-semibold text-primary">{{ student.highest_score }}</span>
-                                <span v-else class="text-muted-foreground">-</span>
+                                <span
+                                    v-if="
+                                        student.highest_score !== null &&
+                                        student.highest_score > 0
+                                    "
+                                    class="font-semibold text-primary"
+                                    >{{ student.highest_score }}</span
+                                >
+                                <span v-else class="text-muted-foreground"
+                                    >-</span
+                                >
                             </TableCell>
                             <TableCell class="text-center">
-                                <Badge v-if="student.submission_count > 0" variant="default" class="bg-green-600">
-                                    {{ $t('submission.teacher.table.hasSubmitted') }}
+                                <Badge
+                                    v-if="student.submission_count > 0"
+                                    variant="default"
+                                    class="bg-green-600"
+                                >
+                                    {{
+                                        $t(
+                                            'submission.teacher.table.hasSubmitted',
+                                        )
+                                    }}
                                 </Badge>
                                 <Badge v-else variant="secondary">
-                                    {{ $t('submission.teacher.table.notSubmitted') }}
+                                    {{
+                                        $t(
+                                            'submission.teacher.table.notSubmitted',
+                                        )
+                                    }}
                                 </Badge>
                             </TableCell>
                             <TableCell class="text-right">
-                                <Button variant="ghost" size="sm" @click="selectStudent(student)">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    @click="selectStudent(student)"
+                                >
                                     <Eye class="mr-2 h-4 w-4" />
-                                    {{ $t('submission.teacher.table.viewHistory') }}
+                                    {{
+                                        $t(
+                                            'submission.teacher.table.viewHistory',
+                                        )
+                                    }}
                                 </Button>
                             </TableCell>
                         </TableRow>
@@ -187,22 +236,30 @@ const openDetailDialog = (submissionId: number) => {
             </Card>
 
             <!-- Tampilkan jika ada siswa yang dipilih -->
-            <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <!-- Left side: History -->
-                <div class="lg:col-span-1 space-y-3 flex flex-col">
-                    <div class="flex-1 pr-1 overflow-y-auto space-y-3">
-                        <div v-if="isFetchingHistory" class="flex justify-center p-8">
-                            <Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
+                <div class="flex flex-col space-y-3 lg:col-span-1">
+                    <div class="flex-1 space-y-3 overflow-y-auto pr-1">
+                        <div
+                            v-if="isFetchingHistory"
+                            class="flex justify-center p-8"
+                        >
+                            <Loader2
+                                class="h-8 w-8 animate-spin text-muted-foreground"
+                            />
                         </div>
                         <template v-else>
-                            <div v-if="submissions.length === 0" class="text-center p-4 text-muted-foreground border rounded-lg border-dashed">
+                            <div
+                                v-if="submissions.length === 0"
+                                class="rounded-lg border border-dashed p-4 text-center text-muted-foreground"
+                            >
                                 {{ $t('submission.teacher.history.empty') }}
                             </div>
                             <!-- History Cards -->
-                            <HistoryCard 
+                            <HistoryCard
                                 v-else
-                                :submissions="submissions" 
-                                :current-view="currentView" 
+                                :submissions="submissions"
+                                :current-view="currentView"
                                 :selected-submission-id="selectedSubmissionId"
                                 @select="openDetailDialog"
                             />
@@ -211,18 +268,27 @@ const openDetailDialog = (submissionId: number) => {
                 </div>
 
                 <!-- Right side: Detail/Form -->
-                <div class="lg:col-span-2 rounded-md border bg-card text-card-foreground shadow-sm p-6 overflow-hidden flex flex-col">
+                <div
+                    class="flex flex-col overflow-hidden rounded-md border bg-card p-6 text-card-foreground shadow-sm lg:col-span-2"
+                >
                     <SubmissionDetail
                         v-if="currentView === 'detail' && selectedSubmissionId"
                         :classroom-id="task.classroom_id"
                         :task-id="task.id"
                         :submission-id="selectedSubmissionId"
                         :rubrics="task.rubrics"
-                        :status="submissions.find(s => s.id === selectedSubmissionId)?.status"
+                        :status="
+                            submissions.find(
+                                (s) => s.id === selectedSubmissionId,
+                            )?.status
+                        "
                         :show-route="submissionShow"
                     />
 
-                    <div v-else class="h-full flex items-center justify-center text-muted-foreground">
+                    <div
+                        v-else
+                        class="flex h-full items-center justify-center text-muted-foreground"
+                    >
                         {{ $t('submission.teacher.history.selectSubmission') }}
                     </div>
                 </div>

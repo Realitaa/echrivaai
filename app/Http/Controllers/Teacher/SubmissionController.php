@@ -24,8 +24,10 @@ class SubmissionController extends Controller
     public function index(Classroom $classroom, Task $task)
     {
         abort_if($task->classroom_id !== $classroom->id, 404);
-        
-        $students = $this->teacherSubmissionService->getEnrolledStudentsWithSubmissions($task);
+
+        $students = $this->teacherSubmissionService->getEnrolledStudentsWithSubmissions(
+            $task,
+        );
 
         return Inertia::render('teacher/submission/Index', [
             'task' => $task->load(['files', 'creator', 'rubrics']),
@@ -37,9 +39,12 @@ class SubmissionController extends Controller
     public function history(Classroom $classroom, Task $task, User $student)
     {
         abort_if($task->classroom_id !== $classroom->id, 404);
-        
-        $submissions = $this->teacherSubmissionService->getStudentHistory($task, $student);
-        
+
+        $submissions = $this->teacherSubmissionService->getStudentHistory(
+            $task,
+            $student,
+        );
+
         return response()->json([
             'submissions' => $submissions,
         ]);
@@ -54,7 +59,9 @@ class SubmissionController extends Controller
         abort_if($task->classroom_id !== $classroom->id, 404);
         abort_if($submission->task_id !== $task->id, 404);
 
-        $data = $this->studentSubmissionService->getSubmissionDetail($submission);
+        $data = $this->studentSubmissionService->getSubmissionDetail(
+            $submission,
+        );
 
         return response()->json($data);
     }

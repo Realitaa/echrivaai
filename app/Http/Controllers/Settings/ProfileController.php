@@ -88,8 +88,8 @@ class ProfileController extends Controller
             cookie(
                 'locale',
                 $locale,
-                60 * 24 * 30 // 30 hari
-            )
+                60 * 24 * 30, // 30 hari
+            ),
         );
     }
 }

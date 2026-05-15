@@ -1,6 +1,6 @@
-import type { SubmissionAIFeedback } from "./ai";
-import type { FileItem } from "./file";
-import type { TaskRubric } from "./task";
+import type { SubmissionAIFeedback } from './ai';
+import type { FileItem } from './file';
+import type { TaskRubric } from './task';
 
 export type SubmissionItem = {
     id: number;
@@ -10,7 +10,7 @@ export type SubmissionItem = {
     submitted_at: string;
     is_latest: boolean;
     final_score?: number;
-}
+};
 
 export type SubmissionDetail = {
     id: number;
@@ -22,7 +22,7 @@ export type SubmissionDetail = {
     rubric_scores: SubmissionRubricScore[];
     files: FileItem[];
     final_score?: number;
-}
+};
 
 export type SubmissionRubricScore = {
     id: number;
@@ -32,4 +32,4 @@ export type SubmissionRubricScore = {
     score_teacher: number | null;
     feedback_teacher: string | null;
     rubric?: TaskRubric;
-}
+};

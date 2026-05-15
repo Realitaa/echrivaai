@@ -1,5 +1,5 @@
-import type { Classroom } from "./classroom";
-import type { FileItem } from "./file";
+import type { Classroom } from './classroom';
+import type { FileItem } from './file';
 
 export type Task = {
     id: number;
@@ -12,7 +12,7 @@ export type Task = {
     classroom?: Classroom;
     files?: any[];
     rubrics?: any[];
-}
+};
 
 export type TaskRubric = {
     id?: number;
@@ -20,7 +20,7 @@ export type TaskRubric = {
     description: string;
     max_score: number;
     order: number;
-}
+};
 
 export type TaskDetail = {
     id: number;
@@ -36,4 +36,4 @@ export type TaskDetail = {
         id: number;
         name: string;
     };
-}
+};

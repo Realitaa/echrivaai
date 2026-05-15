@@ -2,7 +2,7 @@ import { createInertiaApp, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { i18nVue } from 'laravel-vue-i18n'; 
+import { i18nVue } from 'laravel-vue-i18n';
 import { createApp, h } from 'vue';
 import type { DefineComponent } from 'vue';
 import { initializeTheme, updateTheme } from '@/composables/useAppearance';
@@ -28,20 +28,28 @@ createInertiaApp({
             import.meta.glob<DefineComponent>('./pages/**/*.vue'),
         ),
     setup({ el, App, props, plugin }) {
-        const locale = props.initialPage.props.locale as string || defaultLocale;
+        const locale =
+            (props.initialPage.props.locale as string) || defaultLocale;
         currentLocale.value = locale;
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(i18nVue, {
                 lang: locale,
                 resolve: (lang: string) => {
-                    const langs = import.meta.glob<{ default: any }>('../../lang/*.json', { eager: true });
+                    const langs = import.meta.glob<{ default: any }>(
+                        '../../lang/*.json',
+                        { eager: true },
+                    );
 
                     return (
                         langs[`../../lang/php_${lang}.json`] ||
                         langs[`../../lang/${lang}.json`] ||
-                        Object.entries(langs).find(([path]) => path.endsWith(`php_${lang}.json`))?.[1] ||
-                        Object.entries(langs).find(([path]) => path.endsWith(`${lang}.json`))?.[1]
+                        Object.entries(langs).find(([path]) =>
+                            path.endsWith(`php_${lang}.json`),
+                        )?.[1] ||
+                        Object.entries(langs).find(([path]) =>
+                            path.endsWith(`${lang}.json`),
+                        )?.[1]
                     )?.default;
                 },
             })

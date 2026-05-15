@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { ScrollArea } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 

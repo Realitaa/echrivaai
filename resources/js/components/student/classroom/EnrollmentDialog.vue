@@ -20,7 +20,9 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
     <Dialog v-model:open="dialogOpen">
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>{{ $t('classroom.student.enrollDialog.title') }}</DialogTitle>
+                <DialogTitle>{{
+                    $t('classroom.student.enrollDialog.title')
+                }}</DialogTitle>
                 <DialogDescription>
                     {{ $t('classroom.student.enrollDialog.description') }}
                 </DialogDescription>
@@ -34,13 +36,18 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                 autocomplete="off"
             >
                 <div class="space-y-2">
-                    <Label for="code" :class="{ 'text-destructive': errors.code }">
+                    <Label
+                        for="code"
+                        :class="{ 'text-destructive': errors.code }"
+                    >
                         {{ $t('classroom.student.enrollDialog.codeLabel') }}
                     </Label>
                     <Input
                         id="code"
                         name="code"
-                        :placeholder="$t('classroom.student.enrollDialog.codePlaceholder')"
+                        :placeholder="
+                            $t('classroom.student.enrollDialog.codePlaceholder')
+                        "
                         :class="{ 'border-destructive': errors.name }"
                         required
                     />
@@ -55,9 +62,16 @@ const dialogOpen = defineModel<boolean>('open', { default: false });
                         variant="outline"
                         @click="dialogOpen = false"
                         :disabled="processing"
-                    >{{ $t('classroom.student.enrollDialog.cancel') }}</Button>
+                        >{{
+                            $t('classroom.student.enrollDialog.cancel')
+                        }}</Button
+                    >
                     <Button type="submit" :disabled="processing">
-                        {{ processing ? $t('classroom.student.enrollDialog.joining') : $t('classroom.student.enrollDialog.join') }}
+                        {{
+                            processing
+                                ? $t('classroom.student.enrollDialog.joining')
+                                : $t('classroom.student.enrollDialog.join')
+                        }}
                     </Button>
                 </DialogFooter>
             </Form>

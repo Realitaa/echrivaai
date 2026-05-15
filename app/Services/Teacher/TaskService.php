@@ -51,7 +51,11 @@ class TaskService
             }
 
             if (isset($data['attachments'])) {
-                $task->files()->whereNotIn('id', $data['attachments'])->get()->each->delete();
+                $task
+                    ->files()
+                    ->whereNotIn('id', $data['attachments'])
+                    ->get()
+                    ->each->delete();
                 $this->attachFiles($task, $data['attachments']);
             }
 

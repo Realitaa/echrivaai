@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import {
-    Plus,
-    History,
-} from '@lucide/vue';
+import { Plus, History } from '@lucide/vue';
 import dayjs from 'dayjs';
 import { ref, computed } from 'vue';
 import { watch, onMounted, onUnmounted } from 'vue';
@@ -18,8 +15,6 @@ import { show as classroomShow } from '@/routes/student/classroom';
 import { index as taskIndex } from '@/routes/student/classroom/task';
 import { show as showSubmission } from '@/routes/student/classroom/task/submission';
 import type { SubmissionItem, TaskDetail } from '@/types';
-
-
 
 const props = defineProps<{
     task: TaskDetail;
@@ -43,8 +38,8 @@ defineOptions({
             },
             {
                 title: props.task.title,
-                href: "#"
-            }
+                href: '#',
+            },
         ],
     }),
 });
@@ -93,13 +88,17 @@ const stopPolling = () => {
     }
 };
 
-watch(hasProcessingSubmission, (newValue) => {
-    if (newValue) {
-        startPolling();
-    } else {
-        stopPolling();
-    }
-}, { immediate: true });
+watch(
+    hasProcessingSubmission,
+    (newValue) => {
+        if (newValue) {
+            startPolling();
+        } else {
+            stopPolling();
+        }
+    },
+    { immediate: true },
+);
 
 onUnmounted(() => {
     stopPolling();
@@ -107,7 +106,8 @@ onUnmounted(() => {
 
 onMounted(() => {
     if (props.submissions.length > 0) {
-        const latest = props.submissions.find(s => s.is_latest) || props.submissions[0];
+        const latest =
+            props.submissions.find((s) => s.is_latest) || props.submissions[0];
         selectedSubmissionId.value = latest.id;
         currentView.value = 'detail';
     } else {
@@ -128,7 +128,8 @@ const showSubmitForm = () => {
 
 const handleSubmitCancel = () => {
     if (props.submissions.length > 0) {
-        const latest = props.submissions.find(s => s.is_latest) || props.submissions[0];
+        const latest =
+            props.submissions.find((s) => s.is_latest) || props.submissions[0];
         selectedSubmissionId.value = latest.id;
         currentView.value = 'detail';
     } else {
@@ -140,12 +141,13 @@ watch(
     () => props.submissions,
     (newSubmissions) => {
         if (newSubmissions.length > 0 && currentView.value === 'submit') {
-            const latest = newSubmissions.find(s => s.is_latest) || newSubmissions[0];
+            const latest =
+                newSubmissions.find((s) => s.is_latest) || newSubmissions[0];
             selectedSubmissionId.value = latest.id;
             currentView.value = 'detail';
         }
     },
-    { deep: true }
+    { deep: true },
 );
 </script>
 
@@ -159,48 +161,79 @@ watch(
 
         <!-- Submission Section -->
         <div class="space-y-4">
-            <h3 class="text-sm font-semibold flex items-center gap-2">
+            <h3 class="flex items-center gap-2 text-sm font-semibold">
                 <History class="h-4 w-4" />
                 {{ $t('task.student.history.title') }}
             </h3>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <!-- Left side: History -->
-                <div class="lg:col-span-1 space-y-3 flex flex-col">
-                    <div class="flex-1 pr-1 overflow-y-auto space-y-3">
+                <div class="flex flex-col space-y-3 lg:col-span-1">
+                    <div class="flex-1 space-y-3 overflow-y-auto pr-1">
                         <!-- Submit Button -->
                         <Card
-                            class="border-2 transition-all cursor-pointer group shrink-0"
+                            class="group shrink-0 cursor-pointer border-2 transition-all"
                             :class="[
                                 canSubmit
                                     ? 'border-dashed border-primary/30 hover:border-primary hover:shadow-md'
-                                    : 'border-dashed border-muted-foreground/20 opacity-60 cursor-not-allowed',
-                                currentView === 'submit' ? 'border-primary' : ''
+                                    : 'cursor-not-allowed border-dashed border-muted-foreground/20 opacity-60',
+                                currentView === 'submit'
+                                    ? 'border-primary'
+                                    : '',
                             ]"
                             @click="showSubmitForm"
                         >
                             <CardContent class="flex items-center gap-4 py-4">
                                 <div
                                     class="rounded-full p-2.5 transition-colors"
-                                    :class="canSubmit
-                                        ? 'bg-primary/10 text-primary group-hover:bg-primary/20'
-                                        : 'bg-muted text-muted-foreground'"
+                                    :class="
+                                        canSubmit
+                                            ? 'bg-primary/10 text-primary group-hover:bg-primary/20'
+                                            : 'bg-muted text-muted-foreground'
+                                    "
                                 >
                                     <Plus class="h-5 w-5" />
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-semibold" :class="canSubmit ? '' : 'text-muted-foreground'">
-                                        {{ $t('task.student.history.addSubmission') }}
+                                <div class="min-w-0 flex-1">
+                                    <p
+                                        class="text-sm font-semibold"
+                                        :class="
+                                            canSubmit
+                                                ? ''
+                                                : 'text-muted-foreground'
+                                        "
+                                    >
+                                        {{
+                                            $t(
+                                                'task.student.history.addSubmission',
+                                            )
+                                        }}
                                     </p>
-                                    <p class="text-xs text-muted-foreground mt-0.5">
+                                    <p
+                                        class="mt-0.5 text-xs text-muted-foreground"
+                                    >
                                         <template v-if="isDeadlinePassed">
-                                            {{ $t('task.student.history.deadlineOverdue') }}
+                                            {{
+                                                $t(
+                                                    'task.student.history.deadlineOverdue',
+                                                )
+                                            }}
                                         </template>
-                                        <template v-else-if="hasProcessingSubmission">
-                                            {{ $t('task.student.history.processingAi') }}
+                                        <template
+                                            v-else-if="hasProcessingSubmission"
+                                        >
+                                            {{
+                                                $t(
+                                                    'task.student.history.processingAi',
+                                                )
+                                            }}
                                         </template>
                                         <template v-else>
-                                            {{ $t('task.student.history.submitNew') }}
+                                            {{
+                                                $t(
+                                                    'task.student.history.submitNew',
+                                                )
+                                            }}
                                         </template>
                                     </p>
                                 </div>
@@ -208,9 +241,9 @@ watch(
                         </Card>
 
                         <!-- History Cards -->
-                        <HistoryCard 
-                            :submissions="submissions" 
-                            :current-view="currentView" 
+                        <HistoryCard
+                            :submissions="submissions"
+                            :current-view="currentView"
                             :selected-submission-id="selectedSubmissionId"
                             @select="openDetailDialog"
                         />
@@ -218,7 +251,9 @@ watch(
                 </div>
 
                 <!-- Right side: Detail/Form -->
-                <div class="lg:col-span-2 rounded-md border bg-card text-card-foreground shadow-sm p-6 overflow-hidden flex flex-col">
+                <div
+                    class="flex flex-col overflow-hidden rounded-md border bg-card p-6 text-card-foreground shadow-sm lg:col-span-2"
+                >
                     <SubmissionForm
                         v-if="currentView === 'submit'"
                         :classroom-id="task.classroom_id"
@@ -232,11 +267,18 @@ watch(
                         :task-id="task.id"
                         :submission-id="selectedSubmissionId"
                         :rubrics="task.rubrics"
-                        :status="submissions.find(s => s.id === selectedSubmissionId)?.status"
+                        :status="
+                            submissions.find(
+                                (s) => s.id === selectedSubmissionId,
+                            )?.status
+                        "
                         :show-route="showSubmission"
                     />
 
-                    <div v-else class="h-full flex items-center justify-center text-muted-foreground">
+                    <div
+                        v-else
+                        class="flex h-full items-center justify-center text-muted-foreground"
+                    >
                         {{ $t('task.student.history.selectSubmission') }}
                     </div>
                 </div>

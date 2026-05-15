@@ -53,7 +53,9 @@ class ProcessAiFeedbackJob implements ShouldQueue
             previousSubmission: $previousSubmission,
         );
 
-        $promptContent = $submission->content ?: '(Tidak ada teks yang disertakan, silakan periksa dokumen lampiran.)';
+        $promptContent =
+            $submission->content ?:
+            '(Tidak ada teks yang disertakan, silakan periksa dokumen lampiran.)';
         $attachments = [];
 
         $processFile = function ($file) use (&$promptContent, &$attachments) {
@@ -61,12 +63,18 @@ class ProcessAiFeedbackJob implements ShouldQueue
 
             // Handle images
             if (str_starts_with($file->mime_type, 'image/')) {
-                $attachments[] = new \Laravel\Ai\Files\LocalImage($path, $file->mime_type);
+                $attachments[] = new \Laravel\Ai\Files\LocalImage(
+                    $path,
+                    $file->mime_type,
+                );
                 return;
             }
 
             // Handle DOCX (Gemini doesn't support DOCX in inlineData, so we extract text)
-            if ($file->mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            if (
+                $file->mime_type ===
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ) {
                 $text = $this->extractTextFromDocx($path);
                 $promptContent .= "\n\n[Isi dari dokumen {$file->original_name}]:\n{$text}";
                 return;
@@ -75,7 +83,7 @@ class ProcessAiFeedbackJob implements ShouldQueue
             // Handle other documents (like PDF) via Base64Document to ensure correct MIME type
             $attachments[] = new \Laravel\Ai\Files\Base64Document(
                 base64_encode(file_get_contents($path)),
-                $file->mime_type
+                $file->mime_type,
             );
         };
 
@@ -90,7 +98,11 @@ class ProcessAiFeedbackJob implements ShouldQueue
         try {
             $response = $agent->prompt($promptContent, $attachments);
 
-            DB::transaction(function () use ($submission, $response, $promptContent) {
+            DB::transaction(function () use (
+                $submission,
+                $response,
+                $promptContent,
+            ) {
                 // Save AI feedback
                 $submission->aiFeedbacks()->create([
                     'result' => $response['feedback'],
@@ -127,7 +139,7 @@ class ProcessAiFeedbackJob implements ShouldQueue
     private function extractTextFromDocx(string $path): string
     {
         $content = '';
-        $zip = new \ZipArchive;
+        $zip = new \ZipArchive();
 
         if ($zip->open($path) === true) {
             if (($index = $zip->locateName('word/document.xml')) !== false) {

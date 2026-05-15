@@ -87,10 +87,9 @@ const loggedInNavBtn = computed(() => {
                         variant="default"
                         class="bg-purple-600 hover:bg-purple-700"
                     >
-                        <Link
-                            :href="loggedInNavBtn"
-                            >{{ userRole === 'admin' ? 'Dashboard' : 'Classroom' }}</Link
-                        >
+                        <Link :href="loggedInNavBtn">{{
+                            userRole === 'admin' ? 'Dashboard' : 'Classroom'
+                        }}</Link>
                     </Button>
                 </template>
                 <template v-else>

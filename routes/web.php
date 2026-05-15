@@ -9,8 +9,9 @@ Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
 
-Route::patch('locale', [ProfileController::class, 'updateLocale'])
-    ->name('locale.update');
+Route::patch('locale', [ProfileController::class, 'updateLocale'])->name(
+    'locale.update',
+);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('admin/dashboard', [DashboardController::class, 'index'])

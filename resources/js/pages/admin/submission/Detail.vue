@@ -57,24 +57,37 @@ defineOptions({
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <div>
-                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.task') }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ $t('submission.detail.task') }}
+                        </p>
                         <p class="font-medium">{{ submission.task?.title }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.student') }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ $t('submission.detail.student') }}
+                        </p>
                         <p class="font-medium">{{ submission.user?.name }}</p>
                         <p class="text-sm text-muted-foreground">
                             {{ submission.user?.email }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.status') }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ $t('submission.detail.status') }}
+                        </p>
                         <Badge class="mt-1" variant="secondary">{{
-                            submission.status ? $t('submission.status.' + submission.status.toLowerCase()) : $t('submission.status.waiting')
+                            submission.status
+                                ? $t(
+                                      'submission.status.' +
+                                          submission.status.toLowerCase(),
+                                  )
+                                : $t('submission.status.waiting')
                         }}</Badge>
                     </div>
                     <div>
-                        <p class="text-sm text-muted-foreground">{{ $t('submission.detail.score') }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ $t('submission.detail.score') }}
+                        </p>
                         <p class="text-xl font-bold">
                             {{
                                 submission.score !== null
@@ -99,7 +112,8 @@ defineOptions({
                 <Card>
                     <CardHeader>
                         <CardTitle class="flex items-center gap-2">
-                            <FileText class="h-5 w-5" /> {{ $t('submission.detail.files.title') }}
+                            <FileText class="h-5 w-5" />
+                            {{ $t('submission.detail.files.title') }}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -121,7 +135,9 @@ defineOptions({
                                 <div class="flex items-center gap-3">
                                     <FileText class="h-5 w-5 text-blue-500" />
                                     <span class="text-sm font-medium">{{
-                                        file.original_name ?? file.name ?? 'Berkas'
+                                        file.original_name ??
+                                        file.name ??
+                                        'Berkas'
                                     }}</span>
                                 </div>
                                 <Button size="sm" variant="secondary" as-child>
@@ -131,7 +147,11 @@ defineOptions({
                                         class="flex items-center gap-2"
                                     >
                                         <Download class="h-3.5 w-3.5" />
-                                        {{ $t('submission.detail.files.download') }}
+                                        {{
+                                            $t(
+                                                'submission.detail.files.download',
+                                            )
+                                        }}
                                     </a>
                                 </Button>
                             </li>
@@ -143,7 +163,8 @@ defineOptions({
                 <Card>
                     <CardHeader>
                         <CardTitle class="flex items-center gap-2">
-                            <MessageSquare class="h-5 w-5" /> {{ $t('submission.detail.feedback.title') }}
+                            <MessageSquare class="h-5 w-5" />
+                            {{ $t('submission.detail.feedback.title') }}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -170,7 +191,9 @@ defineOptions({
                                     >
                                     <span
                                         class="text-xs text-muted-foreground"
-                                        >{{ useRelativeTime(feedback.created_at) }}</span
+                                        >{{
+                                            useRelativeTime(feedback.created_at)
+                                        }}</span
                                     >
                                 </div>
                                 <div class="text-sm whitespace-pre-wrap">
@@ -180,7 +203,9 @@ defineOptions({
                                     class="mt-2 text-right text-xs font-semibold text-primary"
                                     v-if="feedback.score"
                                 >
-                                    {{ $t('submission.detail.feedback.score') }}: {{ feedback.score }}
+                                    {{
+                                        $t('submission.detail.feedback.score')
+                                    }}: {{ feedback.score }}
                                 </div>
                             </div>
                         </div>

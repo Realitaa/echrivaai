@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-    CalendarDate,
-    getLocalTimeZone,
-    today
-} from '@internationalized/date';
+import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 import { CalendarIcon, Clock } from '@lucide/vue';
 import dayjs from 'dayjs';
 import type { DateValue } from 'reka-ui';
@@ -11,7 +7,11 @@ import { ref, computed, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
 import { useDateFormat } from '@/composables/useDateFormat';
 import { cn } from '@/lib/utils';
 
@@ -40,9 +40,13 @@ watch(
     (val) => {
         if (val) {
             const d = dayjs(val);
-            
+
             if (d.isValid()) {
-                date.value = new CalendarDate(d.year(), d.month() + 1, d.date()) as any;
+                date.value = new CalendarDate(
+                    d.year(),
+                    d.month() + 1,
+                    d.date(),
+                ) as any;
                 time.value = d.format('HH:mm');
             }
         }
@@ -61,7 +65,7 @@ watch(time, (val) => {
             .hour(hours || 0)
             .minute(minutes || 0)
             .second(0);
-        
+
         if (d.isBefore(dayjs())) {
             time.value = dayjs().add(1, 'hour').format('HH:mm');
         }
@@ -79,7 +83,7 @@ const updateValue = () => {
             .hour(hours || 0)
             .minute(minutes || 0)
             .second(0);
-        
+
         const formatted = d.format('YYYY-MM-DD HH:mm:ss');
 
         if (formatted !== props.modelValue) {
@@ -104,11 +108,11 @@ const formattedValue = computed(() => {
 
 const isDateDisabled = (date: any) => {
     if (props.disablePast) {
-        return date.compare(today(getLocalTimeZone())) < 0
+        return date.compare(today(getLocalTimeZone())) < 0;
     }
 
-    return false
-}
+    return false;
+};
 </script>
 
 <template>
@@ -118,28 +122,30 @@ const isDateDisabled = (date: any) => {
                 :id="id"
                 type="button"
                 variant="outline"
-                :class="cn(
-                    'w-full justify-start text-left font-normal',
-                    !modelValue && 'text-muted-foreground',
-                    error && 'border-destructive'
-                )"
+                :class="
+                    cn(
+                        'w-full justify-start text-left font-normal',
+                        !modelValue && 'text-muted-foreground',
+                        error && 'border-destructive',
+                    )
+                "
             >
                 <CalendarIcon class="mr-2 h-4 w-4" />
                 {{ formattedValue }}
             </Button>
         </PopoverTrigger>
         <PopoverContent class="w-auto p-0" align="start">
-            <Calendar v-model="date" initial-focus :is-date-disabled="isDateDisabled" />
+            <Calendar
+                v-model="date"
+                initial-focus
+                :is-date-disabled="isDateDisabled"
+            />
             <div class="border-t p-4">
                 <div class="flex items-center gap-3">
                     <Clock class="h-4 w-4 text-muted-foreground" />
                     <div class="flex flex-1 items-center gap-2">
                         <span class="text-sm font-medium">Waktu:</span>
-                        <Input
-                            type="time"
-                            v-model="time"
-                            class="h-9 w-full"
-                        />
+                        <Input type="time" v-model="time" class="h-9 w-full" />
                     </div>
                 </div>
             </div>

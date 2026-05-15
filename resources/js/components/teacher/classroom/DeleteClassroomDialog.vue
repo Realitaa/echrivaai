@@ -19,13 +19,17 @@ const emit = defineEmits(['delete']);
     <AlertDialog v-model:open="dialogOpen">
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>{{ $t('classroom.teacher.deleteDialog.title') }}</AlertDialogTitle>
+                <AlertDialogTitle>{{
+                    $t('classroom.teacher.deleteDialog.title')
+                }}</AlertDialogTitle>
                 <AlertDialogDescription>
                     {{ $t('classroom.teacher.deleteDialog.description') }}
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>{{ $t('classroom.teacher.deleteDialog.cancel') }}</AlertDialogCancel>
+                <AlertDialogCancel>{{
+                    $t('classroom.teacher.deleteDialog.cancel')
+                }}</AlertDialogCancel>
                 <AlertDialogAction
                     @click="emit('delete')"
                     class="bg-destructive text-destructive-foreground hover:bg-destructive/90"

@@ -19,7 +19,9 @@ const emit = defineEmits(['confirm']);
     <AlertDialog v-model:open="dialogOpen">
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>{{ $t('classroom.deleteDialog.title') }}</AlertDialogTitle>
+                <AlertDialogTitle>{{
+                    $t('classroom.deleteDialog.title')
+                }}</AlertDialogTitle>
                 <AlertDialogDescription>
                     {{ $t('classroom.deleteDialog.description') }}
                 </AlertDialogDescription>

@@ -32,33 +32,54 @@ const openEnrollmentModal = ref(false);
     <Head :title="$t('classroom.student.title')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4 lg:p-8">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div
+            class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        >
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-bold tracking-tight">{{ $t('classroom.student.listTitle') }}</h1>
-                <p class="text-sm text-muted-foreground">{{ $t('classroom.student.description') }}</p>
+                <h1 class="text-2xl font-bold tracking-tight">
+                    {{ $t('classroom.student.listTitle') }}
+                </h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ $t('classroom.student.description') }}
+                </p>
             </div>
             <Button @click="openEnrollmentModal = true">
                 <Plus class="h-4 w-4" /> {{ $t('classroom.student.joinClass') }}
             </Button>
         </div>
 
-        <div v-if="classrooms.data.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <ClassroomCard 
-                v-for="cls in classrooms.data" 
-                :key="cls.id" 
-                :classroom="cls" 
+        <div
+            v-if="classrooms.data.length > 0"
+            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
+            <ClassroomCard
+                v-for="cls in classrooms.data"
+                :key="cls.id"
+                :classroom="cls"
             />
         </div>
-        <div v-else class="flex h-64 items-center justify-center rounded-xl border-2 border-dashed bg-card/50">
+        <div
+            v-else
+            class="flex h-64 items-center justify-center rounded-xl border-2 border-dashed bg-card/50"
+        >
             <div class="text-center">
-                <p class="text-muted-foreground">{{ $t('classroom.student.empty') }} </p>
-                <Button variant="link" @click="openEnrollmentModal = true" class="mt-1">
+                <p class="text-muted-foreground">
+                    {{ $t('classroom.student.empty') }}
+                </p>
+                <Button
+                    variant="link"
+                    @click="openEnrollmentModal = true"
+                    class="mt-1"
+                >
                     {{ $t('classroom.student.joinClass') }}
                 </Button>
             </div>
         </div>
 
-        <div class="flex items-center justify-end space-x-2" v-if="classrooms.links && classrooms.links.length > 3">
+        <div
+            class="flex items-center justify-end space-x-2"
+            v-if="classrooms.links && classrooms.links.length > 3"
+        >
             <template v-for="(link, idx) in classrooms.links" :key="idx">
                 <Button
                     v-if="link.url"
@@ -70,12 +91,14 @@ const openEnrollmentModal = ref(false);
                 >
                     <span v-html="link.label"></span>
                 </Button>
-                <span v-else class="px-2 text-muted-foreground" v-html="link.label"></span>
+                <span
+                    v-else
+                    class="px-2 text-muted-foreground"
+                    v-html="link.label"
+                ></span>
             </template>
         </div>
     </div>
 
-    <EnrollmentDialog 
-        v-model:open="openEnrollmentModal" 
-    />
+    <EnrollmentDialog v-model:open="openEnrollmentModal" />
 </template>

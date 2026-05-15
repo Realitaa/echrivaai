@@ -110,11 +110,19 @@ const statLists: Array<{
                 <TableHeader>
                     <TableRow>
                         <TableHead class="w-[100px]">No</TableHead>
-                        <TableHead>{{ $t('dashboard.approvalNeeded.table.name') }}</TableHead>
-                        <TableHead>{{ $t('dashboard.approvalNeeded.table.email') }}</TableHead>
-                        <TableHead>{{ $t('dashboard.approvalNeeded.table.waiting') }}</TableHead>
+                        <TableHead>{{
+                            $t('dashboard.approvalNeeded.table.name')
+                        }}</TableHead>
+                        <TableHead>{{
+                            $t('dashboard.approvalNeeded.table.email')
+                        }}</TableHead>
+                        <TableHead>{{
+                            $t('dashboard.approvalNeeded.table.waiting')
+                        }}</TableHead>
                         <TableHead>
-                            <span>{{ $t('dashboard.approvalNeeded.table.actions') }}</span>
+                            <span>{{
+                                $t('dashboard.approvalNeeded.table.actions')
+                            }}</span>
                         </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -133,7 +141,9 @@ const statLists: Array<{
                         }}</TableCell>
                         <TableCell>
                             <Button as-child>
-                                <Link :href="approve(teacher.id)">{{ $t('dashboard.approvalNeeded.table.approve') }}</Link>
+                                <Link :href="approve(teacher.id)">{{
+                                    $t('dashboard.approvalNeeded.table.approve')
+                                }}</Link>
                             </Button>
                         </TableCell>
                     </TableRow>

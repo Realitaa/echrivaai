@@ -18,7 +18,9 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="$t('classroom.student.detailTitle', { name: classroom.name })" />
+    <Head
+        :title="$t('classroom.student.detailTitle', { name: classroom.name })"
+    />
 
     <ClassroomDetail :classroom="classroom" :back-url="index().url" />
 </template>

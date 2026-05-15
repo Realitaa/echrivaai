@@ -62,9 +62,10 @@ Route::group(
                 Route::get('/', [TeacherTaskController::class, 'index'])->name(
                     'index',
                 );
-                Route::get('/create', [TeacherTaskController::class, 'create'])->name(
+                Route::get('/create', [
+                    TeacherTaskController::class,
                     'create',
-                );
+                ])->name('create');
                 Route::post('/', [TeacherTaskController::class, 'store'])->name(
                     'store',
                 );

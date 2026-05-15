@@ -167,9 +167,15 @@ const deleteTask = () => {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value="all">{{ $t('task.filter.all') }}</SelectItem>
-                        <SelectItem value="1">{{ $t('task.filter.published') }}</SelectItem>
-                        <SelectItem value="0">{{ $t('task.filter.draft') }}</SelectItem>
+                        <SelectItem value="all">{{
+                            $t('task.filter.all')
+                        }}</SelectItem>
+                        <SelectItem value="1">{{
+                            $t('task.filter.published')
+                        }}</SelectItem>
+                        <SelectItem value="0">{{
+                            $t('task.filter.draft')
+                        }}</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -184,7 +190,9 @@ const deleteTask = () => {
                         <TableHead>{{ $t('task.table.teacher') }}</TableHead>
                         <TableHead>{{ $t('task.table.status') }}</TableHead>
                         <TableHead>{{ $t('task.table.created') }}</TableHead>
-                        <TableHead class="text-right">{{ $t('task.table.actions') }}</TableHead>
+                        <TableHead class="text-right">{{
+                            $t('task.table.actions')
+                        }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -202,25 +210,36 @@ const deleteTask = () => {
                                     task.is_published ? 'default' : 'secondary'
                                 "
                             >
-                                {{ task.is_published ? $t('task.filter.published') : $t('task.filter.draft') }}
+                                {{
+                                    task.is_published
+                                        ? $t('task.filter.published')
+                                        : $t('task.filter.draft')
+                                }}
                             </Badge>
                         </TableCell>
-                        <TableCell>{{ useRelativeTime(task.created_at) }}</TableCell>
+                        <TableCell>{{
+                            useRelativeTime(task.created_at)
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
                                     <Button variant="ghost" class="h-8 w-8 p-0">
-                                        <span class="sr-only">{{ $t('task.table.openMenu') }}</span>
+                                        <span class="sr-only">{{
+                                            $t('task.table.openMenu')
+                                        }}</span>
                                         <MoreHorizontal class="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>{{ $t('task.table.actions') }}</DropdownMenuLabel>
+                                    <DropdownMenuLabel>{{
+                                        $t('task.table.actions')
+                                    }}</DropdownMenuLabel>
                                     <DropdownMenuItem
                                         class="text-destructive"
                                         @click="confirmDelete(task.id)"
                                     >
-                                        <Trash2 class="mr-2 h-4 w-4" /> {{ $t('task.actions.delete') }}
+                                        <Trash2 class="mr-2 h-4 w-4" />
+                                        {{ $t('task.actions.delete') }}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

@@ -54,19 +54,26 @@ test('teacher can view create task form', function () {
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.task.create', $classroom))
         ->assertSuccessful()
-        ->assertInertia(fn(Assert $page) => $page->component('teacher/task/Form'));
+        ->assertInertia(
+            fn(Assert $page) => $page->component('teacher/task/Form'),
+        );
 });
 
-test('teacher cannot view create task form from other classroom teacher', function () {
-    $teacher1 = User::factory()->create(['role' => 'teacher']);
-    $teacher2 = User::factory()->create(['role' => 'teacher']);
+test(
+    'teacher cannot view create task form from other classroom teacher',
+    function () {
+        $teacher1 = User::factory()->create(['role' => 'teacher']);
+        $teacher2 = User::factory()->create(['role' => 'teacher']);
 
-    $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
+        $classroom2 = Classroom::factory()->create([
+            'teacher_id' => $teacher2->id,
+        ]);
 
-    $this->actingAs($teacher1)
-        ->get(route('teacher.classroom.task.create', $classroom2))
-        ->assertForbidden();
-});
+        $this->actingAs($teacher1)
+            ->get(route('teacher.classroom.task.create', $classroom2))
+            ->assertForbidden();
+    },
+);
 
 // === Teacher/TaskController.store ===
 
@@ -583,32 +590,41 @@ test('teacher can view edit task form', function () {
     $this->actingAs($teacher)
         ->get(route('teacher.classroom.task.edit', [$classroom, $task]))
         ->assertSuccessful()
-        ->assertInertia(fn(Assert $page) => $page->component('teacher/task/Form'))
+        ->assertInertia(
+            fn(Assert $page) => $page->component('teacher/task/Form'),
+        )
         ->assertInertia(function (Assert $page) use ($task, $classroom) {
-            $page->has('task', function (Assert $page) use ($task, $classroom) {
-                $page->where('id', $task->id)
-                    ->where('classroom_id', $classroom->id)
-                    ->has('classroom')
-                    ->has('files', 2)
-                    ->etc();
-            })
-            ->has('task.rubrics', 5);
+            $page
+                ->has('task', function (Assert $page) use ($task, $classroom) {
+                    $page
+                        ->where('id', $task->id)
+                        ->where('classroom_id', $classroom->id)
+                        ->has('classroom')
+                        ->has('files', 2)
+                        ->etc();
+                })
+                ->has('task.rubrics', 5);
         });
 });
 
-test('teacher cannot view edit task form for other classroom teacher', function () {
-    $teacher1 = User::factory()->create(['role' => 'teacher']);
-    $teacher2 = User::factory()->create(['role' => 'teacher']);
-    $classroom2 = Classroom::factory()->create(['teacher_id' => $teacher2->id]);
-    $task2 = Task::factory()->create([
-        'classroom_id' => $classroom2->id,
-        'created_by' => $teacher2->id,
-    ]);
+test(
+    'teacher cannot view edit task form for other classroom teacher',
+    function () {
+        $teacher1 = User::factory()->create(['role' => 'teacher']);
+        $teacher2 = User::factory()->create(['role' => 'teacher']);
+        $classroom2 = Classroom::factory()->create([
+            'teacher_id' => $teacher2->id,
+        ]);
+        $task2 = Task::factory()->create([
+            'classroom_id' => $classroom2->id,
+            'created_by' => $teacher2->id,
+        ]);
 
-    $this->actingAs($teacher1)
-        ->get(route('teacher.classroom.task.edit', [$classroom2, $task2]))
-        ->assertForbidden();
-});
+        $this->actingAs($teacher1)
+            ->get(route('teacher.classroom.task.edit', [$classroom2, $task2]))
+            ->assertForbidden();
+    },
+);
 
 test('teacher cannot view edit task form if task is published', function () {
     $teacher = User::factory()->create(['role' => 'teacher']);
@@ -623,13 +639,14 @@ test('teacher cannot view edit task form if task is published', function () {
         route('teacher.classroom.task.edit', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'You cannot edit a published task!',
     ]);
 });
-
 
 // === Teacher/TaskController.update ===
 
@@ -681,7 +698,9 @@ test('teacher can update task attributes while still a draft', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task updated successfully!',
@@ -744,7 +763,9 @@ test('teacher can remove a rubric during task update', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
@@ -812,7 +833,9 @@ test('teacher can remove attachment during task update', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
 
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
@@ -875,7 +898,9 @@ test('teacher cannot update publised task', function () {
         ],
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'You cannot update a published task!',
@@ -998,7 +1023,9 @@ test('teacher can delete unpublished task', function () {
         route('teacher.classroom.task.destroy', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task deleted successfully!',
@@ -1020,7 +1047,9 @@ test('teacher cannot delete published task', function () {
         route('teacher.classroom.task.destroy', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'You cannot delete a published task!',
@@ -1059,7 +1088,9 @@ test('teacher cannot delete task that already has submissions', function () {
         route('teacher.classroom.task.destroy', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'error',
         'message' => 'Cannot delete task that has submissions!',
@@ -1083,7 +1114,9 @@ test('teacher can publish a created task', function () {
         route('teacher.classroom.task.publish', [$classroom, $task]),
     );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
+    $response->assertRedirect(
+        route('teacher.classroom.task.index', $classroom),
+    );
     $response->assertInertiaFlash('toast', [
         'type' => 'success',
         'message' => 'Task published successfully!',
@@ -1095,60 +1128,74 @@ test('teacher can publish a created task', function () {
     ]);
 });
 
-test('teacher can unpublish a published task if the task has no submissions', function () {
-    $teacher = User::factory()->create(['role' => 'teacher']);
-    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create([
-        'classroom_id' => $classroom->id,
-        'created_by' => $teacher->id,
-        'is_published' => true,
-    ]);
+test(
+    'teacher can unpublish a published task if the task has no submissions',
+    function () {
+        $teacher = User::factory()->create(['role' => 'teacher']);
+        $classroom = Classroom::factory()->create([
+            'teacher_id' => $teacher->id,
+        ]);
+        $task = Task::factory()->create([
+            'classroom_id' => $classroom->id,
+            'created_by' => $teacher->id,
+            'is_published' => true,
+        ]);
 
-    $response = $this->actingAs($teacher)->patch(
-        route('teacher.classroom.task.unpublish', [$classroom, $task]),
-    );
+        $response = $this->actingAs($teacher)->patch(
+            route('teacher.classroom.task.unpublish', [$classroom, $task]),
+        );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
-    $response->assertInertiaFlash('toast', [
-        'type' => 'success',
-        'message' => 'Task unpublished successfully!',
-    ]);
+        $response->assertRedirect(
+            route('teacher.classroom.task.index', $classroom),
+        );
+        $response->assertInertiaFlash('toast', [
+            'type' => 'success',
+            'message' => 'Task unpublished successfully!',
+        ]);
 
-    $this->assertDatabaseHas('tasks', [
-        'id' => $task->id,
-        'is_published' => false,
-    ]);
-});
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'is_published' => false,
+        ]);
+    },
+);
 
-test('teacher cannot unpublish a published task if the task has submissions', function () {
-    $teacher = User::factory()->create(['role' => 'teacher']);
-    $student = User::factory()->create(['role' => 'student']);
-    $classroom = Classroom::factory()->create(['teacher_id' => $teacher->id]);
-    $task = Task::factory()->create([
-        'classroom_id' => $classroom->id,
-        'created_by' => $teacher->id,
-        'is_published' => true,
-    ]);
-    Submission::factory()->create([
-        'task_id' => $task->id,
-        'user_id' => $student->id,
-    ]);
+test(
+    'teacher cannot unpublish a published task if the task has submissions',
+    function () {
+        $teacher = User::factory()->create(['role' => 'teacher']);
+        $student = User::factory()->create(['role' => 'student']);
+        $classroom = Classroom::factory()->create([
+            'teacher_id' => $teacher->id,
+        ]);
+        $task = Task::factory()->create([
+            'classroom_id' => $classroom->id,
+            'created_by' => $teacher->id,
+            'is_published' => true,
+        ]);
+        Submission::factory()->create([
+            'task_id' => $task->id,
+            'user_id' => $student->id,
+        ]);
 
-    $response = $this->actingAs($teacher)->patch(
-        route('teacher.classroom.task.unpublish', [$classroom, $task]),
-    );
+        $response = $this->actingAs($teacher)->patch(
+            route('teacher.classroom.task.unpublish', [$classroom, $task]),
+        );
 
-    $response->assertRedirect(route('teacher.classroom.task.index', $classroom));
-    $response->assertInertiaFlash('toast', [
-        'type' => 'error',
-        'message' => 'Cannot unpublish task that has submissions!',
-    ]);
+        $response->assertRedirect(
+            route('teacher.classroom.task.index', $classroom),
+        );
+        $response->assertInertiaFlash('toast', [
+            'type' => 'error',
+            'message' => 'Cannot unpublish task that has submissions!',
+        ]);
 
-    $this->assertDatabaseHas('tasks', [
-        'id' => $task->id,
-        'is_published' => true,
-    ]);
-});
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'is_published' => true,
+        ]);
+    },
+);
 
 test('teacher cannot publish other teacher\'s classroom task', function () {
     $teacher1 = User::factory()->create(['role' => 'teacher']);
@@ -1159,7 +1206,9 @@ test('teacher cannot publish other teacher\'s classroom task', function () {
         'created_by' => $teacher2->id,
     ]);
 
-    $this->actingAs($teacher1)->patch(route('teacher.classroom.task.publish', [$classroom2, $task2]))->assertForbidden();
+    $this->actingAs($teacher1)
+        ->patch(route('teacher.classroom.task.publish', [$classroom2, $task2]))
+        ->assertForbidden();
 });
 
 test('teacher cannot unpublish other teacher\'s classroom task', function () {
@@ -1171,7 +1220,11 @@ test('teacher cannot unpublish other teacher\'s classroom task', function () {
         'created_by' => $teacher2->id,
     ]);
 
-    $this->actingAs($teacher1)->patch(route('teacher.classroom.task.unpublish', [$classroom2, $task2]))->assertForbidden();
+    $this->actingAs($teacher1)
+        ->patch(
+            route('teacher.classroom.task.unpublish', [$classroom2, $task2]),
+        )
+        ->assertForbidden();
 });
 
 // === ROUTE ACCESS ===

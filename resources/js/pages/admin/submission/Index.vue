@@ -52,11 +52,21 @@ defineProps<{
                 <TableHeader>
                     <TableRow>
                         <TableHead>{{ $t('submission.table.task') }}</TableHead>
-                        <TableHead>{{ $t('submission.table.student') }}</TableHead>
-                        <TableHead>{{ $t('submission.table.status') }}</TableHead>
-                        <TableHead>{{ $t('submission.table.score') }}</TableHead>
-                        <TableHead>{{ $t('submission.table.submitted') }}</TableHead>
-                        <TableHead class="text-right">{{ $t('submission.table.actions') }}</TableHead>
+                        <TableHead>{{
+                            $t('submission.table.student')
+                        }}</TableHead>
+                        <TableHead>{{
+                            $t('submission.table.status')
+                        }}</TableHead>
+                        <TableHead>{{
+                            $t('submission.table.score')
+                        }}</TableHead>
+                        <TableHead>{{
+                            $t('submission.table.submitted')
+                        }}</TableHead>
+                        <TableHead class="text-right">{{
+                            $t('submission.table.actions')
+                        }}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -67,17 +77,25 @@ defineProps<{
                         <TableCell>{{ sub.user?.name }}</TableCell>
                         <TableCell>
                             <Badge variant="outline">{{
-                                sub.status ? $t('submission.status.' + sub.status.toLowerCase()) : $t('submission.status.waiting')
+                                sub.status
+                                    ? $t(
+                                          'submission.status.' +
+                                              sub.status.toLowerCase(),
+                                      )
+                                    : $t('submission.status.waiting')
                             }}</Badge>
                         </TableCell>
                         <TableCell>{{
                             sub.score !== null ? sub.score : '-'
                         }}</TableCell>
-                        <TableCell>{{ useRelativeTime(sub.created_at) }}</TableCell>
+                        <TableCell>{{
+                            useRelativeTime(sub.created_at)
+                        }}</TableCell>
                         <TableCell class="text-right">
                             <Button variant="outline" size="sm" as-child>
                                 <Link :href="show(sub.id).url">
-                                    <Eye class="mr-2 h-4 w-4" /> {{ $t('submission.table.detail') }}
+                                    <Eye class="mr-2 h-4 w-4" />
+                                    {{ $t('submission.table.detail') }}
                                 </Link>
                             </Button>
                         </TableCell>
